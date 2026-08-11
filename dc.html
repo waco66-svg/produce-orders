@@ -20,9 +20,9 @@ border-radius:50%;animation:s 1s linear infinite;display:none}
 @keyframes s{to{transform:rotate(360deg)}}
 </style></head><body>
 <div class="card"><h1>DC Order Page</h1>
-<p id="msg">Enter the team code to open the order page.</p>
-<input id="pc" type="text" autocomplete="off" autocapitalize="none" placeholder="team code">
-<button id="go">Open</button><div class="spin" id="spin"></div><div class="err" id="err"></div></div>
+<p id="msg">Loading this week's order page...</p>
+<input id="pc" type="text" autocomplete="off" autocapitalize="none" placeholder="team code" style="display:none">
+<button id="go" style="display:none">Open</button><div class="spin" id="spin"></div><div class="err" id="err"></div></div>
 <script type="text/plain" id="tpl"><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -370,22 +370,24 @@ try {
 </html>
 </script>
 <script>
-const HASH="2a940bddcfa908551ac78622a3c676b38790ee404f5b11f1219ff9610e513f3d", DATA_URL="https://script.google.com/macros/s/AKfycbwFt2hW6uRMtnIo3JDeoOkjscGIGNosE2g6i-TE1Tj2QyFZoNNtDXV3lc7r4aRRKNtT/exec", PARAM="dc";
+const HASH="", DATA_URL="https://script.google.com/macros/s/AKfycbwFt2hW6uRMtnIo3JDeoOkjscGIGNosE2g6i-TE1Tj2QyFZoNNtDXV3lc7r4aRRKNtT/exec", PARAM="dc", NOCODE=true;
 async function sha(s){const d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));
   return Array.from(new Uint8Array(d)).map(b=>b.toString(16).padStart(2,"0")).join("")}
 function busy(on,msg){document.getElementById("spin").style.display=on?"block":"none";
   if(msg)document.getElementById("msg").textContent=msg;
   document.getElementById("go").disabled=on}
 async function tryOpen(code,silent){
-  code=(code||"").trim().toLowerCase();
-  if(!code)return;
   const err=document.getElementById("err");
   err.textContent="";
-  if(await sha(code)!==HASH){
-    if(!silent)err.textContent="That code didn't work - check with Matthew.";
-    return;
+  if(!NOCODE){
+    code=(code||"").trim().toLowerCase();
+    if(!code)return;
+    if(await sha(code)!==HASH){
+      if(!silent)err.textContent="That code didn't work - check with Matthew.";
+      return;
+    }
+    try{localStorage.setItem("orderPageCode",code)}catch(e){}
   }
-  try{localStorage.setItem("orderPageCode",code)}catch(e){}
   busy(true,"Loading this week's order page...");
   let cfg;
   try{
@@ -400,8 +402,10 @@ async function tryOpen(code,silent){
     });
     if(cfg.error)throw new Error(cfg.error);
   }catch(e){
-    busy(false,"Enter the team code to open the order page.");
+    busy(false,NOCODE?"Tap Retry to try again.":"Enter the team code to open the order page.");
     err.textContent="Couldn't load this week's data ("+e.message+"). Check your connection and try again.";
+    if(NOCODE){const b=document.getElementById("go");b.textContent="Retry";b.style.display="block";
+      b.onclick=()=>{b.style.display="none";tryOpen("",true)};}
     return;
   }
   const cfgText=JSON.stringify(cfg);
@@ -415,6 +419,8 @@ async function tryOpen(code,silent){
 }
 document.getElementById("go").onclick=()=>tryOpen(document.getElementById("pc").value,false);
 document.getElementById("pc").addEventListener("keydown",e=>{if(e.key==="Enter")tryOpen(e.target.value,false)});
-(function(){let c=null;try{c=localStorage.getItem("orderPageCode")}catch(e){}
+(function(){
+ if(NOCODE){tryOpen("",true);return}
+ let c=null;try{c=localStorage.getItem("orderPageCode")}catch(e){}
  if(c)tryOpen(c,true)})();
 </script></body></html>
