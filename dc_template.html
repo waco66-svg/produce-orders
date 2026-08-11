@@ -133,6 +133,16 @@ __DEMO__
 <script type="application/json" id="cfg">__CFG__</script>
 <script>
 var CFG = JSON.parse(document.getElementById('cfg').textContent);
+if (CFG.closed) {
+  document.body.innerHTML = '<div style="max-width:420px;margin:80px auto;background:#fff;' +
+    'border:1px solid #dbe4de;border-radius:14px;padding:30px 22px;text-align:center">' +
+    '<div style="font-size:42px">\u2705</div>' +
+    '<h2 style="color:#1a6b3c;margin:10px 0 8px;font-size:20px">No order in progress</h2>' +
+    '<p style="color:#5f7268;font-size:14.5px;line-height:1.55;margin:0">' +
+    (CFG.message || 'The last order window has closed. Check back after Matthew\'s next announcement.') +
+    '</p></div>';
+  throw new Error('order window closed');
+}
 if (CFG.orderedAsOf) {
   document.getElementById('hdrsub').textContent += ' · orders synced ' + CFG.orderedAsOf;
 }
