@@ -12,6 +12,7 @@ BASE = "https://script.google.com/macros/s/AKfycbwFt2hW6uRMtnIo3JDeoOkjscGIGNosE
 PAGES = [
     ("dc", "dc_template.html", "dc.html"),
     ("fpb", "fpb_template.html", "fpb.html"),
+    ("pom", "pom_template.html", "pom.html"),
 ]
 
 for param, tpl_name, out in PAGES:
