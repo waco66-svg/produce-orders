@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>3 Day Sale — Order Entry</title>
+<style>
+  :root { --accent:#1a6b3c; --accent-dark:#14522e; --bg:#f2f5f3; --card:#fff;
+          --ink:#1b2a22; --sub:#5f7268; --line:#dbe4de; --amber:#b45309; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+         background:var(--bg); color:var(--ink); }
+  header { background:var(--accent); color:#fff; padding:14px 16px; position:sticky;
+           top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; }
+  header .t { font-size:17px; font-weight:700; }
+  header .s { font-size:12px; opacity:.9; margin-top:2px; }
+  .who { padding:22px 16px; max-width:520px; margin:0 auto; }
+  .who h2 { font-size:20px; margin:6px 0 16px; }
+  .namegrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .namebtn { padding:18px 8px; font-size:17px; font-weight:600; background:var(--card);
+             border:1.5px solid var(--line); border-radius:12px; cursor:pointer; font-family:inherit; }
+  .namebtn:active { background:#e6f1ea; border-color:var(--accent); }
+  .wrap { max-width:520px; margin:0 auto; padding:12px 12px 120px; }
+  .chip { background:#fff; color:var(--accent); border:none; border-radius:8px;
+          font-size:13px; font-weight:600; padding:7px 11px; cursor:pointer; font-family:inherit; }
+  .itemsref { background:var(--card); border:1px solid var(--line); border-radius:12px;
+              margin-bottom:12px; overflow:hidden; }
+  .itemsref summary { padding:13px 14px; font-weight:700; font-size:14.5px; cursor:pointer;
+                      list-style:none; display:flex; justify-content:space-between; }
+  .itemsref summary::after { content:"▾"; color:var(--sub); }
+  .itemsref[open] summary::after { content:"▴"; }
+  .iref { padding:9px 14px; border-top:1px solid var(--line); font-size:13.5px;
+          display:flex; justify-content:space-between; gap:8px; }
+  .iref .n { font-weight:600; }
+  .iref .d { color:var(--sub); font-size:12px; margin-top:1px; }
+  .iref .p { text-align:right; white-space:nowrap; color:var(--sub); font-size:12px; }
+  .iref .p b { color:var(--ink); font-size:13.5px; }
+  .store { background:var(--card); border:1px solid var(--line); border-radius:12px;
+           margin-bottom:10px; overflow:hidden; }
+  .store-head { padding:14px; display:flex; align-items:center; justify-content:space-between;
+                cursor:pointer; }
+  .store-head .nm { font-size:16px; font-weight:700; }
+  .store-head .ct { font-size:12px; color:var(--sub); margin-top:2px; }
+  .badge { font-size:12.5px; font-weight:700; color:#fff; background:var(--accent);
+           border-radius:20px; padding:4px 10px; min-width:20px; text-align:center; }
+  .badge.zero { background:#c8d4cd; }
+  .rows { border-top:1px solid var(--line); display:none; }
+  .store.open .rows { display:block; }
+  .irow { display:flex; align-items:center; justify-content:space-between; gap:10px;
+          padding:10px 12px; border-bottom:1px solid #edf2ee; }
+  .irow:last-child { border-bottom:none; }
+  .irow .l { min-width:0; }
+  .irow .l .n { font-size:14px; font-weight:600; line-height:1.25; }
+  .irow .l .d { font-size:11.5px; color:var(--sub); }
+  .step { display:flex; align-items:center; gap:0; flex-shrink:0; }
+  .step button { width:46px; height:44px; font-size:24px; font-weight:600; border:1.5px solid var(--line);
+                 background:#fff; cursor:pointer; font-family:inherit; color:var(--accent); }
+  .step .minus { border-radius:10px 0 0 10px; }
+  .step .plus { border-radius:0 10px 10px 0; }
+  .step button:active { background:#e6f1ea; }
+  .step input { width:52px; height:44px; border:1.5px solid var(--line); border-left:none;
+                border-right:none; text-align:center; font-size:17px; font-weight:700;
+                font-family:inherit; color:var(--ink); -moz-appearance:textfield; }
+  .step input::-webkit-outer-spin-button, .step input::-webkit-inner-spin-button
+    { -webkit-appearance:none; }
+  footer { position:fixed; bottom:0; left:0; right:0; background:#fff;
+           border-top:1px solid var(--line); padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+           display:none; align-items:center; justify-content:space-between; gap:12px; z-index:10; }
+  footer .tot { font-size:14px; }
+  footer .tot b { font-size:18px; }
+  .submit { background:var(--accent); color:#fff; border:none; border-radius:12px;
+            font-size:16px; font-weight:700; padding:14px 22px; cursor:pointer; font-family:inherit; }
+  .submit:active { background:var(--accent-dark); }
+  .submit:disabled { background:#c8d4cd; }
+  #review { display:none; padding:12px; max-width:520px; margin:0 auto 120px; }
+  #review pre { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px;
+                font-size:12.5px; white-space:pre-wrap; word-break:break-word; }
+  .row2 { display:flex; gap:10px; }
+  .row2 .submit { flex:1; }
+  .ghost { background:#fff; color:var(--accent); border:1.5px solid var(--accent); }
+  .note { font-size:12px; color:var(--sub); text-align:center; margin:14px 8px; line-height:1.5; }
+  .demo { background:var(--amber); color:#fff; text-align:center; font-size:12px;
+          font-weight:600; padding:5px; }
+</style>
+</head>
+<body>
+__DEMO__
+<header>
+  <div>
+    <div class="t">3 Day Sale</div>
+    <div class="s" id="hdrsub">Week of __WEEK__ · Orders due __DUE__</div>
+  </div>
+  <button class="chip" id="switch" style="display:none">Change name</button>
+</header>
+
+<div class="who" id="who">
+  <h2>Who's ordering?</h2>
+  <div class="namegrid" id="names"></div>
+  <div class="note">Pick your name to see your stores. Tap quantities for each store, then hit
+    Send Order — it opens an email to Matthew with everything filled in.</div>
+</div>
+
+<div class="wrap" id="entry" style="display:none">
+  <div id="restored" style="display:none; background:#e6f1ea; border:1px solid var(--accent);
+       border-radius:10px; padding:10px 12px; font-size:13px; margin-bottom:10px;">
+    ✓ Your saved progress was restored.
+    <a href="#" id="freshlink" style="color:var(--accent); font-weight:600;">Start fresh instead</a>
+  </div>
+  <details class="itemsref">
+    <summary>This week's items &amp; pricing</summary>
+    <div id="itemlist"></div>
+  </details>
+  <div id="stores"></div>
+  <div class="note">Your progress saves automatically on this phone as you tap — but the order
+    only counts once you hit Send.</div>
+</div>
+
+<div id="review">
+  <h3>Your order</h3>
+  <pre id="ordertext"></pre>
+  <div class="row2">
+    <button class="submit ghost" id="copybtn">Copy</button>
+    <button class="submit" id="emailbtn">✉ Email it</button>
+  </div>
+  <div class="note">Viewing this inside the OneDrive app? Its preview can't send email - open the team order link in Safari or Chrome instead, or tap Copy and paste into an email to Matthew.</div>
+</div>
+
+<footer id="foot">
+  <div class="tot"><b id="totcases">0</b> cases · <span id="totstores">0</span> stores</div>
+  <button class="submit" id="sendbtn">Send Order</button>
+</footer>
+
+<script type="application/json" id="cfg">__CFG__</script>
+<script>
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+if (CFG.closed) {
+  document.body.innerHTML = '<div style="max-width:420px;margin:80px auto;background:#fff;' +
+    'border:1px solid #dbe4de;border-radius:14px;padding:30px 22px;text-align:center">' +
+    '<div style="font-size:42px">\u2705</div>' +
+    '<h2 style="color:#1a6b3c;margin:10px 0 8px;font-size:20px">No order in progress</h2>' +
+    '<p style="color:#5f7268;font-size:14.5px;line-height:1.55;margin:0">' +
+    (CFG.message || 'The last order window has closed. Check back after Matthew\'s next announcement.') +
+    '</p></div>';
+  throw new Error('order window closed');
+}
+if (CFG.orderedAsOf) {
+  document.getElementById('hdrsub').textContent += ' · orders synced ' + CFG.orderedAsOf;
+}
+var SUP = null, QTY = {};   // QTY[store][itemIndex] = n
+
+// ---- progress autosave (survives closing the page; per-week key; fails silently
+// where storage is unavailable, e.g. some email-attachment previews) ----
+var KEY = 'ds-' + CFG.week;
+function saveProgress() {
+  try { localStorage.setItem(KEY, JSON.stringify({ sup: SUP, qty: QTY })); } catch (e) {}
+}
+function loadProgress() {
+  try { var d = JSON.parse(localStorage.getItem(KEY));
+        if (d && d.sup && CFG.supervisors[d.sup]) return d; } catch (e) {}
+  return null;
+}
+function clearProgress() { try { localStorage.removeItem(KEY); } catch (e) {} }
+
+var names = document.getElementById('names');
+Object.keys(CFG.supervisors).forEach(function (n) {
+  var b = document.createElement('button');
+  b.className = 'namebtn'; b.textContent = n;
+  b.onclick = function () { pick(n); };
+  names.appendChild(b);
+});
+
+var il = document.getElementById('itemlist');
+CFG.items.forEach(function (it) {
+  var d = document.createElement('div'); d.className = 'iref';
+  var unit = (it.cost / it.pack);
+  d.innerHTML = '<div><div class="n">' + esc(it.desc) + '</div>' +
+    '<div class="d">' + it.pack + ' ' + esc(String(it.size)) + ' · case $' + it.cost.toFixed(2) + '</div></div>' +
+    '<div class="p">Lowes <b>' + fmtRetail(it.retailL) + '</b><br>FK <b>' + fmtRetail(it.retailFK) + '</b></div>';
+  il.appendChild(d);
+});
+
+function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function fmtRetail(r) {
+  // produce multiples: .33 -> 3/$1, .25 -> 4/$1, .50 -> 2/$1, .20 -> 5/$1
+  var m = {'0.33':'3/$1','0.25':'4/$1','0.50':'2/$1','0.20':'5/$1'}[r.toFixed(2)];
+  return '$' + r.toFixed(2) + (m ? ' (' + m + ')' : '');
+}
+
+function pick(name, saved) {
+  SUP = name; QTY = {};
+  document.getElementById('who').style.display = 'none';
+  document.getElementById('entry').style.display = 'block';
+  document.getElementById('foot').style.display = 'flex';
+  document.getElementById('switch').style.display = 'inline-block';
+  document.getElementById('review').style.display = 'none';
+  var box = document.getElementById('stores');
+  box.textContent = '';
+  CFG.supervisors[name].forEach(function (st) {
+    QTY[st.store] = {};
+    var baked = (CFG.ordered && CFG.ordered[st.store]) || null;
+    var local = (saved && saved.qty[st.store] && Object.keys(saved.qty[st.store]).length)
+                ? saved.qty[st.store] : null;
+    var src = local || baked;
+    var bakedTotal = 0;
+    if (baked) Object.keys(baked).forEach(function (k) { bakedTotal += baked[k]; });
+    var card = document.createElement('div'); card.className = 'store';
+    var head = document.createElement('div'); head.className = 'store-head';
+    head.innerHTML = '<div><div class="nm">Store ' + st.store + '</div>' +
+      '<div class="ct">' + esc(st.city) + ', ' + esc(st.state) + ' · ' + esc(st.banner) +
+      (baked ? ' &nbsp;<b style="color:var(--accent)">✓ ordered ' + bakedTotal + ' cs</b>' : '') +
+      '</div></div>';
+    var badge = document.createElement('div'); badge.className = 'badge zero'; badge.textContent = '0';
+    head.appendChild(badge);
+    head.onclick = function () { card.classList.toggle('open'); };
+    card.appendChild(head);
+    var rows = document.createElement('div'); rows.className = 'rows';
+    CFG.items.forEach(function (it, idx) {
+      var r = document.createElement('div'); r.className = 'irow';
+      var l = document.createElement('div'); l.className = 'l';
+      var isFK = /food/i.test(st.banner || '');
+      var retail = isFK ? it.retailFK : it.retailL;
+      var unit = it.cost / it.pack;
+      l.innerHTML = '<div class="n">' + esc(it.desc) + '</div><div class="d">' +
+        it.pack + ' ' + esc(String(it.size)) + ' · $' + it.cost.toFixed(2) + '/cs</div>' +
+        '<div class="d">$' + unit.toFixed(2) + ' unit cost · retail <b>' +
+        fmtRetail(retail) + '</b></div>';
+      var stp = document.createElement('div'); stp.className = 'step';
+      var minus = document.createElement('button'); minus.className = 'minus'; minus.textContent = '−';
+      var inp = document.createElement('input'); inp.type = 'number'; inp.value = '0';
+      inp.min = 0; inp.inputMode = 'numeric';
+      var plus = document.createElement('button'); plus.className = 'plus'; plus.textContent = '+';
+      function set(v) {
+        v = Math.max(0, Math.min(999, Math.round(v) || 0));
+        inp.value = v; QTY[st.store][idx] = v; refresh(st.store, badge);
+        saveProgress();
+      }
+      minus.onclick = function () { set(parseInt(inp.value || 0) - 1); };
+      plus.onclick = function () { set(parseInt(inp.value || 0) + 1); };
+      inp.onchange = function () { set(parseInt(inp.value || 0)); };
+      stp.appendChild(minus); stp.appendChild(inp); stp.appendChild(plus);
+      r.appendChild(l); r.appendChild(stp);
+      rows.appendChild(r);
+      if (src && src[idx] !== undefined) set(src[idx]);
+    });
+    card.appendChild(rows);
+    box.appendChild(card);
+  });
+  totals();
+  saveProgress();
+  document.getElementById('restored').style.display = saved ? 'block' : 'none';
+  window.scrollTo(0, 0);
+}
+
+function refresh(store, badge) {
+  var t = 0, q = QTY[store];
+  Object.keys(q).forEach(function (k) { t += q[k]; });
+  badge.textContent = t;
+  badge.className = 'badge' + (t ? '' : ' zero');
+  totals();
+}
+
+function totals() {
+  var cases = 0, stores = 0;
+  Object.keys(QTY).forEach(function (s) {
+    var t = 0; Object.keys(QTY[s]).forEach(function (k) { t += QTY[s][k]; });
+    cases += t; if (t) stores++;
+  });
+  document.getElementById('totcases').textContent = cases;
+  document.getElementById('totstores').textContent = stores;
+  document.getElementById('sendbtn').disabled = cases === 0;
+}
+
+function orderText() {
+  var lines = ['3 DAY SALE ORDER',
+               'Week: ' + CFG.week + '   Due: ' + CFG.due,
+               'Supervisor: ' + SUP, ''];
+  var cases = 0;
+  CFG.supervisors[SUP].forEach(function (st) {
+    var q = QTY[st.store], any = false, sub = [];
+    var touched = Object.keys(q).length > 0;
+    CFG.items.forEach(function (it, idx) {
+      if (q[idx]) { sub.push('  ' + q[idx] + ' x ' + it.desc); any = true; cases += q[idx]; }
+    });
+    if (any) { lines.push('Store ' + st.store + ' (' + st.city + '):'); lines = lines.concat(sub); }
+    else if (touched) { lines.push('Store ' + st.store + ' (' + st.city + '): CLEAR (no order)'); }
+  });
+  lines.push('', 'TOTAL CASES: ' + cases);
+  return lines.join('\n');
+}
+
+document.getElementById('sendbtn').onclick = function () {
+  document.getElementById('ordertext').textContent = orderText();
+  document.getElementById('entry').style.display = 'none';
+  document.getElementById('foot').style.display = 'none';
+  document.getElementById('review').style.display = 'block';
+  window.scrollTo(0, 0);
+};
+
+document.getElementById('emailbtn').onclick = function () {
+  try { localStorage.setItem(KEY + '-sent', new Date().toLocaleString()); } catch (e) {}
+  var subj = '3 Day Sale Order ' + CFG.week + ' - ' + SUP;
+  var url = 'mailto:' + CFG.email + '?subject=' + encodeURIComponent(subj) +
+            (CFG.cc ? '&cc=' + encodeURIComponent(CFG.cc) : '') +
+            '&body=' + encodeURIComponent(orderText());
+  location.href = url;
+};
+
+document.getElementById('copybtn').onclick = function () {
+  var t = orderText(), b = this;
+  function done() { b.textContent = 'Copied!'; setTimeout(function () { b.textContent = 'Copy'; }, 1400); }
+  if (navigator.clipboard && navigator.clipboard.writeText)
+    navigator.clipboard.writeText(t).then(done, function () { fb(); });
+  else fb();
+  function fb() { var ta = document.createElement('textarea'); ta.value = t;
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta); }
+};
+
+document.getElementById('switch').onclick = function () {
+  document.getElementById('entry').style.display = 'none';
+  document.getElementById('review').style.display = 'none';
+  document.getElementById('foot').style.display = 'none';
+  this.style.display = 'none';
+  document.getElementById('who').style.display = 'block';
+};
+
+document.getElementById('freshlink').onclick = function (e) {
+  e.preventDefault();
+  if (confirm('Clear all saved quantities and start over?')) {
+    clearProgress();
+    pick(SUP, null);
+  }
+};
+
+// ---- auto-restore on open ----
+var SAVED = loadProgress();
+if (SAVED) pick(SAVED.sup, SAVED);
+try {
+  var sentAt = localStorage.getItem(KEY + '-sent');
+  if (sentAt && SAVED) {
+    var r = document.getElementById('restored');
+    r.style.display = 'block';
+    r.insertAdjacentHTML('afterbegin',
+      '<div style="margin-bottom:4px">✓ You sent an order ' + sentAt +
+      '. You can adjust quantities and send again anytime.</div>');
+  }
+} catch (e) {}
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 """Rebuild the order pages from the Google Drive data feed.
 
 Runs on GitHub's servers every 30 minutes (see .github/workflows/refresh.yml).
-For each program (dc, fpb) it fetches the latest data JSON from Matthew's
+For each program (dc, fpb, pom, ds) it fetches the latest data JSON from Matthew's
 Apps Script endpoint and injects it into the matching template. If the fetch
 fails or there is no data yet, the existing page is left untouched.
 """
@@ -13,6 +13,7 @@ PAGES = [
     ("dc", "dc_template.html", "dc.html"),
     ("fpb", "fpb_template.html", "fpb.html"),
     ("pom", "pom_template.html", "pom.html"),
+    ("ds", "ds_template.html", "ds.html"),
 ]
 
 for param, tpl_name, out in PAGES:
