@@ -38,10 +38,10 @@ h1 { font-size:38px; font-weight:700; line-height:1; letter-spacing:-.01em; }
 .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; }
 .tile { display:block; text-decoration:none; color:inherit; background:var(--surface); border:1px solid var(--line); border-top:4px solid var(--line); padding:12px 14px; transition:transform .12s ease; }
 .tile:hover,.tile:focus-visible { transform:translateY(-1px); outline:2px solid var(--accent); outline-offset:1px; }
-.tile.ready { border-top-color:var(--accent); } .tile.warn { border-top-color:var(--warn); } .tile.critical { border-top-color:var(--crit); } .tile.loaded { border-top-color:var(--line); } .tile.approved { border-top-color:var(--good); }
+.tile.ready { border-top-color:var(--accent); } .tile.warn { border-top-color:var(--warn); } .tile.critical { border-top-color:var(--crit); } .tile.loaded { border-top-color:var(--line); } .tile.approved { border-top-color:var(--good); } .tile.written { border-top-color:var(--ink); }
 .tile-name { font-family:"Barlow Semi Condensed",sans-serif; font-size:19px; font-weight:600; }
 .tile-status { font-size:13px; font-weight:600; margin-top:2px; }
-.tile.ready .tile-status { color:var(--accent); } .tile.warn .tile-status { color:var(--warn); } .tile.critical .tile-status { color:var(--crit); } .tile.loaded .tile-status { color:var(--muted); } .tile.approved .tile-status { color:var(--good); }
+.tile.ready .tile-status { color:var(--accent); } .tile.warn .tile-status { color:var(--warn); } .tile.critical .tile-status { color:var(--crit); } .tile.loaded .tile-status { color:var(--muted); } .tile.approved .tile-status { color:var(--good); } .tile.written .tile-status { color:var(--ink); }
 .tile-meta { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; font-size:12.5px; color:var(--muted); }
 .tile-meta b { color:var(--ink); font-family:"IBM Plex Mono",monospace; font-weight:500; }
 .legend { margin:14px 0 0; font-size:13px; color:var(--muted); display:flex; flex-wrap:wrap; gap:6px 18px; }
@@ -51,7 +51,7 @@ h1 { font-size:38px; font-weight:700; line-height:1; letter-spacing:-.01em; }
 .vh .grow { flex:1; }
 h2 { font-size:28px; font-weight:700; }
 .pill { font-size:12.5px; font-weight:600; padding:3px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:.06em; font-family:"Barlow Semi Condensed",sans-serif; }
-.pill.ready { background:var(--accent-soft); color:var(--accent); } .pill.warn { background:var(--warn-soft); color:var(--warn); } .pill.critical { background:var(--crit-soft); color:var(--crit); } .pill.loaded { background:var(--line-2); color:var(--muted); } .pill.approved { background:var(--good-soft); color:var(--good); }
+.pill.ready { background:var(--accent-soft); color:var(--accent); } .pill.warn { background:var(--warn-soft); color:var(--warn); } .pill.critical { background:var(--crit-soft); color:var(--crit); } .pill.loaded { background:var(--line-2); color:var(--muted); } .pill.approved { background:var(--good-soft); color:var(--good); } .pill.written { background:var(--ink); color:var(--paper); }
 .facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:6px 24px; margin:12px 0 6px; padding:12px 0; border-top:1px solid var(--line-2); border-bottom:1px solid var(--line-2); font-size:13.5px; }
 .facts div { display:flex; gap:10px; min-width:0; }
 .facts dt { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:11px; font-weight:600; padding-top:3px; flex:0 0 62px; }
@@ -136,6 +136,7 @@ function openCalls(r){ return r.needsCall.filter(function(c){ return !remembered
 function status(r){
   var v = STATE.vendors[r.id];
   var pending = openCalls(r).filter(function(c){ return !STATE.calls[c.id]; });
+  if (r.written) return ['written','Written to Vendor Compare'];
   if (!r.plusAligned || r.tamper.length) return ['critical','Form altered'];
   if (v && v.approved) return ['approved','Approved'];
   if (pending.length) return ['warn', pending.length + (pending.length===1?' needs':' need') + ' your call'];
@@ -177,7 +178,7 @@ function vendorSection(r){
   if (nd.length) parts.push('<h3>New and dropped bids <span class="cnt">'+nd.length+'</span></h3>' + table(['PLU','Item','Last','This week',''], nd));
   if (r.packEdits.length) parts.push('<h3>Pack size edits <span class="cnt">'+r.packEdits.length+'</span></h3>' + table(['PLU','Item','Was','Now',''],
     r.packEdits.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(esc(x.old),'num mono')+td(esc(x.new),'num mono strong')+td('Vendor changed the pack on the form; flows to Pack Size','muted')+'</tr>'; })));
-  var oc = openCalls(r);
+  var oc = r.written ? [] : openCalls(r);
   if (oc.length) {
     var pending = oc.filter(function(c){ return !STATE.calls[c.id]; }).length;
     parts.push('<h3 class="warn-h">Needs your call <span class="cnt warn">'+pending+' of '+oc.length+' open</span></h3>' +
@@ -194,7 +195,8 @@ function vendorSection(r){
 
   var ctl = '', v = STATE.vendors[r.id];
   var pend = openCalls(r).filter(function(c){ return !STATE.calls[c.id]; }).length;
-  if (st==='critical') ctl = '<span class="blocker">Blocked until the form is checked</span>';
+  if (st==='written') ctl = '<span class="approved-line">Written <span class="by">'+esc(r.written.by)+' · '+esc(r.written.at)+'</span></span>';
+  else if (st==='critical') ctl = '<span class="blocker">Blocked until the form is checked</span>';
   else if (st==='loaded') ctl = '';
   else if (v && v.approved) ctl = '<span class="approved-line">Approved <span class="by">'+esc(v.by)+' · '+esc(v.at)+'</span><button data-unapprove="'+esc(r.id)+'">Undo</button></span>';
   else if (pend) ctl = '<span class="blocker">Decide the '+pend+' open item'+(pend===1?'':'s')+' below, then approve</span>';
@@ -209,7 +211,7 @@ function vendorSection(r){
 
 function approvalsText(){
   var V = CFG.vendors;
-  var approved = V.filter(function(r){ return STATE.vendors[r.id] && STATE.vendors[r.id].approved; });
+  var approved = V.filter(function(r){ return !r.written && STATE.vendors[r.id] && STATE.vendors[r.id].approved; });
   var human = [], machine = ['=== APPROVALS ===', 'W|'+META.week];
   approved.forEach(function(r){
     var v = STATE.vendors[r.id];
@@ -221,7 +223,9 @@ function approvalsText(){
       else if (rememberedPack(r,c)) { machine.push('C|'+c.id+'|remembered|'+c.proposal); }
     });
   });
-  var notApproved = V.filter(function(r){ return !(STATE.vendors[r.id] && STATE.vendors[r.id].approved); }).map(function(r){ return r.vendor; });
+  var notApproved = V.filter(function(r){ return !r.written && !(STATE.vendors[r.id] && STATE.vendors[r.id].approved); }).map(function(r){ return r.vendor; });
+  var done = V.filter(function(r){ return r.written; }).map(function(r){ return r.vendor; });
+  if (done.length) human.push('', 'Already written: ' + done.join(', '));
   if (notApproved.length) human.push('', 'Not approved this week: ' + notApproved.join(', '));
   machine.push('=== END ===');
   return { count: approved.length, text: 'DSD approvals for ' + META.week + '\n\n' + human.join('\n') + '\n\nWrite the approved vendors into Vendor Compare.\n\n' + machine.join('\n') };
@@ -234,6 +238,7 @@ function render(){
     return;
   }
   var sts = V.map(status);
+  var nWritten = sts.filter(function(s){ return s[0]==='written'; }).length;
   var nReady = sts.filter(function(s){ return s[0]==='ready'; }).length, nApproved = sts.filter(function(s){ return s[0]==='approved'; }).length,
       nCall = V.reduce(function(a,r){ return a + openCalls(r).filter(function(c){ return !STATE.calls[c.id]; }).length; }, 0),
       nLoaded = sts.filter(function(s){ return s[0]==='loaded'; }).length;
@@ -246,12 +251,12 @@ function render(){
     '<div class="wrap"><header class="masthead"><div><div class="eyebrow">Lowe\'s Market · DSD Produce</div><h1>Vendor Change Report</h1></div>' +
     '<div class="stamp"><b>'+esc(META.week)+'</b><br>Compared against '+esc(META.compared)+' · nothing is written until approved' +
     '<div class="who"><label for="who">Deciding as</label><input id="who" value="'+esc(who())+'" placeholder="Your name"></div></div></header>' +
-    '<div class="summary"><span><b>'+nApproved+'</b>approved</span><span><b>'+nReady+'</b>ready to approve</span><span><b>'+nCall+'</b>need your call</span><span><b>'+nLoaded+'</b>already loaded</span>' +
+    '<div class="summary"><span><b>'+nWritten+'</b>written</span><span><b>'+nApproved+'</b>approved</span><span><b>'+nReady+'</b>ready to approve</span><span><b>'+nCall+'</b>need your call</span><span><b>'+nLoaded+'</b>already loaded</span>' +
     (META.missing && META.missing.length ? '<span><b>'+META.missing.length+'</b>not received: '+esc(META.missing.join(', '))+'</span>' : '') + '</div>' +
     '<nav class="tiles">'+tiles+'</nav>' +
     '<div class="sendbar"><div class="txt"><b>'+a.count+' vendor'+(a.count===1?'':'s')+' approved.</b> When you\'re done for the week, tap Send approvals: it opens an email to Matt with everything decided on this page. Your decisions save on this phone as you tap, but nothing is written to Vendor Compare until that email is sent.</div>' +
     '<button class="primary big" data-send-approvals'+(a.count?'':' disabled')+'>✉ Send approvals</button><button data-copy-approvals>Copy</button></div>' +
-    '<div class="legend"><span><i style="background:var(--good)"></i>Approved — will be written</span><span><i style="background:var(--accent)"></i>Ready — approve to write</span><span><i style="background:var(--warn)"></i>Needs your call — a proposal is waiting</span><span><i style="background:var(--crit)"></i>Form altered — vendor changed a yellow column or the row order</span><span><i style="background:var(--line)"></i>Already loaded — file matches the sheet</span></div>' +
+    '<div class="legend"><span><i style="background:var(--ink)"></i>Written — already in Vendor Compare</span><span><i style="background:var(--good)"></i>Approved — will be written</span><span><i style="background:var(--accent)"></i>Ready — approve to write</span><span><i style="background:var(--warn)"></i>Needs your call — a proposal is waiting</span><span><i style="background:var(--crit)"></i>Form altered — vendor changed a yellow column or the row order</span><span><i style="background:var(--line)"></i>Already loaded — file matches the sheet</span></div>' +
     V.map(vendorSection).join('') +
     '<section class="how"><h2>How to read this</h2><p>Each vendor\'s bid form is checked against our v12 template (row order, descriptions, grades, units) and then against that vendor\'s MAIN sheet in Vendor Compare. Only case cost, pack size, item code and notes are ever written; PLU and the yellow columns are never touched.</p>' +
     '<p>"N/A", "NA" and "Xx" are read as no bid. A note that implies a pack size, or text in the pack column, becomes a proposal: the leading number is offered and the vendor\'s original text is shown beside it. A priced item whose pack differs from both the Produce Book and our bid form must be accepted or set back to the book pack; once accepted for a vendor, that pack is remembered for later weeks.</p>' +
