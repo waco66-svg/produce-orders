@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DSD Vendor Change Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --paper:#F5F6F2; --surface:#FFFFFF; --ink:#1B2420; --ink-2:#3E4743; --muted:#6C756F; --line:#D9DED9; --line-2:#E9ECE8;
+  --accent:#1F6B52; --accent-ink:#FFFFFF; --accent-soft:#E3EFE9;
+  --warn:#A8701A; --warn-soft:#F7EBD3; --crit:#A2372A; --crit-soft:#F6E0DC; --good:#2E7D5B; --good-soft:#DFF0E7;
+  --up:#A2372A; --dn:#2E7D5B; --code:#EEF1ED; --btn:#1F6B52; --btn-ink:#FFFFFF;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper:#141917; --surface:#1C2320; --ink:#E7ECE8; --ink-2:#C2CAC5; --muted:#8C968F; --line:#2F3934; --line-2:#26302B;
+  --accent:#5FB894; --accent-ink:#0F1613; --accent-soft:#1E332B;
+  --warn:#E0A94A; --warn-soft:#3A2E17; --crit:#E07A6B; --crit-soft:#3E211D; --good:#6CC49A; --good-soft:#1B3328;
+  --up:#E07A6B; --dn:#6CC49A; --code:#242C28; --btn:#5FB894; --btn-ink:#0F1613;
+} }
+:root[data-theme="dark"] {
+  --paper:#141917; --surface:#1C2320; --ink:#E7ECE8; --ink-2:#C2CAC5; --muted:#8C968F; --line:#2F3934; --line-2:#26302B;
+  --accent:#5FB894; --accent-ink:#0F1613; --accent-soft:#1E332B;
+  --warn:#E0A94A; --warn-soft:#3A2E17; --crit:#E07A6B; --crit-soft:#3E211D; --good:#6CC49A; --good-soft:#1B3328;
+  --up:#E07A6B; --dn:#6CC49A; --code:#242C28; --btn:#5FB894; --btn-ink:#0F1613;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif; font-size:15px; line-height:1.45; }
+.wrap { max-width:1100px; margin:0 auto; padding:28px 24px 80px; }
+h1,h2,h3 { font-family:"Barlow Semi Condensed","Arial Narrow",sans-serif; text-wrap:balance; margin:0; }
+.masthead { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px 24px; padding-bottom:18px; border-bottom:2px solid var(--ink); }
+.eyebrow { font-family:"Barlow Semi Condensed",sans-serif; text-transform:uppercase; letter-spacing:.12em; font-size:12px; font-weight:600; color:var(--accent); }
+h1 { font-size:38px; font-weight:700; line-height:1; letter-spacing:-.01em; }
+.stamp { text-align:right; color:var(--muted); font-size:14px; }
+.stamp b { color:var(--ink); font-weight:600; }
+.who { display:flex; align-items:center; gap:8px; margin-top:6px; justify-content:flex-end; font-size:13px; }
+.who input { font:inherit; padding:3px 8px; border:1px solid var(--line); border-radius:4px; background:var(--surface); color:var(--ink); width:110px; }
+.summary { display:flex; flex-wrap:wrap; gap:8px 28px; margin:16px 0 22px; color:var(--ink-2); font-size:15px; }
+.summary b { font-family:"Barlow Semi Condensed",sans-serif; font-size:22px; font-weight:700; color:var(--ink); margin-right:4px; }
+.tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; }
+.tile { display:block; text-decoration:none; color:inherit; background:var(--surface); border:1px solid var(--line); border-top:4px solid var(--line); padding:12px 14px; transition:transform .12s ease; }
+.tile:hover,.tile:focus-visible { transform:translateY(-1px); outline:2px solid var(--accent); outline-offset:1px; }
+.tile.ready { border-top-color:var(--accent); } .tile.warn { border-top-color:var(--warn); } .tile.critical { border-top-color:var(--crit); } .tile.loaded { border-top-color:var(--line); } .tile.approved { border-top-color:var(--good); }
+.tile-name { font-family:"Barlow Semi Condensed",sans-serif; font-size:19px; font-weight:600; }
+.tile-status { font-size:13px; font-weight:600; margin-top:2px; }
+.tile.ready .tile-status { color:var(--accent); } .tile.warn .tile-status { color:var(--warn); } .tile.critical .tile-status { color:var(--crit); } .tile.loaded .tile-status { color:var(--muted); } .tile.approved .tile-status { color:var(--good); }
+.tile-meta { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; font-size:12.5px; color:var(--muted); }
+.tile-meta b { color:var(--ink); font-family:"IBM Plex Mono",monospace; font-weight:500; }
+.legend { margin:14px 0 0; font-size:13px; color:var(--muted); display:flex; flex-wrap:wrap; gap:6px 18px; }
+.legend i { display:inline-block; width:10px; height:10px; margin-right:6px; vertical-align:-1px; }
+.vendor { margin-top:44px; background:var(--surface); border:1px solid var(--line); padding:20px 22px 22px; scroll-margin-top:16px; }
+.vh { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.vh .grow { flex:1; }
+h2 { font-size:28px; font-weight:700; }
+.pill { font-size:12.5px; font-weight:600; padding:3px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:.06em; font-family:"Barlow Semi Condensed",sans-serif; }
+.pill.ready { background:var(--accent-soft); color:var(--accent); } .pill.warn { background:var(--warn-soft); color:var(--warn); } .pill.critical { background:var(--crit-soft); color:var(--crit); } .pill.loaded { background:var(--line-2); color:var(--muted); } .pill.approved { background:var(--good-soft); color:var(--good); }
+.facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:6px 24px; margin:12px 0 6px; padding:12px 0; border-top:1px solid var(--line-2); border-bottom:1px solid var(--line-2); font-size:13.5px; }
+.facts div { display:flex; gap:10px; min-width:0; }
+.facts dt { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:11px; font-weight:600; padding-top:3px; flex:0 0 62px; }
+.facts dd { margin:0; overflow-wrap:anywhere; }
+h3 { font-size:18px; font-weight:600; margin:20px 0 8px; display:flex; align-items:center; gap:8px; }
+h3.warn-h { color:var(--warn); }
+.cnt { font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:500; background:var(--accent-soft); color:var(--accent); padding:1px 7px; border-radius:999px; }
+.cnt.warn { background:var(--warn-soft); color:var(--warn); } .cnt.crit { background:var(--crit-soft); color:var(--crit); }
+.tw { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; font-size:14px; }
+th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; padding:6px 10px 6px 0; border-bottom:1px solid var(--line); white-space:nowrap; }
+td { padding:6px 10px 6px 0; border-bottom:1px solid var(--line-2); vertical-align:top; }
+tr:last-child td { border-bottom:0; }
+th.num,td.num { text-align:right; padding-right:14px; }
+.mono { font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:13.5px; }
+.strong { font-weight:500; color:var(--ink); }
+.muted { color:var(--muted); }
+.mv { font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:500; } .mv.up { color:var(--up); } .mv.dn { color:var(--dn); }
+.chip { font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:999px; text-transform:uppercase; letter-spacing:.06em; white-space:nowrap; }
+.chip.new { background:var(--good-soft); color:var(--good); } .chip.drop { background:var(--crit-soft); color:var(--crit); }
+code { font-family:"IBM Plex Mono",monospace; background:var(--code); padding:1px 6px; border-radius:3px; font-size:13px; }
+.calls { border-left:3px solid var(--warn); padding-left:10px; }
+.call-row td { vertical-align:middle; }
+.opts { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+button { font:inherit; font-size:13px; font-weight:600; padding:5px 11px; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; }
+button:hover { border-color:var(--accent); } button:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+button.primary { background:var(--btn); color:var(--btn-ink); border-color:var(--btn); }
+button.primary:hover { filter:brightness(1.08); }
+button.big { font-family:"Barlow Semi Condensed",sans-serif; font-size:15px; padding:7px 16px; text-transform:uppercase; letter-spacing:.06em; }
+button[disabled] { opacity:.5; cursor:not-allowed; }
+.opts input { font:inherit; font-size:13px; width:80px; padding:4px 7px; border:1px solid var(--line); border-radius:4px; background:var(--surface); color:var(--ink); }
+.opts input.custom { width:110px; }
+.decided { display:inline-flex; align-items:center; gap:8px; }
+.decided .val { font-family:"IBM Plex Mono",monospace; font-weight:500; color:var(--good); }
+.decided .by { color:var(--muted); font-size:12.5px; }
+.decided button { font-size:12px; padding:2px 8px; font-weight:500; }
+.approved-line { color:var(--good); font-weight:600; font-size:14px; display:flex; align-items:center; gap:10px; }
+.approved-line .by { color:var(--muted); font-weight:400; font-size:13px; }
+.blocker { color:var(--warn); font-size:13.5px; }
+.empty { margin:14px 0 0; color:var(--muted); font-style:italic; }
+details.notes { margin-top:20px; } details.notes summary { cursor:pointer; font-family:"Barlow Semi Condensed",sans-serif; font-size:18px; font-weight:600; }
+details.notes summary .muted { font-family:"Source Sans 3",sans-serif; font-size:14px; font-weight:400; }
+.how { margin-top:44px; padding-top:18px; border-top:2px solid var(--ink); color:var(--ink-2); font-size:14.5px; max-width:68ch; }
+.how h2 { font-size:20px; margin-bottom:6px; } .how p { margin:0 0 10px; }
+.crit { color:var(--crit); }
+.sendbar { margin-top:28px; padding:16px 18px; background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent); display:flex; flex-wrap:wrap; align-items:center; gap:12px 18px; }
+.sendbar .txt { flex:1; min-width:240px; font-size:14.5px; color:var(--ink-2); }
+.sendbar .txt b { color:var(--ink); }
+.sendbar a.primary { display:inline-block; text-decoration:none; font-family:"Barlow Semi Condensed",sans-serif; font-size:15px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; padding:8px 16px; border-radius:4px; background:var(--btn); color:var(--btn-ink); }
+.sendbar a.primary.off { opacity:.45; pointer-events:none; }
+.toast { position:fixed; left:50%; bottom:22px; transform:translateX(-50%); background:var(--ink); color:var(--paper); padding:9px 16px; border-radius:6px; font-size:14px; opacity:0; transition:opacity .2s; pointer-events:none; }
+.toast.show { opacity:1; }
+.ro { background:var(--warn-soft); color:var(--warn); padding:8px 12px; margin:14px 0 0; font-size:13.5px; border-radius:4px; }
+.log { margin-top:30px; font-size:13px; color:var(--muted); }
+.log li { margin:2px 0; }
+@media (max-width:640px) { h1 { font-size:30px; } .wrap { padding:18px 14px 60px; } .vendor { padding:14px; } }
+@media (prefers-reduced-motion: reduce) { .tile { transition:none; } .toast { transition:none; } }
+</style>
+</head><body>
+<div id="root"></div>
+<script type="application/json" id="cfg">__CFG__</script>
+<script>(function(){
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var META = CFG.meta;
+var KEY = 'vc-' + (META.weekKey || META.week);
+var STATE = load();
+
+function load(){ try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.vendors) return s; } catch(e){} return {vendors:{}, calls:{}, log:[]}; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(STATE)); } catch(e){} }
+function who(){ try { return localStorage.getItem('vc-who') || ''; } catch(e){ return ''; } }
+function setWho(v){ try { localStorage.setItem('vc-who', v); } catch(e){} }
+
+var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+var money = function(v){ return (v==null||v==='') ? '' : '$' + Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+var pct = function(o,n){ if(!o) return ''; var p=(n-o)/o*100; return (p>=0?'+':'') + p.toFixed(0) + '%'; };
+var when = function(){ return new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); };
+
+// Packs accepted in an EARLIER week (carried in the data file) are not asked again
+function rememberedPack(r,c){ var m=(CFG.acceptedPacks||{})[r.id]||{}; return c.field==='Case Pack' && c.alt!=null && String(m[c.plu])===String(c.proposal); }
+function openCalls(r){ return r.needsCall.filter(function(c){ return !rememberedPack(r,c); }); }
+
+function status(r){
+  var v = STATE.vendors[r.id];
+  var pending = openCalls(r).filter(function(c){ return !STATE.calls[c.id]; });
+  if (!r.plusAligned || r.tamper.length) return ['critical','Form altered'];
+  if (v && v.approved) return ['approved','Approved'];
+  if (pending.length) return ['warn', pending.length + (pending.length===1?' needs':' need') + ' your call'];
+  if (r.changes.length || r.new.length || r.dropped.length || r.packEdits.length || r.needsCall.length) return ['ready','Ready to approve'];
+  return ['loaded','Already loaded'];
+}
+
+function table(headers, rows, cls){
+  if (!rows.length) return '';
+  var NUM = {'Last':1,'This week':1,'Move':1,'Was':1,'Now':1};
+  return '<div class="tw"><table class="'+(cls||'')+'"><thead><tr>' +
+    headers.map(function(h){ return '<th'+(NUM[h]?' class="num"':'')+'>'+esc(h)+'</th>'; }).join('') +
+    '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
+}
+var td = function(v,c){ return '<td class="'+(c||'')+'">'+v+'</td>'; };
+
+function callRow(r, c){
+  var d = STATE.calls[c.id], cell;
+  if (d) {
+    cell = '<span class="decided"><span class="val">'+esc(d.label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+'</span><button data-undo-call="'+esc(c.id)+'">Change</button></span>';
+  } else {
+    cell = '<span class="opts">' +
+      (c.proposal!=null ? '<button class="primary" data-call="'+esc(c.id)+'" data-choice="proposal" data-value="'+esc(c.proposal)+'">'+(c.alt!=null?'Accept vendor pack ':'Use ')+esc(c.proposal)+'</button>' : '') +
+      (c.alt!=null ? '<button data-call="'+esc(c.id)+'" data-choice="alt" data-value="'+esc(c.alt)+'">Keep book pack '+esc(c.alt)+'</button>'
+                   : '<button data-call="'+esc(c.id)+'" data-choice="skip" data-value="">Skip this item</button>') +
+      '<input class="custom" placeholder="Other value" data-custom-for="'+esc(c.id)+'" aria-label="Other value">' +
+      '<button data-call="'+esc(c.id)+'" data-choice="custom">Use that</button></span>';
+  }
+  return '<tr class="call-row">'+td(esc(c.plu),'mono')+td(esc(c.desc))+td(esc(c.field))+td('<code>'+esc(c.text)+'</code>')+td(cell)+td(esc(c.why),'muted')+'</tr>';
+}
+
+function vendorSection(r){
+  var s = status(r), st = s[0], label = s[1], parts = [];
+  var ch = r.changes.slice().sort(function(a,b){ return Math.abs((b.new-b.old)/b.old) - Math.abs((a.new-a.old)/a.old); });
+  if (ch.length) parts.push('<h3>Price changes <span class="cnt">'+ch.length+'</span></h3>' + table(['PLU','Item','Last','This week','Move'],
+    ch.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(money(x.old),'num mono')+td(money(x.new),'num mono strong')+td('<span class="mv '+(x.new>x.old?'up':'dn')+'">'+pct(x.old,x.new)+'</span>','num')+'</tr>'; })));
+  var nd = r.new.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td('—','num mono muted')+td(money(x.new),'num mono strong')+td('<span class="chip new">New bid</span>')+'</tr>'; })
+    .concat(r.dropped.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(money(x.old),'num mono')+td('—','num mono muted')+td('<span class="chip drop">Dropped</span>')+'</tr>'; }));
+  if (nd.length) parts.push('<h3>New and dropped bids <span class="cnt">'+nd.length+'</span></h3>' + table(['PLU','Item','Last','This week',''], nd));
+  if (r.packEdits.length) parts.push('<h3>Pack size edits <span class="cnt">'+r.packEdits.length+'</span></h3>' + table(['PLU','Item','Was','Now',''],
+    r.packEdits.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(esc(x.old),'num mono')+td(esc(x.new),'num mono strong')+td('Vendor changed the pack on the form; flows to Pack Size','muted')+'</tr>'; })));
+  var oc = openCalls(r);
+  if (oc.length) {
+    var pending = oc.filter(function(c){ return !STATE.calls[c.id]; }).length;
+    parts.push('<h3 class="warn-h">Needs your call <span class="cnt warn">'+pending+' of '+oc.length+' open</span></h3>' +
+      table(['PLU','Item','Field','Vendor wrote','Decision','Why'], oc.map(function(c){ return callRow(r,c); }), 'calls'));
+  }
+  var remembered = r.needsCall.length - oc.length;
+  if (remembered) parts.push('<p class="empty">'+remembered+' pack size'+(remembered===1?'':'s')+' previously accepted for this vendor, not asked again.</p>');
+  if (r.tamper.length) parts.push('<h3 class="warn-h">Yellow columns altered <span class="cnt crit">'+r.tamper.length+'</span></h3>' + table(['PLU','Field','Our form says',"Vendor's file says"],
+    r.tamper.map(function(t){ return '<tr>'+td(esc(t.plu),'mono')+td(esc(t.field))+td(esc(t.template))+td(esc(t.vendor))+'</tr>'; })));
+  if (r.notes.length) parts.push('<details class="notes"><summary>Vendor notes <span class="cnt">'+r.notes.length+'</span> <span class="muted">— for information, no action</span></summary>' +
+    table(['PLU','Item','Note'], r.notes.map(function(n){ return '<tr>'+td(esc(n.plu),'mono')+td(esc(n.desc))+td(esc(n.text))+'</tr>'; })) + '</details>');
+  if (!parts.length) parts.push('<p class="empty">Every bid on this form already matches the vendor sheet in Vendor Compare. Nothing to write.</p>');
+  else if (!(r.changes.length||r.new.length||r.dropped.length||r.packEdits.length) && oc.length) parts.unshift('<p class="empty">Prices already match Vendor Compare; only the items below need a decision.</p>');
+
+  var ctl = '', v = STATE.vendors[r.id];
+  var pend = openCalls(r).filter(function(c){ return !STATE.calls[c.id]; }).length;
+  if (st==='critical') ctl = '<span class="blocker">Blocked until the form is checked</span>';
+  else if (st==='loaded') ctl = '';
+  else if (v && v.approved) ctl = '<span class="approved-line">Approved <span class="by">'+esc(v.by)+' · '+esc(v.at)+'</span><button data-unapprove="'+esc(r.id)+'">Undo</button></span>';
+  else if (pend) ctl = '<span class="blocker">Decide the '+pend+' open item'+(pend===1?'':'s')+' below, then approve</span>';
+  else ctl = '<button class="primary big" data-approve="'+esc(r.id)+'">Approve '+esc(r.vendor)+'</button>';
+
+  return '<section class="vendor" id="'+esc(r.id)+'"><header class="vh"><h2>'+esc(r.vendor)+'</h2><span class="pill '+st+'">'+esc(label)+'</span><span class="grow"></span>'+ctl+'</header>' +
+    '<dl class="facts"><div><dt>File</dt><dd class="mono">'+esc(r.file)+'</dd></div><div><dt>Form</dt><dd>'+esc(r.form)+'</dd></div><div><dt>Writes to</dt><dd class="mono">'+esc(r.sheet)+'</dd></div>' +
+    '<div><dt>Rows</dt><dd>'+r.rows+' on form · '+r.mainRows+' on sheet · PLUs '+(r.plusAligned?'aligned':'<b class="crit">misaligned</b>')+'</dd></div>' +
+    '<div><dt>Bids</dt><dd>'+r.bids+' priced · '+r.unchanged+' unchanged · '+r.codes+' item codes</dd></div>' +
+    (r.perennialPackDiffs ? '<div><dt>Packs</dt><dd>'+r.perennialPackDiffs+' packs differ from the Produce Book but match our form; not flagged</dd></div>' : '') + '</dl>' + parts.join('') + '</section>';
+}
+
+function approvalsText(){
+  var V = CFG.vendors;
+  var approved = V.filter(function(r){ return STATE.vendors[r.id] && STATE.vendors[r.id].approved; });
+  var human = [], machine = ['=== APPROVALS ===', 'W|'+META.week];
+  approved.forEach(function(r){
+    var v = STATE.vendors[r.id];
+    human.push(r.vendor + ' — approved by ' + v.by + ' (' + v.at + ')');
+    machine.push('V|'+r.id+'|'+v.by+'|'+v.at);
+    r.needsCall.forEach(function(c){
+      var d = STATE.calls[c.id];
+      if (d) { human.push('   ' + c.plu + ' ' + c.desc + ' — ' + c.field + ': ' + d.label); machine.push('C|'+c.id+'|'+d.choice+'|'+(d.value==null?'':d.value)); }
+      else if (rememberedPack(r,c)) { machine.push('C|'+c.id+'|remembered|'+c.proposal); }
+    });
+  });
+  var notApproved = V.filter(function(r){ return !(STATE.vendors[r.id] && STATE.vendors[r.id].approved); }).map(function(r){ return r.vendor; });
+  if (notApproved.length) human.push('', 'Not approved this week: ' + notApproved.join(', '));
+  machine.push('=== END ===');
+  return { count: approved.length, text: 'DSD approvals for ' + META.week + '\n\n' + human.join('\n') + '\n\nWrite the approved vendors into Vendor Compare.\n\n' + machine.join('\n') };
+}
+
+function render(){
+  var V = CFG.vendors || [];
+  if (CFG.closed || !V.length) {
+    document.getElementById('root').innerHTML = '<div class="wrap"><header class="masthead"><div><div class="eyebrow">Lowe\'s Market · DSD Produce</div><h1>Vendor Change Report</h1></div></header><p class="empty" style="font-size:17px;margin-top:30px">'+esc(CFG.closedMessage || 'No vendor report is open right now. Check back after the bid forms come in.')+'</p></div>';
+    return;
+  }
+  var sts = V.map(status);
+  var nReady = sts.filter(function(s){ return s[0]==='ready'; }).length, nApproved = sts.filter(function(s){ return s[0]==='approved'; }).length,
+      nCall = V.reduce(function(a,r){ return a + openCalls(r).filter(function(c){ return !STATE.calls[c.id]; }).length; }, 0),
+      nLoaded = sts.filter(function(s){ return s[0]==='loaded'; }).length;
+  var tiles = V.map(function(r,i){ var st=sts[i][0], label=sts[i][1]; var n=r.changes.length+r.new.length+r.dropped.length;
+    return '<a class="tile '+st+'" href="#'+esc(r.id)+'"><div class="tile-name">'+esc(r.vendor)+'</div><div class="tile-status">'+esc(label)+'</div>' +
+      '<div class="tile-meta"><span><b>'+r.bids+'</b> bids</span><span><b>'+n+'</b> price changes</span><span><b>'+(r.packEdits.length+r.needsCall.filter(function(c){ return c.field==='Case Pack'; }).length)+'</b> pack</span></div></a>'; }).join('');
+  var a = approvalsText();
+  var log = (STATE.log||[]).slice().reverse().slice(0,12).map(function(l){ return '<li>'+esc(l)+'</li>'; }).join('');
+  document.getElementById('root').innerHTML =
+    '<div class="wrap"><header class="masthead"><div><div class="eyebrow">Lowe\'s Market · DSD Produce</div><h1>Vendor Change Report</h1></div>' +
+    '<div class="stamp"><b>'+esc(META.week)+'</b><br>Compared against '+esc(META.compared)+' · nothing is written until approved' +
+    '<div class="who"><label for="who">Deciding as</label><input id="who" value="'+esc(who())+'" placeholder="Your name"></div></div></header>' +
+    '<div class="summary"><span><b>'+nApproved+'</b>approved</span><span><b>'+nReady+'</b>ready to approve</span><span><b>'+nCall+'</b>need your call</span><span><b>'+nLoaded+'</b>already loaded</span>' +
+    (META.missing && META.missing.length ? '<span><b>'+META.missing.length+'</b>not received: '+esc(META.missing.join(', '))+'</span>' : '') + '</div>' +
+    '<nav class="tiles">'+tiles+'</nav>' +
+    '<div class="sendbar"><div class="txt"><b>'+a.count+' vendor'+(a.count===1?'':'s')+' approved.</b> When you\'re done for the week, tap Send approvals: it opens an email to Matt with everything decided on this page. Your decisions save on this phone as you tap, but nothing is written to Vendor Compare until that email is sent.</div>' +
+    '<button class="primary big" data-send-approvals'+(a.count?'':' disabled')+'>✉ Send approvals</button><button data-copy-approvals>Copy</button></div>' +
+    '<div class="legend"><span><i style="background:var(--good)"></i>Approved — will be written</span><span><i style="background:var(--accent)"></i>Ready — approve to write</span><span><i style="background:var(--warn)"></i>Needs your call — a proposal is waiting</span><span><i style="background:var(--crit)"></i>Form altered — vendor changed a yellow column or the row order</span><span><i style="background:var(--line)"></i>Already loaded — file matches the sheet</span></div>' +
+    V.map(vendorSection).join('') +
+    '<section class="how"><h2>How to read this</h2><p>Each vendor\'s bid form is checked against our v12 template (row order, descriptions, grades, units) and then against that vendor\'s MAIN sheet in Vendor Compare. Only case cost, pack size, item code and notes are ever written; PLU and the yellow columns are never touched.</p>' +
+    '<p>"N/A", "NA" and "Xx" are read as no bid. A note that implies a pack size, or text in the pack column, becomes a proposal: the leading number is offered and the vendor\'s original text is shown beside it. A priced item whose pack differs from both the Produce Book and our bid form must be accepted or set back to the book pack; once accepted for a vendor, that pack is remembered for later weeks.</p>' +
+    (log ? '<h2>Decisions on this phone</h2><ul class="log">'+log+'</ul>' : '') + '</section></div><div class="toast" id="toast"></div>';
+}
+
+var toastTimer; function toast(m, ms){ var t=document.getElementById('toast'); if(!t) return; t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.classList.remove('show'); }, ms||2200); }
+function needName(){ var n = who().trim(); if (!n) { toast('Type your name under the date first'); var w=document.getElementById('who'); if(w) w.focus(); return null; } return n; }
+function copyText(t, done){
+  if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).then(done, function(){ fb(); }); } else fb();
+  function fb(){ var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch(e){} document.body.removeChild(ta); }
+}
+
+document.addEventListener('input', function(e){ if (e.target.id==='who') setWho(e.target.value); });
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button'); if (!b) return;
+  if (b.hasAttribute('data-copy-approvals')) { copyText(approvalsText().text, function(){ toast('Copied — paste into an email to ' + META.email); }); return; }
+  if (b.hasAttribute('data-send-approvals')) {
+    var a = approvalsText();
+    try { localStorage.setItem(KEY + '-sent', new Date().toLocaleString()); } catch(err){}
+    var url = 'mailto:' + META.email + '?subject=' + encodeURIComponent('DSD approvals ready – ' + META.week) + (META.cc ? '&cc=' + encodeURIComponent(META.cc) : '') + '&body=' + encodeURIComponent(a.text);
+    location.href = url; return;
+  }
+  var name = needName(); if (!name) return;
+  var at = when();
+  if (b.dataset.call) {
+    var id = b.dataset.call, label, value;
+    if (b.dataset.choice==='proposal') { value = b.dataset.value; label = 'Use ' + value; }
+    else if (b.dataset.choice==='alt') { value = b.dataset.value; label = 'Keep book ' + value; }
+    else if (b.dataset.choice==='skip') { value = null; label = 'Skipped'; }
+    else { var inp = document.querySelector('input[data-custom-for="'+id+'"]'); value = (inp.value||'').trim(); if (!value) { toast('Type a value first'); inp.focus(); return; } label = 'Use ' + value; }
+    STATE.calls[id] = {choice:b.dataset.choice, value:value, label:label, by:name, at:at};
+    STATE.log.push(at+' — '+name+' decided '+id+': '+label);
+  } else if (b.dataset.undoCall) {
+    delete STATE.calls[b.dataset.undoCall]; STATE.log.push(at+' — '+name+' reopened '+b.dataset.undoCall);
+  } else if (b.dataset.approve) {
+    var r = CFG.vendors.filter(function(v){ return v.id===b.dataset.approve; })[0];
+    STATE.vendors[r.id] = {approved:true, by:name, at:at}; STATE.log.push(at+' — '+name+' approved '+r.vendor);
+  } else if (b.dataset.unapprove) {
+    var r2 = CFG.vendors.filter(function(v){ return v.id===b.dataset.unapprove; })[0];
+    delete STATE.vendors[r2.id]; STATE.log.push(at+' — '+name+' un-approved '+r2.vendor);
+  } else return;
+  persist();
+  render();
+});
+
+render();
+})();
+</script>
+</body></html>
