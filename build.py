@@ -14,7 +14,8 @@ PAGES = [
     ("dc", "dc_template.html", "dc.html"),
     ("fpb", "fpb_template.html", "fpb.html"),
     ("pom", "pom_template.html", "pom.html"),
-    ("vc", "vc_template.html", "vc.html"),      # DSD Vendor Change Report (approvals)
+    ("vc", "vc_template.html", "vc.html"), 
+    ("bep", "bep_template.html", "bep.html"),     # DSD Vendor Change Report (approvals)
 ]
 
 for param, tpl_name, out in PAGES:
