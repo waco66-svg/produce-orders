@@ -44,6 +44,15 @@
   .badge { font-size:12.5px; font-weight:700; color:#fff; background:var(--accent);
            border-radius:20px; padding:4px 10px; min-width:20px; text-align:center; }
   .badge.zero { background:#c8d4cd; }
+  .badge.part { background:#e8a33d; }
+  .step input.blank { background:#fff; color:#9aa8a0; }
+  .step input.passed { background:#eef2f0; color:#8b9a92; font-weight:600; }
+  .irow.passed .n { color:#8b9a92; }
+  .passbtn { margin-left:auto; font-size:12.5px; font-weight:600; padding:7px 12px;
+    border:1.5px solid var(--line); background:#fff; border-radius:9px; color:#4a5a52; }
+  .passbtn:active { background:#e6f1ea; }
+  .passrow { display:flex; align-items:center; gap:10px; padding:8px 14px 2px;
+    font-size:12.5px; color:#6b7a72; }
   .rows { border-top:1px solid var(--line); display:none; }
   .store.open .rows { display:block; }
   .irow { display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -217,6 +226,14 @@ function pick(name, saved) {
     head.onclick = function () { card.classList.toggle('open'); };
     card.appendChild(head);
     var rows = document.createElement('div'); rows.className = 'rows';
+    var setters = [];
+    var passrow = document.createElement('div'); passrow.className = 'passrow';
+    passrow.innerHTML = '<span>Not ordering anything here?</span>';
+    var passall = document.createElement('button');
+    passall.className = 'passbtn'; passall.textContent = 'Pass on all ' + CFG.items.length;
+    passall.onclick = function () { setters.forEach(function (fn) { fn(0); }); };
+    passrow.appendChild(passall);
+    rows.appendChild(passrow);
     CFG.items.forEach(function (it, idx) {
       var r = document.createElement('div'); r.className = 'irow';
       var l = document.createElement('div'); l.className = 'l';
@@ -230,20 +247,42 @@ function pick(name, saved) {
         ((isFK ? it.extraFK : it.extraL) ? ' · ' + esc(isFK ? it.extraFK : it.extraL) : '') + '</div>';
       var stp = document.createElement('div'); stp.className = 'step';
       var minus = document.createElement('button'); minus.className = 'minus'; minus.textContent = '−';
-      var inp = document.createElement('input'); inp.type = 'number'; inp.value = '0';
-      inp.min = 0; inp.inputMode = 'numeric';
+      var inp = document.createElement('input'); inp.type = 'number'; inp.value = '';
+      inp.min = 0; inp.inputMode = 'numeric'; inp.placeholder = '–'; inp.className = 'blank';
       var plus = document.createElement('button'); plus.className = 'plus'; plus.textContent = '+';
+      // THREE states, and the difference is the whole point (Matthew, 8/27/26):
+      //   blank -> nobody looked at this line. Never sent in the email.
+      //   0     -> looked and deliberately passed. Sent as "0 x <item>".
+      //   n     -> ordering n.
       function set(v) {
-        v = Math.max(0, Math.min(999, Math.round(v) || 0));
-        inp.value = v; QTY[st.store][idx] = v; refresh(st.store, badge);
-        saveProgress();
+        if (v === undefined || v === null || v === '') {
+          delete QTY[st.store][idx];
+          inp.value = ''; inp.className = 'blank'; r.classList.remove('passed');
+        } else {
+          v = Math.max(0, Math.min(999, Math.round(v) || 0));
+          QTY[st.store][idx] = v;
+          inp.value = v;
+          inp.className = v === 0 ? 'passed' : '';
+          r.classList.toggle('passed', v === 0);
+        }
+        refresh(st.store, badge); saveProgress();
       }
-      minus.onclick = function () { set(parseInt(inp.value || 0) - 1); };
-      plus.onclick = function () { set(parseInt(inp.value || 0) + 1); };
-      inp.onchange = function () { set(parseInt(inp.value || 0)); };
+      // stepping down from blank lands on a VISIBLE 0, not on nothing
+      minus.onclick = function () {
+        var cur = QTY[st.store][idx];
+        set(cur === undefined ? 0 : cur - 1);
+      };
+      plus.onclick = function () {
+        var cur = QTY[st.store][idx];
+        set(cur === undefined ? 1 : cur + 1);
+      };
+      inp.onchange = function () {
+        set(inp.value === '' ? undefined : parseInt(inp.value));
+      };
       stp.appendChild(minus); stp.appendChild(inp); stp.appendChild(plus);
       r.appendChild(l); r.appendChild(stp);
       rows.appendChild(r);
+      setters.push(set);
       if (src && src[idx] !== undefined) set(src[idx]);
     });
     card.appendChild(rows);
@@ -258,20 +297,25 @@ function pick(name, saved) {
 function refresh(store, badge) {
   var t = 0, q = QTY[store];
   Object.keys(q).forEach(function (k) { t += q[k]; });
-  badge.textContent = t;
-  badge.className = 'badge' + (t ? '' : ' zero');
+  var seen = Object.keys(q).length, n = CFG.items.length;
+  if (seen === 0)    { badge.textContent = '–';            badge.className = 'badge zero'; }
+  else if (seen < n) { badge.textContent = seen + '/' + n;  badge.className = 'badge part'; }
+  else               { badge.textContent = t + ' cs';       badge.className = 'badge' + (t ? '' : ' zero'); }
   totals();
 }
 
 function totals() {
-  var cases = 0, stores = 0;
+  var cases = 0, stores = 0, reviewed = 0;
   Object.keys(QTY).forEach(function (s) {
     var t = 0; Object.keys(QTY[s]).forEach(function (k) { t += QTY[s][k]; });
-    cases += t; if (t) stores++;
+    cases += t; if (t) stores++; if (Object.keys(QTY[s]).length) reviewed++;
   });
   document.getElementById('totcases').textContent = cases;
   document.getElementById('totstores').textContent = stores;
-  document.getElementById('sendbtn').disabled = cases === 0;
+  // Enable on ANY review, not on cases > 0. A supervisor who looks at the whole
+  // list and passes on all of it must be able to submit - otherwise he shows up in
+  // the sweeps as blank ("nobody looked") when he did look. (Matthew, 8/27/26)
+  document.getElementById('sendbtn').disabled = reviewed === 0;
 }
 
 function orderText() {
@@ -283,7 +327,13 @@ function orderText() {
     var q = QTY[st.store], any = false, sub = [];
     var touched = Object.keys(q).length > 0;
     CFG.items.forEach(function (it, idx) {
-      if (q[idx]) { sub.push('  ' + q[idx] + ' x ' + it.desc); any = true; cases += q[idx]; }
+      // an explicit 0 is DATA - it means reviewed-and-passing and it is how an
+      // email takes a line back down. Only untouched (undefined) items are skipped.
+      if (q[idx] !== undefined) {
+        sub.push('  ' + q[idx] + ' x ' + it.desc);
+        if (q[idx]) any = true;
+        cases += q[idx];
+      }
     });
     if (any) { lines.push('Store ' + st.store + ' (' + st.city + '):'); lines = lines.concat(sub); }
     else if (touched) { lines.push('Store ' + st.store + ' (' + st.city + '): CLEAR (no order)'); }
