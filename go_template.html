@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Grand Opening Order - FK Odessa 37</title>
+<style>
+:root{--g:#70AD47;--gd:#4e7d31;--ink:#1a1a1a;--mut:#6b7280;--line:#e2e5e9;--bg:#f6f7f8;--card:#fff;--in:#fff8e1;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--g);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:10;box-shadow:0 1px 6px rgba(0,0,0,.18)}
+header h1{margin:0;font-size:17px;font-weight:700}
+header .sub{font-size:13px;opacity:.94;margin-top:2px}
+.tabs{display:flex;gap:6px;padding:10px 12px 0;max-width:880px;margin:0 auto}
+.tab{flex:1;padding:11px 8px;border:1px solid var(--line);border-bottom:none;background:#eceff1;border-radius:10px 10px 0 0;font-size:14px;font-weight:600;color:var(--mut);text-align:center;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 -2px 0 var(--g) inset}
+.wrap{max-width:880px;margin:0 auto;padding:0 12px 130px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:0 0 12px 12px;padding:12px}
+.meta{font-size:13px;color:var(--mut);margin:2px 0 10px;line-height:1.6}
+.meta b{color:var(--ink)}
+.bar{display:flex;gap:8px;margin-bottom:12px}
+.bar button{flex:1;padding:10px;border:1px solid var(--line);background:#fff;border-radius:9px;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer}
+.item{padding:12px 4px;border-bottom:1px solid var(--line)}
+.item:last-of-type{border-bottom:none}
+.nm{font-size:15px;font-weight:600;line-height:1.25}
+.dt{font-size:12px;color:var(--mut);margin-top:3px}
+.dt .cst{color:var(--gd);font-weight:700}
+.rows{display:flex;flex-wrap:wrap;gap:14px;margin-top:9px;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:4px}
+.lbl{font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.3px;text-transform:uppercase}
+.qty{display:flex;align-items:center}
+.qty button{width:36px;height:36px;border:1px solid var(--line);background:#fff;font-size:19px;line-height:1;color:var(--gd);cursor:pointer}
+.qty button:first-child{border-radius:9px 0 0 9px}
+.qty button:last-child{border-radius:0 9px 9px 0}
+.qty .val{width:46px;height:36px;border:1px solid var(--line);border-left:none;border-right:none;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;background:var(--in)}
+.qty .val.blank{color:#c3c8ce;font-weight:400;background:#fff}
+.qty .val.zero{color:#a3a9b0}
+.rng{display:flex;align-items:center;gap:6px}
+.rng input{width:62px;height:36px;border:1px solid var(--line);border-radius:9px;background:var(--in);font-size:15px;text-align:center;font-family:inherit;color:var(--ink)}
+.rng input::placeholder{color:#c3c8ce}
+.rng span{color:var(--mut);font-weight:700}
+.bad input{border-color:#c0392b;background:#fdecea}
+.warn{font-size:12px;color:#c0392b;margin-top:6px;display:none}
+.warn.on{display:block}
+footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -2px 10px rgba(0,0,0,.07)}
+.fin{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.tally{flex:1;font-size:13px;color:var(--mut)}
+.tally b{color:var(--ink);font-size:16px}
+.send{padding:13px 22px;border:none;border-radius:10px;background:var(--g);color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+.send:disabled{background:#c8cdd2;cursor:not-allowed}
+.note{font-size:12px;color:var(--mut);margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.closed{max-width:880px;margin:60px auto;padding:0 20px;text-align:center;color:var(--mut)}
+.closed h2{color:var(--ink);font-size:20px}
+</style></head><body>
+<header><h1>Grand Opening Order</h1>
+<div class="sub">Food King Odessa #37 &middot; AFI #134 &middot; Mike M</div>
+<div class="sub">Week of __WEEK__ &middot; Orders due __DUE__</div></header>
+<div id="app"></div>
+<script type="application/json" id="cfg">__CFG__</script>
+<script>
+var CFG=JSON.parse(document.getElementById('cfg').textContent);
+var app=document.getElementById('app');
+
+if(CFG.closed||!CFG.weeks||!CFG.weeks.length){
+  app.innerHTML='<div class="closed"><h2>No order in progress</h2><p>'+
+    (CFG.message||'There is no Grand Opening order open right now. This page will fill in when the next one is posted.')+
+    '</p></div>';
+}else{
+ var Q={},cur=0,dirty=false;
+ CFG.weeks.forEach(function(w,i){Q[i]=w.items.map(function(){return {init:undefined,lo:'',hi:''}})});
+
+ app.innerHTML='<div class="tabs" id="tabs"></div><div class="wrap"><div class="panel" id="panel"></div></div>'+
+  '<footer><div class="fin"><div class="tally" id="tally"></div><button class="send" id="send">Send Order</button></div></footer>';
+
+ function tabs(){var t=document.getElementById('tabs');t.innerHTML='';
+  CFG.weeks.forEach(function(w,i){var b=document.createElement('div');b.className='tab';
+   b.setAttribute('aria-selected',i===cur);b.textContent=w.ad+' ad';
+   b.onclick=function(){cur=i;render()};t.appendChild(b)})}
+
+ function bump(i,d){var s=Q[cur][i];var v=s.init;v=(v===undefined?0:v)+d;if(v<0)v=0;s.init=v;dirty=true;render()}
+
+ function render(){tabs();
+  var w=CFG.weeks[cur],p=document.getElementById('panel');
+  var h='<div class="meta"><b>'+w.ad+' ad</b> &middot; delivers <b>'+w.deliver+'</b> &middot; due <b>'+w.due+
+    '</b><br>'+w.items.length+' items. Initial shipment is firm; the weekly range is a planning guide for AFI, not a commitment.</div>';
+  h+='<div class="bar"><button id="pass">Pass on all '+w.items.length+'</button><button id="clr">Clear all</button></div>';
+  w.items.forEach(function(it,i){var s=Q[cur][i];
+   var cls=s.init===undefined?'blank':(s.init===0?'zero':'');
+   var txt=s.init===undefined?'&ndash;':s.init;
+   var bad=s.lo!==''&&s.hi!==''&&(+s.hi)<(+s.lo);
+   h+='<div class="item"><div class="nm">'+it.desc+'</div>'+
+      '<div class="dt">#'+it.order+' &middot; '+it.pack+(it.size?' '+it.size:'')+
+      ' &middot; <span class="cst">$'+it.cost.toFixed(2)+'/cs</span></div>'+
+      '<div class="rows">'+
+        '<div class="fld"><div class="lbl">Initial shipment</div>'+
+        '<div class="qty"><button data-m="'+i+'">&minus;</button><div class="val '+cls+'">'+txt+
+        '</div><button data-p="'+i+'">+</button></div></div>'+
+        '<div class="fld"><div class="lbl">Projected weekly need</div>'+
+        '<div class="rng'+(bad?' bad':'')+'"><input inputmode="numeric" placeholder="low" data-lo="'+i+'" value="'+s.lo+'">'+
+        '<span>&ndash;</span><input inputmode="numeric" placeholder="high" data-hi="'+i+'" value="'+s.hi+'"></div></div>'+
+      '</div><div class="warn'+(bad?' on':'')+'">High is lower than low &mdash; check this line.</div></div>'});
+  h+='<div class="note">Sends to '+CFG.to+' (cc '+CFG.cc+'). Each ad week sends as its own order &mdash; switch tabs and send the other one too.</div>';
+  p.innerHTML=h;
+  p.querySelectorAll('[data-m]').forEach(function(b){b.onclick=function(){
+    var i=+b.dataset.m;if(Q[cur][i].init===undefined){Q[cur][i].init=0;dirty=true;render()}else{bump(i,-1)}}});
+  p.querySelectorAll('[data-p]').forEach(function(b){b.onclick=function(){bump(+b.dataset.p,1)}});
+  p.querySelectorAll('[data-lo],[data-hi]').forEach(function(inp){
+    var k=inp.dataset.lo!==undefined?'lo':'hi',i=+(inp.dataset.lo!==undefined?inp.dataset.lo:inp.dataset.hi);
+    inp.oninput=function(){Q[cur][i][k]=inp.value.replace(/[^0-9]/g,'');dirty=true};
+    inp.onblur=function(){render()}});
+  document.getElementById('pass').onclick=function(){Q[cur].forEach(function(s){s.init=0});dirty=true;render()};
+  document.getElementById('clr').onclick=function(){Q[cur]=w.items.map(function(){return {init:undefined,lo:'',hi:''}});dirty=true;render()};
+  var cs=0,rev=0;Q[cur].forEach(function(s){if(s.init!==undefined){rev++;cs+=s.init}});
+  document.getElementById('tally').innerHTML='<b>'+cs+'</b> initial cases &middot; '+rev+' of '+w.items.length+' reviewed';
+  document.getElementById('send').disabled=rev===0}
+
+ document.getElementById('send')||0;
+ app.addEventListener('click',function(e){if(e.target.id==='send'){
+  var w=CFG.weeks[cur],L=[];
+  L.push('GRAND OPENING ORDER');L.push('');
+  L.push('Supervisor: Mike M');L.push('Store: 37 Odessa (Food King)');
+  L.push('Week: '+w.ad+' ad');L.push('Delivers: '+w.deliver);L.push('Due: '+w.due);L.push('');
+  var cs=0;
+  w.items.forEach(function(it,i){var s=Q[cur][i];if(s.init===undefined&&s.lo===''&&s.hi==='')return;
+    cs+=(s.init||0);
+    var rng=s.lo===''?'':(s.hi===''||s.hi===s.lo?s.lo:s.lo+'-'+s.hi);
+    L.push(it.order+' | '+it.desc+' | initial '+(s.init===undefined?'-':s.init)+
+           ' | weekly '+(rng||'-'))});
+  L.push('');L.push('TOTAL INITIAL CASES: '+cs);
+  var sub='GRAND OPENING ORDER - FK Odessa 37 - '+w.ad+' ad';
+  dirty=false;
+  location.href='mailto:'+encodeURIComponent(CFG.to)+'?cc='+encodeURIComponent(CFG.cc)+
+    '&subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(L.join('\n'))}});
+ window.addEventListener('beforeunload',function(e){if(dirty){e.preventDefault();e.returnValue=''}});
+ render();
+}
+</script></body></html>
