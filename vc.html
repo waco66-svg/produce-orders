@@ -159,8 +159,8 @@ function callRow(r, c){
     cell = '<span class="decided"><span class="val">'+esc(d.label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+'</span><button data-undo-call="'+esc(c.id)+'">Change</button></span>';
   } else {
     cell = '<span class="opts">' +
-      (c.proposal!=null ? '<button class="primary" data-call="'+esc(c.id)+'" data-choice="proposal" data-value="'+esc(c.proposal)+'">'+(c.alt!=null?'Accept vendor pack ':'Use ')+esc(c.proposal)+'</button>' : '') +
-      (c.alt!=null ? '<button data-call="'+esc(c.id)+'" data-choice="alt" data-value="'+esc(c.alt)+'">Keep book pack '+esc(c.alt)+'</button>'
+      (c.proposal!=null ? '<button class="primary" data-call="'+esc(c.id)+'" data-choice="proposal" data-value="'+esc(c.proposal)+'">'+(c.alt!=null?(c.field==='Item Code'?'Accept item code ':'Accept vendor pack '):'Use ')+esc(c.proposal)+'</button>' : '') +
+      (c.alt!=null ? '<button data-call="'+esc(c.id)+'" data-choice="alt" data-value="'+esc(c.alt)+'">'+(c.field==='Item Code'?'Keep item code ':'Keep book pack ')+esc(c.alt)+'</button>'
                    : '<button data-call="'+esc(c.id)+'" data-choice="skip" data-value="">Skip this item</button>') +
       '<input class="custom" placeholder="Other value" data-custom-for="'+esc(c.id)+'" aria-label="Other value">' +
       '<button data-call="'+esc(c.id)+'" data-choice="custom">Use that</button></span>';
@@ -284,8 +284,9 @@ document.addEventListener('click', function(e){
   var at = when();
   if (b.dataset.call) {
     var id = b.dataset.call, label, value;
+    var fld = id.split(':').pop();   // CasePack | CaseCost | ItemCode — "the book" only means a pack
     if (b.dataset.choice==='proposal') { value = b.dataset.value; label = 'Use ' + value; }
-    else if (b.dataset.choice==='alt') { value = b.dataset.value; label = 'Keep book ' + value; }
+    else if (b.dataset.choice==='alt') { value = b.dataset.value; label = (fld==='CasePack' ? 'Keep book ' : 'Keep ') + value; }
     else if (b.dataset.choice==='skip') { value = null; label = 'Skipped'; }
     else { var inp = document.querySelector('input[data-custom-for="'+id+'"]'); value = (inp.value||'').trim(); if (!value) { toast('Type a value first'); inp.focus(); return; } label = 'Use ' + value; }
     STATE.calls[id] = {choice:b.dataset.choice, value:value, label:label, by:name, at:at};
