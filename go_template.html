@@ -14,6 +14,7 @@ header .sub{font-size:13px;opacity:.94;margin-top:2px}
 .tab[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 -2px 0 var(--g) inset}
 .wrap{max-width:880px;margin:0 auto;padding:0 12px 130px}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:0 0 12px 12px;padding:12px}
+.gowk{display:inline-block;background:var(--g);color:#fff;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin:4px 0 8px}
 .meta{font-size:13px;color:var(--mut);margin:2px 0 10px;line-height:1.6}
 .meta b{color:var(--ink)}
 .bar{display:flex;gap:8px;margin-bottom:12px}
@@ -72,14 +73,16 @@ if(CFG.closed||!CFG.weeks||!CFG.weeks.length){
 
  function tabs(){var t=document.getElementById('tabs');t.innerHTML='';
   CFG.weeks.forEach(function(w,i){var b=document.createElement('div');b.className='tab';
-   b.setAttribute('aria-selected',i===cur);b.textContent=w.ad+' ad';
+   b.setAttribute('aria-selected',i===cur);
+   b.textContent=(w.goWeek?'GO Week '+w.goWeek+' · ':'')+w.ad;
    b.onclick=function(){cur=i;render()};t.appendChild(b)})}
 
  function bump(i,d){var s=Q[cur][i];var v=s.init;v=(v===undefined?0:v)+d;if(v<0)v=0;s.init=v;dirty=true;render()}
 
  function render(){tabs();
   var w=CFG.weeks[cur],p=document.getElementById('panel');
-  var h='<div class="meta"><b>'+w.ad+' ad</b> &middot; delivers <b>'+w.deliver+'</b> &middot; due <b>'+w.due+
+  var h=(w.goWeek?'<div class="gowk">Grand Opening &middot; Week '+w.goWeek+'</div>':'')+
+   '<div class="meta"><b>'+w.ad+' ad</b> &middot; delivers <b>'+w.deliver+'</b> &middot; due <b>'+w.due+
     '</b><br>'+w.items.length+' items. Initial shipment is firm; the weekly range is a planning guide for AFI, not a commitment.</div>';
   h+='<div class="bar"><button id="pass">Pass on all '+w.items.length+'</button><button id="clr">Clear all</button></div>';
   w.items.forEach(function(it,i){var s=Q[cur][i];
@@ -117,6 +120,7 @@ if(CFG.closed||!CFG.weeks||!CFG.weeks.length){
   var w=CFG.weeks[cur],L=[];
   L.push('GRAND OPENING ORDER');L.push('');
   L.push('Supervisor: Mike M');L.push('Store: 37 Odessa (Food King)');
+  if(w.goWeek){L.push('Grand Opening Week: '+w.goWeek)}
   L.push('Week: '+w.ad+' ad');L.push('Delivers: '+w.deliver);L.push('Due: '+w.due);L.push('');
   var cs=0;
   w.items.forEach(function(it,i){var s=Q[cur][i];if(s.init===undefined&&s.lo===''&&s.hi==='')return;
@@ -125,7 +129,7 @@ if(CFG.closed||!CFG.weeks||!CFG.weeks.length){
     L.push(it.order+' | '+it.desc+' | initial '+(s.init===undefined?'-':s.init)+
            ' | weekly '+(rng||'-'))});
   L.push('');L.push('TOTAL INITIAL CASES: '+cs);
-  var sub='GRAND OPENING ORDER - FK Odessa 37 - '+w.ad+' ad';
+  var sub='GRAND OPENING ORDER - FK Odessa 37 - '+(w.goWeek?'Week '+w.goWeek+' - ':'')+w.ad+' ad';
   dirty=false;
   location.href='mailto:'+encodeURIComponent(CFG.to)+'?cc='+encodeURIComponent(CFG.cc)+
     '&subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(L.join('\n'))}});
