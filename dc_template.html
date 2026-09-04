@@ -142,6 +142,25 @@ __DEMO__
 <script type="application/json" id="cfg">__CFG__</script>
 <script>
 var CFG = JSON.parse(document.getElementById('cfg').textContent);
+
+/* PER-STORE AD-GROUP VARIANTS (added 9/4/26).
+   Normally every Lowes store shares one coupon and every Food King store shares
+   another, chosen by st.banner. Some weeks one ad group differs: a different retail
+   (store 37 on Grand Opening pricing) or a different ITEM (store 55 Alamogordo got
+   Mini Sweet Peppers instead of the Fresh Cut chunks). Those stores carry
+   "v":"<group>" and CFG.variants[<group>].items replaces CFG.items for them alone.
+   VITEMS is keyed by store number because refresh() only has the number, not the
+   store object. */
+var VITEMS = {};
+Object.keys(CFG.supervisors || {}).forEach(function (s) {
+  (CFG.supervisors[s] || []).forEach(function (st) {
+    if (st.v && CFG.variants && CFG.variants[st.v] && CFG.variants[st.v].items) {
+      VITEMS[st.store] = CFG.variants[st.v].items;
+    }
+  });
+});
+function itemsFor(st) { return (st && VITEMS[st.store]) || CFG.items; }
+function itemsForStore(n) { return VITEMS[n] || CFG.items; }
 if (CFG.closed) {
   document.body.innerHTML = '<div style="max-width:420px;margin:80px auto;background:#fff;' +
     'border:1px solid #dbe4de;border-radius:14px;padding:30px 22px;text-align:center">' +
@@ -230,11 +249,11 @@ function pick(name, saved) {
     var passrow = document.createElement('div'); passrow.className = 'passrow';
     passrow.innerHTML = '<span>Not ordering anything here?</span>';
     var passall = document.createElement('button');
-    passall.className = 'passbtn'; passall.textContent = 'Pass on all ' + CFG.items.length;
+    passall.className = 'passbtn'; passall.textContent = 'Pass on all ' + itemsFor(st).length;
     passall.onclick = function () { setters.forEach(function (fn) { fn(0); }); };
     passrow.appendChild(passall);
     rows.appendChild(passrow);
-    CFG.items.forEach(function (it, idx) {
+    itemsFor(st).forEach(function (it, idx) {
       var r = document.createElement('div'); r.className = 'irow';
       var l = document.createElement('div'); l.className = 'l';
       var isFK = /food/i.test(st.banner || '');
@@ -297,7 +316,7 @@ function pick(name, saved) {
 function refresh(store, badge) {
   var t = 0, q = QTY[store];
   Object.keys(q).forEach(function (k) { t += q[k]; });
-  var seen = Object.keys(q).length, n = CFG.items.length;
+  var seen = Object.keys(q).length, n = itemsForStore(store).length;
   if (seen === 0)    { badge.textContent = '–';            badge.className = 'badge zero'; }
   else if (seen < n) { badge.textContent = seen + '/' + n;  badge.className = 'badge part'; }
   else               { badge.textContent = t + ' cs';       badge.className = 'badge' + (t ? '' : ' zero'); }
@@ -326,7 +345,7 @@ function orderText() {
   CFG.supervisors[SUP].forEach(function (st) {
     var q = QTY[st.store], any = false, sub = [];
     var touched = Object.keys(q).length > 0;
-    CFG.items.forEach(function (it, idx) {
+    itemsFor(st).forEach(function (it, idx) {
       // an explicit 0 is DATA - it means reviewed-and-passing and it is how an
       // email takes a line back down. Only untouched (undefined) items are skipped.
       if (q[idx] !== undefined) {
