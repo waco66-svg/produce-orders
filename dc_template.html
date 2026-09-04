@@ -178,7 +178,7 @@ var SUP = null, QTY = {};   // QTY[store][itemIndex] = n
 
 // ---- progress autosave (survives closing the page; per-week key; fails silently
 // where storage is unavailable, e.g. some email-attachment previews) ----
-var KEY = 'fpb-' + CFG.week;
+var KEY = 'dc-' + CFG.week;
 function saveProgress() {
   try { localStorage.setItem(KEY, JSON.stringify({ sup: SUP, qty: QTY })); } catch (e) {}
 }

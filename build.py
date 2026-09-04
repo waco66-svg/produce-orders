@@ -3,7 +3,7 @@
 
 Runs on GitHub's servers (see .github/workflows/refresh.yml), triggered by
 Matthew's Apps Script when a new data file lands in "Order Page Data".
-For each program (dc, fpb, pom, vc, bep, ds, go) it fetches the latest data JSON
+For each program (dc, fpb, pom, vc, bep, ds, go, fl) it fetches the latest data JSON
 from the Apps Script endpoint and injects it into the matching template. If the
 fetch fails or there is no data yet, the existing page is left untouched.
 """
@@ -18,6 +18,7 @@ PAGES = [
     ("bep", "bep_template.html", "bep.html"),
     ("ds", "ds_template.html", "ds.html"),    # 3 Day Sale
     ("go", "go_template.html", "go.html"),    # Grand Opening, Food King Odessa 37
+    ("fl", "fl_template.html", "fl.html"),    # Floral holidays (Valentine's, Easter, Mothers Day, Poinsettias)
 ]
 
 for param, tpl_name, out in PAGES:
