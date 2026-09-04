@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Floral Holiday Orders</title>
+<style>
+  :root { --accent:#1a6b3c; --accent-dark:#14522e; --bg:#f2f5f3; --card:#fff;
+          --ink:#1b2a22; --sub:#5f7268; --line:#dbe4de; --amber:#b45309; --ad:#fff9d6; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+         background:var(--bg); color:var(--ink); }
+  header { background:var(--accent); color:#fff; padding:14px 16px; position:sticky;
+           top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; }
+  header .t { font-size:17px; font-weight:700; }
+  header .s { font-size:12px; opacity:.9; margin-top:2px; }
+  .chip { background:#fff; color:var(--accent); border:none; border-radius:8px;
+          font-size:13px; font-weight:600; padding:7px 11px; cursor:pointer; font-family:inherit; }
+  .who { padding:22px 16px; max-width:560px; margin:0 auto; }
+  .who h2 { font-size:20px; margin:6px 0 16px; }
+  .namegrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .namebtn { padding:18px 8px; font-size:17px; font-weight:600; background:var(--card);
+             border:1.5px solid var(--line); border-radius:12px; cursor:pointer; font-family:inherit; }
+  .namebtn:active { background:#e6f1ea; border-color:var(--accent); }
+  .wrap { max-width:560px; margin:0 auto; padding:12px 12px 132px; }
+  .banner { background:#e6f1ea; border:1px solid var(--accent); border-radius:10px;
+            padding:11px 13px; font-size:13.5px; margin-bottom:12px; }
+  .store { background:var(--card); border:1px solid var(--line); border-radius:12px;
+           margin-bottom:10px; overflow:hidden; }
+  .store-head { padding:13px 14px; display:flex; align-items:center; gap:9px;
+                justify-content:space-between; cursor:pointer; }
+  .store-head .n { font-size:16px; font-weight:700; }
+  .store-head .c { font-size:12.5px; color:var(--sub); margin-top:1px; }
+  .bn { font-size:10.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+        padding:3px 7px; border-radius:20px; background:#e6f1ea; color:var(--accent-dark); }
+  .bn.fk { background:#fdeee0; color:var(--amber); }
+  .prog { font-size:11.5px; color:var(--sub); white-space:nowrap; }
+  .prog.done { color:var(--accent); font-weight:700; }
+  .sec { border-top:1px solid var(--line); }
+  .sec > summary { padding:11px 14px; font-weight:700; font-size:13.5px; cursor:pointer;
+                   list-style:none; display:flex; justify-content:space-between; gap:8px; }
+  .sec > summary::-webkit-details-marker { display:none; }
+  .sec > summary::after { content:"▾"; color:var(--sub); }
+  .sec[open] > summary::after { content:"▴"; }
+  .passrow { display:flex; align-items:center; gap:10px; padding:6px 14px 8px;
+             font-size:12.5px; color:var(--sub); }
+  .passbtn { margin-left:auto; font-size:12.5px; font-weight:600; padding:7px 12px;
+             background:var(--card); border:1px solid var(--line); border-radius:8px;
+             cursor:pointer; font-family:inherit; color:var(--accent); }
+  .irow { display:flex; align-items:center; gap:10px; padding:9px 14px;
+          border-top:1px solid var(--line); }
+  .irow.ad { background:var(--ad); }
+  .irow .info { flex:1; min-width:0; }
+  .irow .nm { font-size:13.5px; font-weight:600; }
+  .irow .dt { font-size:11.5px; color:var(--sub); margin-top:2px; }
+  .adtag { font-size:9.5px; font-weight:800; letter-spacing:.5px; background:var(--amber);
+           color:#fff; padding:2px 5px; border-radius:4px; margin-right:5px; vertical-align:1px; }
+  .qty { width:66px; padding:11px 6px; font-size:17px; text-align:center; font-family:inherit;
+         border:1.5px solid var(--line); border-radius:9px; background:#fff; }
+  .qty.set { border-color:var(--accent); background:#f2f9f5; font-weight:700; }
+  .qty.zero { color:#8b9a92; font-weight:600; background:#eef2f0; }
+  .foot { position:fixed; left:0; right:0; bottom:0; background:var(--card);
+          border-top:1px solid var(--line); padding:11px 12px calc(11px + env(safe-area-inset-bottom));
+          display:flex; gap:10px; align-items:center; justify-content:center; }
+  .send { flex:1; max-width:536px; padding:15px; font-size:16px; font-weight:700; color:#fff;
+          background:var(--accent); border:none; border-radius:11px; cursor:pointer; font-family:inherit; }
+  .send:disabled { background:#9db3a7; }
+  .modal { position:fixed; inset:0; background:rgba(20,30,25,.55); display:none;
+           align-items:flex-end; z-index:50; }
+  .modal.on { display:flex; }
+  .sheet { background:var(--card); width:100%; max-height:88vh; overflow:auto;
+           border-radius:16px 16px 0 0; padding:18px 16px calc(18px + env(safe-area-inset-bottom)); }
+  .sheet h3 { margin:0 0 8px; font-size:17px; }
+  .sheet p { font-size:13.5px; color:var(--sub); line-height:1.45; margin:0 0 12px; }
+  .warn { background:#fdeee0; border:1px solid var(--amber); color:#7c3d06;
+          border-radius:10px; padding:11px 13px; font-size:13px; margin-bottom:12px; }
+  .ta { width:100%; height:190px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px;
+        border:1px solid var(--line); border-radius:10px; padding:10px; resize:vertical; }
+  .row2 { display:flex; gap:9px; margin-top:11px; }
+  .row2 button { flex:1; padding:14px; font-size:14.5px; font-weight:700; border-radius:10px;
+                 font-family:inherit; cursor:pointer; }
+  .primary { background:var(--accent); color:#fff; border:none; }
+  .ghost { background:var(--card); color:var(--ink); border:1.5px solid var(--line); }
+  .kv { font-size:12.5px; color:var(--sub); margin:2px 0; word-break:break-all; }
+  .closed { max-width:560px; margin:60px auto; padding:0 20px; text-align:center; }
+  .closed h2 { font-size:22px; } .closed p { color:var(--sub); font-size:14.5px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<script>
+var CFG = {"week": "Valentine's Day 2027", "holiday": "Valentine's Day 2027", "due": "Fri 9/25", "email": "matthew.macdonald@lowesmarket.com", "cc": "waco66@gmail.com", "closed": false, "sections": [{"key": "bouquets", "label": "Bouquets", "items": [{"order": 7104346, "upc": 89827104346, "desc": "Happy Hearts Bqt", "pack": 32, "size": "bqt", "cost": 219.79, "unit": 6.8684, "retailL": 12.99, "retailFK": 9.6738, "ad": true}, {"order": 16346, "upc": 72344230000, "desc": "10 Stems Cut Tulip Consumer Bunch", "pack": 12, "size": "bqt", "cost": 91.1, "unit": 7.5917, "retailL": 14.99, "retailFK": 9.98, "ad": false}, {"order": 7103604, "upc": 89827103604, "desc": "Heart Song Bqt", "pack": 16, "size": "bqt", "cost": 134.96, "unit": 8.435, "retailL": 12.99, "retailFK": 9.67, "ad": true}, {"order": 7102425, "upc": 89827102425, "desc": "Lovely Bqt", "pack": 17, "size": "bqt", "cost": 165.93, "unit": 9.7606, "retailL": 16.99, "retailFK": 13.7473, "ad": false}, {"order": 7102806, "upc": 89827102806, "desc": "Sweetness Bqt", "pack": 12, "size": "bqt", "cost": 124.36, "unit": 10.3633, "retailL": 16.99, "retailFK": 14.5962, "ad": false}, {"order": 7104270, "upc": 89827104270, "desc": "Wild About You Bqt", "pack": 17, "size": "bqt", "cost": 190.51, "unit": 11.2065, "retailL": 19.99, "retailFK": 15.7838, "ad": false}, {"order": 7104034, "upc": 89827104034, "desc": "Secret Admirer Bqt", "pack": 13, "size": "bqt", "cost": 164.48, "unit": 12.6523, "retailL": 19.99, "retailFK": 17.8201, "ad": false}, {"order": 7104027, "upc": 89827104027, "desc": "Gal Pal Posies", "pack": 12, "size": "bqt", "cost": 161.95, "unit": 13.4958, "retailL": 19.99, "retailFK": 17.98, "ad": false}, {"order": 7103595, "upc": 89827103595, "desc": "Cloud of Carnations Bouquet", "pack": 12, "size": "bqt", "cost": 167.74, "unit": 13.9783, "retailL": 24.99, "retailFK": 19.6877, "ad": false}, {"order": 7104285, "upc": 89827104285, "desc": "Yours Truly Bqt", "pack": 12, "size": "bqt", "cost": 172.07, "unit": 14.3392, "retailL": 24.99, "retailFK": 19.98, "ad": false}, {"order": 7102999, "upc": 89827102999, "desc": "Love's Duet Bouquet", "pack": 12, "size": "bqt", "cost": 182.2, "unit": 15.1833, "retailL": 24.99, "retailFK": 19.98, "ad": true}, {"order": 7104352, "upc": 89827104352, "desc": "Sassy Sweet Bqt", "pack": 10, "size": "bqt", "cost": 177.14, "unit": 17.714, "retailL": 34.99, "retailFK": 24.9493, "ad": false}, {"order": 7104018, "upc": 89827104018, "desc": "Sweetheart's Delight Bqt", "pack": 9, "size": "bqt", "cost": 176.23, "unit": 19.5811, "retailL": 39.99, "retailFK": 27.579, "ad": false}, {"order": 7104372, "upc": 89827104372, "desc": "Love Wins Bqt", "pack": 9, "size": "bqt", "cost": 194.13, "unit": 21.57, "retailL": 39.99, "retailFK": 30.3803, "ad": false}, {"order": 7103971, "upc": 89827103971, "desc": "Garden Petals Bqt (Ecuadorian)", "pack": 10, "size": "bqt", "cost": 216.9, "unit": 21.69, "retailL": 39.99, "retailFK": 30.5493, "ad": false}, {"order": 7104267, "upc": 89827104267, "desc": "Rosy Whisper Bqt", "pack": 7, "size": "bqt", "cost": 168.7, "unit": 24.1, "retailL": 44.99, "retailFK": 33.9437, "ad": false}, {"order": 7100315, "upc": 89827100315, "desc": "Single Rose Bouquet in a Single Bucket Shipper", "pack": 25, "size": "bqt", "cost": 134.06, "unit": 5.3624, "retailL": 8.99, "retailFK": 7.5527, "ad": false}, {"order": 7103125, "upc": 89827103125, "desc": "3 st Glitter Roses 50cm (Ecuadorian)", "pack": 35, "size": "bqt", "cost": 210.88, "unit": 6.0251, "retailL": 11.99, "retailFK": 8.4861, "ad": false}, {"order": 7103639, "upc": 89827103639, "desc": "3 st Glitz and Glamour Roses 50cm (Ecuadorian)", "pack": 30, "size": "bqt", "cost": 220.52, "unit": 7.3507, "retailL": 12.99, "retailFK": 9.98, "ad": false}, {"order": 7100732, "upc": 89827100732, "desc": "Valentine's Tie Dye Roses (Ecuadorian)", "pack": 16, "size": "bqt", "cost": 209.19, "unit": 13.0744, "retailL": 24.99, "retailFK": 18.4146, "ad": false}, {"order": 7102182, "upc": 89827102182, "desc": "Designer Elegance Rose Bqt", "pack": 15, "size": "bqt", "cost": 173.52, "unit": 11.568, "retailL": 19.99, "retailFK": 16.293, "ad": false}, {"order": 7103975, "upc": 89827103975, "desc": "Rose Symphony Bqt (Ecuadorian)", "pack": 10, "size": "bqt", "cost": 228.95, "unit": 22.895, "retailL": 39.99, "retailFK": 32.2465, "ad": false}, {"order": 7100221, "upc": 89827100221, "desc": "40cm Dozen Rose CB", "pack": 10, "size": "bqt", "cost": 161.47, "unit": 16.147, "retailL": 29.99, "retailFK": 22.7423, "ad": false}, {"order": 7100863, "upc": 89827100863, "desc": "50cm COLOR Dozen Rose CB", "pack": 12, "size": "bqt", "cost": 173.52, "unit": 14.46, "retailL": 24.99, "retailFK": 19.98, "ad": false}, {"order": 7102055, "upc": 89827102055, "desc": "50cm Dozen Rose CB", "pack": 12, "size": "bqt", "cost": 214.01, "unit": 17.8342, "retailL": 29.99, "retailFK": 24.98, "ad": false}, {"order": 7100403, "upc": 89827100403, "desc": "50cm RED Dozen Rose Bunch", "pack": 12, "size": "bqt", "cost": 260.28, "unit": 21.69, "retailL": 39.99, "retailFK": 29.98, "ad": false}, {"order": 7100402, "upc": 89827100402, "desc": "50cm Dozen Premium Rose Bqt", "pack": 10, "size": "bqt", "cost": 175.93, "unit": 17.593, "retailL": 19.99, "retailFK": 17.98, "ad": true}, {"order": 7102634, "upc": 89827102634, "desc": "Double Dozen Duo", "pack": 6, "size": "bqt", "cost": 200.63, "unit": 33.4383, "retailL": 59.99, "retailFK": 47.0962, "ad": false}]}, {"key": "arrangementsbudv", "label": "Arrangements, Bud Vases, Bulk Product for Upgrading", "items": [{"order": 2020476, "upc": 818282020476, "desc": "Cute and Sweet Petite Arrangement", "pack": 9, "size": "vse", "cost": 86.76, "unit": 9.64, "retailL": 14.99, "retailFK": 12.98, "ad": true}, {"order": 7100225, "upc": 89827100225, "desc": "Single Rose Bud Vase", "pack": 12, "size": "vse", "cost": 112.79, "unit": 9.3992, "retailL": 16.99, "retailFK": 12.98, "ad": false}, {"order": 7103021, "upc": 89827103021, "desc": "Cute Triple Rose Vase", "pack": 12, "size": "vse", "cost": 140.99, "unit": 11.7492, "retailL": 19.99, "retailFK": 16.5482, "ad": false}, {"order": 7103685, "upc": 89827103685, "desc": "Queen of Hearts Arrangments", "pack": 6, "size": "vse", "cost": 66.88, "unit": 11.1467, "retailL": 19.99, "retailFK": 15.6996, "ad": false}, {"order": 7104010, "upc": 89827104010, "desc": "\"Bring Along Blooms\" Arrangement", "pack": 6, "size": "vse", "cost": 93.99, "unit": 15.665, "retailL": 29.99, "retailFK": 19.98, "ad": false}, {"order": 7103617, "upc": 89827103617, "desc": "Triple Hearts Bud Vase", "pack": 12, "size": "vse", "cost": 216.18, "unit": 18.015, "retailL": 29.99, "retailFK": 25.3732, "ad": false}, {"order": 7102443, "upc": 89827102443, "desc": "Glittered Rose Mason Jar", "pack": 12, "size": "vse", "cost": 219.79, "unit": 18.3158, "retailL": 29.99, "retailFK": 24.98, "ad": true}, {"order": 7100408, "upc": 89827100408, "desc": "Premium Half Dozen Rose Vase", "pack": 7, "size": "vse", "cost": 159.42, "unit": 22.7743, "retailL": 39.99, "retailFK": 29.98, "ad": false}, {"order": 2021329, "upc": 818282021329, "desc": "To the Moon and Back Medium Arrangement", "pack": 4, "size": "vse", "cost": 105.56, "unit": 26.39, "retailL": 49.99, "retailFK": 37.169, "ad": false}, {"order": 4230088, "upc": 72344230088, "desc": "10 Stem Cut Tulips in Oasis and Giftbag", "pack": 8, "size": "vse", "cost": 81.94, "unit": 10.2425, "retailL": 16.99, "retailFK": 14.98, "ad": true}, {"order": 7103599, "upc": 89827103599, "desc": "Dashing Daisies in a Vase in a Gift Bag", "pack": 5, "size": "vse", "cost": 156.65, "unit": 31.33, "retailL": 49.99, "retailFK": 44.1268, "ad": false}, {"order": 7102116, "upc": 89827102116, "desc": "Dozen Rose Vase in a Bag", "pack": 5, "size": "vse", "cost": 173.52, "unit": 34.704, "retailL": 49.99, "retailFK": 44.99, "ad": false}, {"order": 7102531, "upc": 89827102531, "desc": "Premium Dozen Rose Vase", "pack": 5, "size": "vse", "cost": 173.52, "unit": 34.704, "retailL": 39.99, "retailFK": 34.98, "ad": true}, {"order": "N/A", "upc": "N/A", "desc": "Bulk Red Roses (Ecuadorian)", "pack": 200, "size": "ct", "cost": 457.9, "unit": 2.2895, "retailL": 4.99, "retailFK": 3.2246, "ad": false}, {"order": "N/A", "upc": "N/A", "desc": "Bulk Color Roses (Ecuadorian)", "pack": 200, "size": "ct", "cost": 385.6, "unit": 1.928, "retailL": 3.99, "retailFK": 2.7155, "ad": false}, {"order": "N/A", "upc": "N/A", "desc": "Bulk Carnations", "pack": 150, "size": "ct", "cost": 117.49, "unit": 0.7833, "retailL": 1.49, "retailFK": 0.98, "ad": false}, {"order": 7103761, "upc": 89827103761, "desc": "Charming Floret CB (Ecuador)", "pack": 15, "size": "ct", "cost": 79.53, "unit": 5.302, "retailL": 9.99, "retailFK": 7.4676, "ad": false}, {"order": 7103337, "upc": 89827103337, "desc": "4 st Spray Rose CB (Ecuador)", "pack": 23, "size": "ct", "cost": 157.98, "unit": 6.8687, "retailL": 12.99, "retailFK": 9.6742, "ad": false}, {"order": 7100271, "upc": 89827100271, "desc": "5 st Alstroemeria CB", "pack": 24, "size": "ct", "cost": 109.9, "unit": 4.5792, "retailL": 8.99, "retailFK": 6.4496, "ad": false}, {"order": 7100228, "upc": 89827100228, "desc": "2 st Oriental Lily CB", "pack": 15, "size": "ct", "cost": 83.15, "unit": 5.5433, "retailL": 9.99, "retailFK": 7.8075, "ad": false}, {"order": 7101247, "upc": 89827101247, "desc": "5 st Sunflower CB", "pack": 10, "size": "ct", "cost": 66.28, "unit": 6.628, "retailL": 12.99, "retailFK": 9.3352, "ad": false}, {"order": "N/A", "upc": "N/A", "desc": "Bulk Babies Breath/Xlence Gyp", "pack": 12, "size": "ct", "cost": 133.03, "unit": 11.0858, "retailL": 19.99, "retailFK": 15.6138, "ad": false}, {"order": "N/A", "upc": "N/A", "desc": "Fresh Vacuum Seal Leather Leaf", "pack": 25, "size": "ct", "cost": 143.09, "unit": 5.7236, "retailL": 9.99, "retailFK": 7.98, "ad": false}, {"order": 7166612, "upc": 89827166612, "desc": "5 st Novelty Greens", "pack": 20, "size": "ct", "cost": 91.58, "unit": 4.579, "retailL": 8.99, "retailFK": 6.4493, "ad": false}, {"order": 7700130, "upc": 81517700130, "desc": "Large Green Drop Ins", "pack": 10, "size": "ct", "cost": 90.38, "unit": 9.038, "retailL": 14.99, "retailFK": 12.7296, "ad": false}, {"order": 7700793, "upc": 81517700793, "desc": "From the Heart Combo", "pack": 12, "size": "ct", "cost": 154.0, "unit": 12.8333, "retailL": 24.99, "retailFK": 17.98, "ad": false}, {"order": "N/A", "upc": "N/A", "desc": "Chrysal Clear Professional T-Bags Flower Food", "pack": 320, "size": "ct", "cost": 115.2, "unit": 0.36, "retailL": 0.6857, "retailFK": 0.5, "ad": false}, {"order": "N/A", "upc": "N/A", "desc": "Dozen Vase EMPTY Clear", "pack": 12, "size": "ct", "cost": 43.2, "unit": 3.6, "retailL": 6.99, "retailFK": 4.98, "ad": false}, {"order": "N/A", "upc": "N/A", "desc": "Bud Vase EMPTY Clear", "pack": 48, "size": "ct", "cost": 108.0, "unit": 2.25, "retailL": 4.99, "retailFK": 2.98, "ad": false}, {"order": "N/A", "upc": "N/A", "desc": "Half Dozen Vase EMPTY Clear", "pack": 12, "size": "ct", "cost": 36.45, "unit": 3.0375, "retailL": 5.99, "retailFK": 3.98, "ad": false}]}, {"key": "plantsdriedbouqu", "label": "Plants, Dried Bouquets, Rose Globes", "items": [{"order": 4240923, "upc": 72344240923, "desc": "4\" Bulbs in Glass with Coconut Liner", "pack": 12, "size": "4in", "cost": 86.76, "unit": 7.23, "retailL": 12.99, "retailFK": 9.98, "ad": false}, {"order": 4260923, "upc": 72344260923, "desc": "6\" Bulbs in Glass with Coconut Liner", "pack": 6, "size": "6in", "cost": 81.34, "unit": 13.5567, "retailL": 24.99, "retailFK": 18.98, "ad": false}, {"order": 4260049, "upc": 72344260049, "desc": "6\" Assorted Bulbs in Square Wood Pot", "pack": 6, "size": "6in", "cost": 81.34, "unit": 13.5567, "retailL": 24.99, "retailFK": 18.98, "ad": false}, {"order": 4260002, "upc": 72344260002, "desc": "6\" Bulb Garden in Seagrass Basket", "pack": 6, "size": "6in", "cost": 81.34, "unit": 13.5567, "retailL": 24.99, "retailFK": 18.98, "ad": false}, {"order": 6233374, "upc": "067946233374", "desc": "4\" Mini Roses with Faded Hearts Pot Cover", "pack": 18, "size": "4in", "cost": 116.04, "unit": 6.4467, "retailL": 12.99, "retailFK": 8.98, "ad": false}, {"order": 6233480, "upc": "067946233480", "desc": "6\" Mini Roses with Faded hearts Pot Cover", "pack": 8, "size": "6in", "cost": 87.72, "unit": 10.965, "retailL": 19.99, "retailFK": 15.4437, "ad": false}, {"order": 7181375, "upc": 78117181375, "desc": "4.5\" Assorted Blooming with Pot Cover", "pack": 15, "size": "4.5in", "cost": 76.82, "unit": 5.1213, "retailL": 9.99, "retailFK": 7.2131, "ad": false}, {"order": 7181372, "upc": 78117181372, "desc": "6\" Assorted Blooming with Pot Cover", "pack": 8, "size": "6in", "cost": 79.53, "unit": 9.9413, "retailL": 17.99, "retailFK": 13.98, "ad": false}, {"order": 3971426, "upc": 77513971426, "desc": "4.5\" Blooming in Love Lush Quicup with Pick", "pack": 15, "size": "4.5in", "cost": 92.18, "unit": 6.1453, "retailL": 9.99, "retailFK": 8.6554, "ad": false}, {"order": 3971707, "upc": 775139717074, "desc": "2.5\" Kalanchoe in Mini Message Heart Ceramic", "pack": 18, "size": "2.5in", "cost": 95.44, "unit": 5.3022, "retailL": 9.99, "retailFK": 7.4679, "ad": false}, {"order": 6218081, "upc": "067946218081", "desc": "6\" Mini Roses in Floral Market Valentine's Gift Bag w/ Tag", "pack": 8, "size": "6in", "cost": 94.95, "unit": 11.8688, "retailL": 16.99, "retailFK": 14.98, "ad": true}, {"order": 6234029, "upc": "067946234029", "desc": "4\" Mini Roses in Floral Bag with Love Wire Pick sheet", "pack": 12, "size": "4in", "cost": 111.34, "unit": 9.2783, "retailL": 17.99, "retailFK": 12.98, "ad": false}, {"order": 6213925, "upc": "067946213925", "desc": "4\" Assorted Blooming in Love Mug Ceramic", "pack": 12, "size": "4in", "cost": 128.69, "unit": 10.7242, "retailL": 19.99, "retailFK": 14.98, "ad": false}, {"order": 6234548, "upc": "067946234548", "desc": "4\" Dianthus in Kraft Pot Cover", "pack": 18, "size": "4in", "cost": 91.1, "unit": 5.0611, "retailL": 9.99, "retailFK": 7.1283, "ad": false}, {"order": 6234838, "upc": "067946234838", "desc": "4\" Assorted Tropical Foliage Tin w/ Tag Tropical Tones Pink", "pack": 12, "size": "4in", "cost": 96.16, "unit": 8.0133, "retailL": 14.99, "retailFK": 11.2863, "ad": false}, {"order": 4254317, "upc": 66504254317, "desc": "Puppy Love with 6cm Haworthia", "pack": 12, "size": "6cm", "cost": 85.31, "unit": 7.1092, "retailL": 12.99, "retailFK": 9.98, "ad": false}, {"order": 4253804, "upc": 66504253804, "desc": "Love Mugs with 3\" Foliage", "pack": 12, "size": "3in", "cost": 96.88, "unit": 8.0733, "retailL": 14.99, "retailFK": 11.3708, "ad": false}, {"order": 4211317, "upc": 66504211317, "desc": "5\" Tall Scarlet with Lucky Bamboo Heart", "pack": 15, "size": "5in", "cost": 221.42, "unit": 14.7613, "retailL": 27.99, "retailFK": 20.7906, "ad": false}, {"order": 4211024, "upc": 66504211024, "desc": "4.5\" Evelyn with Assorted Bonsai", "pack": 8, "size": "4.5in", "cost": 126.28, "unit": 15.785, "retailL": 29.99, "retailFK": 22.2324, "ad": false}, {"order": 4210776, "upc": 66504210776, "desc": "8\" Valerie with Succulent Garden", "pack": 5, "size": "8in", "cost": 109.66, "unit": 21.932, "retailL": 39.99, "retailFK": 30.8901, "ad": false}, {"order": 4296330, "upc": 66504296330, "desc": "6\" Gardenia Topiary with pot cover", "pack": 6, "size": "6in", "cost": 119.3, "unit": 19.8833, "retailL": 37.99, "retailFK": 27.98, "ad": false}, {"order": 4206046, "upc": 66504206046, "desc": "6\" Pink Fasciata Bromeliad with pot cover", "pack": 6, "size": "6in", "cost": 122.91, "unit": 20.485, "retailL": 39.99, "retailFK": 28.8521, "ad": false}, {"order": 7104049, "upc": 89827104049, "desc": "50cm Single stem RED Preserved Roses", "pack": 12, "size": "ct", "cost": 134.33, "unit": 11.1942, "retailL": 19.99, "retailFK": 15.7665, "ad": false}, {"order": 5463047, "upc": 850005463047, "desc": "Round Rose Globes", "pack": 6, "size": "ct", "cost": 72.23, "unit": 12.0383, "retailL": 19.99, "retailFK": 16.9554, "ad": false}, {"order": 7104385, "upc": 89827104385, "desc": "Mini Heart Rose Globes", "pack": 10, "size": "ct", "cost": 108.0, "unit": 10.8, "retailL": 16.99, "retailFK": 15.2113, "ad": true}]}], "supervisors": {"Mario": [{"store": 106, "city": "George West", "state": "TX", "banner": "Lowes"}, {"store": 110, "city": "Orange Grove", "state": "TX", "banner": "Lowes"}, {"store": 111, "city": "Hebbronville", "state": "TX", "banner": "Lowes"}, {"store": 112, "city": "Three Rivers", "state": "TX", "banner": "Lowes"}, {"store": 113, "city": "Palacios", "state": "TX", "banner": "Lowes"}, {"store": 116, "city": "Port Aransas", "state": "TX", "banner": "Lowes"}, {"store": 145, "city": "Cotulla", "state": "TX", "banner": "Lowes"}, {"store": 147, "city": "San Diego", "state": "TX", "banner": "Lowes"}, {"store": 148, "city": "Dilley", "state": "TX", "banner": "Lowes"}, {"store": 150, "city": "Freer", "state": "TX", "banner": "Lowes"}, {"store": 152, "city": "Laredo", "state": "TX", "banner": "Lowes"}, {"store": 153, "city": "Nixon", "state": "TX", "banner": "Lowes"}, {"store": 155, "city": "Zapata", "state": "TX", "banner": "Lowes"}, {"store": 156, "city": "Goliad", "state": "TX", "banner": "Lowes"}, {"store": 157, "city": "Yorktown", "state": "TX", "banner": "Lowes"}], "Mike B": [{"store": 102, "city": "Bandera", "state": "TX", "banner": "Lowes"}, {"store": 108, "city": "Canyon Lake", "state": "TX", "banner": "Lowes"}, {"store": 120, "city": "Rocksprings", "state": "TX", "banner": "Lowes"}, {"store": 127, "city": "Somerset", "state": "TX", "banner": "Lowes"}, {"store": 136, "city": "Blanco", "state": "TX", "banner": "Lowes"}, {"store": 137, "city": "Johnson City", "state": "TX", "banner": "Lowes"}, {"store": 141, "city": "Canyon Lake", "state": "TX", "banner": "Lowes"}, {"store": 142, "city": "Brackettville", "state": "TX", "banner": "Lowes"}, {"store": 151, "city": "Poteet", "state": "TX", "banner": "Lowes"}, {"store": 159, "city": "Comfort", "state": "TX", "banner": "Lowes"}, {"store": 123, "city": "Devine", "state": "TX", "banner": "FoodKing"}], "Antonio": [{"store": 1, "city": "Perryton", "state": "TX", "banner": "Lowes"}, {"store": 3, "city": "Friona", "state": "TX", "banner": "Lowes"}, {"store": 6, "city": "Floydada", "state": "TX", "banner": "Lowes"}, {"store": 10, "city": "Dimmitt", "state": "TX", "banner": "Lowes"}, {"store": 17, "city": "Clovis", "state": "NM", "banner": "Lowes"}, {"store": 19, "city": "Ulysses", "state": "KS", "banner": "Lowes"}, {"store": 20, "city": "Canadian", "state": "TX", "banner": "Lowes"}, {"store": 27, "city": "Clarendon", "state": "TX", "banner": "Lowes"}, {"store": 29, "city": "Fritch", "state": "TX", "banner": "Lowes"}, {"store": 49, "city": "Tulia", "state": "TX", "banner": "Lowes"}, {"store": 62, "city": "Hale Center", "state": "TX", "banner": "Lowes"}, {"store": 64, "city": "Spearman", "state": "TX", "banner": "Lowes"}, {"store": 67, "city": "Dumas", "state": "TX", "banner": "FoodKing"}, {"store": 28, "city": "Borger", "state": "TX", "banner": "FoodKing"}, {"store": 48, "city": "Hereford", "state": "TX", "banner": "FoodKing"}], "Sean": [{"store": 12, "city": "Tuscola", "state": "TX", "banner": "Lowes"}, {"store": 26, "city": "Iowa Park", "state": "TX", "banner": "Lowes"}, {"store": 47, "city": "Colorado City", "state": "TX", "banner": "Lowes"}, {"store": 121, "city": "Hico", "state": "TX", "banner": "Lowes"}, {"store": 158, "city": "Cross Plains", "state": "TX", "banner": "Lowes"}, {"store": 160, "city": "Decatur", "state": "TX", "banner": "Lowes"}, {"store": 163, "city": "Bridgeport", "state": "TX", "banner": "Lowes"}, {"store": 165, "city": "Boyd", "state": "TX", "banner": "Lowes"}, {"store": 166, "city": "Jacksboro", "state": "TX", "banner": "Lowes"}, {"store": 167, "city": "Chico", "state": "TX", "banner": "Lowes"}, {"store": 168, "city": "Alvord", "state": "TX", "banner": "Lowes"}, {"store": 169, "city": "Gainesville", "state": "TX", "banner": "Lowes"}, {"store": 173, "city": "Big Spring", "state": "TX", "banner": "Lowes"}, {"store": 174, "city": "Midland", "state": "TX", "banner": "Lowes"}], "Mike M": [{"store": 4, "city": "Eunice", "state": "NM", "banner": "Lowes"}, {"store": 14, "city": "Jal", "state": "NM", "banner": "Lowes"}, {"store": 32, "city": "Odessa", "state": "TX", "banner": "Lowes"}, {"store": 34, "city": "Odessa", "state": "TX", "banner": "Lowes"}, {"store": 35, "city": "Odessa", "state": "TX", "banner": "Lowes"}, {"store": 36, "city": "Odessa", "state": "TX", "banner": "Lowes"}, {"store": 154, "city": "Mc Camey", "state": "TX", "banner": "Lowes"}, {"store": 175, "city": "Crane", "state": "TX", "banner": "Lowes"}, {"store": 37, "city": "Odessa", "state": "TX", "banner": "FoodKing"}], "Isaac": [{"store": 9, "city": "Plains", "state": "TX", "banner": "Lowes"}, {"store": 11, "city": "Abernathy", "state": "TX", "banner": "Lowes"}, {"store": 16, "city": "Hobbs", "state": "NM", "banner": "Lowes"}, {"store": 39, "city": "Denver City", "state": "TX", "banner": "Lowes"}, {"store": 40, "city": "Seagraves", "state": "TX", "banner": "Lowes"}, {"store": 65, "city": "Crosbyton", "state": "TX", "banner": "Lowes"}, {"store": 131, "city": "Sundown", "state": "TX", "banner": "Lowes"}, {"store": 171, "city": "Seminole", "state": "TX", "banner": "Lowes"}, {"store": 172, "city": "Andrews", "state": "TX", "banner": "Lowes"}, {"store": 8, "city": "Littlefield", "state": "TX", "banner": "FoodKing"}, {"store": 15, "city": "Hobbs", "state": "NM", "banner": "FoodKing"}, {"store": 33, "city": "Muleshoe", "state": "TX", "banner": "FoodKing"}, {"store": 81, "city": "Lubbock", "state": "TX", "banner": "FoodKing"}, {"store": 82, "city": "Lubbock", "state": "TX", "banner": "FoodKing"}, {"store": 85, "city": "Lubbock", "state": "TX", "banner": "FoodKing"}], "Jason": [{"store": 103, "city": "Weimar", "state": "TX", "banner": "Lowes"}, {"store": 105, "city": "Needville", "state": "TX", "banner": "Lowes"}, {"store": 115, "city": "East Bernard", "state": "TX", "banner": "Lowes"}, {"store": 129, "city": "Brady", "state": "TX", "banner": "Lowes"}, {"store": 130, "city": "San Saba", "state": "TX", "banner": "Lowes"}, {"store": 133, "city": "Junction", "state": "TX", "banner": "Lowes"}, {"store": 134, "city": "Eden", "state": "TX", "banner": "Lowes"}, {"store": 138, "city": "Mason", "state": "TX", "banner": "Lowes"}, {"store": 139, "city": "Llano", "state": "TX", "banner": "Lowes"}, {"store": 140, "city": "Menard", "state": "TX", "banner": "Lowes"}, {"store": 161, "city": "Lago Vista", "state": "TX", "banner": "Lowes"}], "David": [{"store": 7, "city": "Ruidoso", "state": "NM", "banner": "Lowes"}, {"store": 55, "city": "Alamogordo", "state": "NM", "banner": "Lowes"}, {"store": 57, "city": "Las Cruces", "state": "NM", "banner": "Lowes"}, {"store": 58, "city": "Las Cruces", "state": "NM", "banner": "Lowes"}, {"store": 59, "city": "Tularosa", "state": "NM", "banner": "Lowes"}, {"store": 90, "city": "Anthony", "state": "TX", "banner": "Lowes"}, {"store": 68, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 69, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 70, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 71, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 72, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 73, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 74, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 76, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 77, "city": "Socorro", "state": "TX", "banner": "FoodKing"}, {"store": 80, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 83, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 87, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 96, "city": "El Paso", "state": "TX", "banner": "FoodKing"}, {"store": 97, "city": "El Paso", "state": "TX", "banner": "FoodKing"}], "Johnny": [{"store": 21, "city": "Gallup", "state": "NM", "banner": "Lowes"}, {"store": 22, "city": "Ganado", "state": "AZ", "banner": "Lowes"}, {"store": 23, "city": "Gallup", "state": "NM", "banner": "Lowes"}, {"store": 24, "city": "Window Rock", "state": "AZ", "banner": "Lowes"}, {"store": 56, "city": "Belen", "state": "NM", "banner": "Lowes"}, {"store": 91, "city": "Las Vegas", "state": "NM", "banner": "Lowes"}, {"store": 92, "city": "Las Vegas", "state": "NM", "banner": "Lowes"}, {"store": 94, "city": "Tucumcari", "state": "NM", "banner": "Lowes"}, {"store": 98, "city": "Albuquerque", "state": "NM", "banner": "Lowes"}, {"store": 89, "city": "Santa Fe", "state": "NM", "banner": "FoodKing"}, {"store": 99, "city": "Albuquerque", "state": "NM", "banner": "FoodKing"}], "Cain": [{"store": 13, "city": "Antonito", "state": "CO", "banner": "Lowes"}, {"store": 18, "city": "Chama", "state": "NM", "banner": "Lowes"}, {"store": 25, "city": "Del Norte", "state": "CO", "banner": "Lowes"}, {"store": 52, "city": "Taos", "state": "NM", "banner": "Lowes"}, {"store": 53, "city": "Raton", "state": "NM", "banner": "Lowes"}, {"store": 60, "city": "Angel Fire", "state": "NM", "banner": "Lowes"}, {"store": 109, "city": "Westcliffe", "state": "CO", "banner": "Lowes"}, {"store": 117, "city": "Denver", "state": "CO", "banner": "Lowes"}, {"store": 118, "city": "Denver", "state": "CO", "banner": "Lowes"}, {"store": 122, "city": "Aurora", "state": "CO", "banner": "Lowes"}, {"store": 93, "city": "Espanola", "state": "NM", "banner": "FoodKing"}, {"store": 128, "city": "Greeley", "state": "CO", "banner": "FoodKing"}], "Joe": [{"store": 31, "city": "Kermit", "state": "TX", "banner": "Lowes"}, {"store": 43, "city": "Fort Stockton", "state": "TX", "banner": "Lowes"}, {"store": 45, "city": "Monahans", "state": "TX", "banner": "Lowes"}, {"store": 104, "city": "Ozona", "state": "TX", "banner": "Lowes"}, {"store": 119, "city": "Sonora", "state": "TX", "banner": "Lowes"}, {"store": 124, "city": "Big Lake", "state": "TX", "banner": "Lowes"}, {"store": 135, "city": "Eldorado", "state": "TX", "banner": "Lowes"}, {"store": 146, "city": "Iraan", "state": "TX", "banner": "Lowes"}, {"store": 176, "city": "Van Horn", "state": "TX", "banner": "Lowes"}, {"store": 177, "city": "Ft. Davis", "state": "TX", "banner": "Lowes"}, {"store": 178, "city": "Alpine", "state": "TX", "banner": "Lowes"}, {"store": 179, "city": "Marfa", "state": "TX", "banner": "Lowes"}, {"store": 181, "city": "Presidio", "state": "TX", "banner": "Lowes"}, {"store": 38, "city": "San Angelo", "state": "TX", "banner": "FoodKing"}]}};
+var MAILTO_MAX = 1900;   // conservative: Outlook desktop and several mobile clients truncate above ~2k
+var SUP = null, QTY = {}, KEY = 'fl-' + (CFG.holiday || CFG.week || 'x');
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function money(v){ return (v==null||isNaN(v))?'-':'$'+Number(v).toFixed(2); }
+function allItems(){ var a=[]; (CFG.sections||[]).forEach(function(s){
+  s.items.forEach(function(it,i){ a.push({s:s,it:it,k:s.key+':'+i}); }); }); return a; }
+function totalItems(){ return allItems().length; }
+function retailFor(st,it){ return (st.banner==='Lowes'||!st.banner)? it.retailL : it.retailFK; }
+
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({sup:SUP,qty:QTY})); }catch(e){} }
+function load(){ try{ var d=JSON.parse(localStorage.getItem(KEY));
+  if(d && d.sup && CFG.supervisors[d.sup]){ return d; } }catch(e){} return null; }
+function clearSaved(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+
+function seenCount(store){ return Object.keys(QTY[store]||{}).length; }
+
+/* ---------- order text ----------
+   An explicit 0 is DATA (reviewed and passing); an untouched item is a real gap
+   and is never silently reported as a zero. A fully-reviewed section collapses
+   to one line so the email stays inside what mail clients will actually send. */
+function sectionBlock(st, sec){
+  var q=QTY[st.store]||{}, touched=[], nonzero=[], cases=0;
+  sec.items.forEach(function(it,i){
+    var v=q[sec.key+':'+i];
+    if(v!==undefined){ touched.push(v); if(Number(v)>0){ nonzero.push(v+' x '+it.desc); cases+=Number(v); } }
+  });
+  if(!touched.length) return null;
+  var full = touched.length===sec.items.length, L=[];
+  if(!nonzero.length){
+    L.push('  '+sec.label+': PASS - '+touched.length+' reviewed, none ordered');
+  } else {
+    L.push('  '+sec.label+':');
+    nonzero.forEach(function(t){ L.push('    '+t); });
+    var rest=touched.length-nonzero.length;
+    if(rest) L.push('    + '+rest+' more reviewed, 0');
+  }
+  if(!full) L.push('    ** '+(sec.items.length-touched.length)+' NOT LOOKED AT **');
+  return {lines:L, cases:cases, ordered:nonzero.length>0, full:full};
+}
+function storeHead(st){
+  return 'Store '+st.store+' ('+st.city+')'+(st.banner&&st.banner!=='Lowes'?' - FOOD KING':'');
+}
+/* a unit is one (store, section) pair - the smallest thing we can put in an email */
+function allUnits(stores){
+  var u=[];
+  stores.forEach(function(st){
+    (CFG.sections||[]).forEach(function(sec,xi){
+      if(sectionBlock(st,sec)) u.push({st:st, xi:xi});
+    });
+  });
+  return u;
+}
+function renderUnits(units, partLabel){
+  var L=[(CFG.holiday||CFG.week||'FLORAL')+' FLORAL ORDER',
+         'Due: '+(CFG.due||''), 'Supervisor: '+SUP];
+  if(partLabel) L.push(partLabel);
+  L.push('');
+  var cases=0, i=0;
+  while(i<units.length){
+    var st=units[i].st, blocks=[], any=false, allFull=true;
+    while(i<units.length && units[i].st.store===st.store){
+      var b=sectionBlock(st, CFG.sections[units[i].xi]);
+      if(b){ blocks.push(b); cases+=b.cases; if(b.ordered) any=true; if(!b.full) allFull=false; }
+      i++;
+    }
+    if(!any && allFull && blocks.length===(CFG.sections||[]).length){
+      L.push(storeHead(st)+': CLEAR - all '+totalItems()+' reviewed, no order');
+    } else {
+      L.push(storeHead(st)+':');
+      blocks.forEach(function(b){ L=L.concat(b.lines); });
+    }
+  }
+  L.push('', 'TOTAL CASES: '+cases);
+  return L.join('\n');
+}
+function orderText(stores){ return renderUnits(allUnits(stores), null); }
+function mailtoURL(sub, body){
+  return 'mailto:'+encodeURIComponent(CFG.email||'')+'?cc='+encodeURIComponent(CFG.cc||'')+
+         '&subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body);
+}
+/* greedy split at (store,section) granularity so every part is guaranteed to fit */
+function splitParts(stores){
+  var units=allUnits(stores), parts=[], cur=[];
+  units.forEach(function(u){
+    var trial=cur.concat([u]);
+    if(cur.length && mailtoURL('x', renderUnits(trial,'(part 9 of 9)')).length>MAILTO_MAX){
+      parts.push(cur); cur=[u];
+    } else cur=trial;
+  });
+  if(cur.length) parts.push(cur);
+  return parts;
+}
+/* ---------- render ---------- */
+function render(){
+  var app=document.getElementById('app');
+  if(CFG.closed){
+    app.innerHTML='<div class="closed"><h2>No floral order in progress</h2>'+
+      '<p>Nothing is open right now. You will get an email when the next floral holiday opens.</p></div>';
+    return;
+  }
+  if(!SUP){
+    var g=Object.keys(CFG.supervisors||{}).map(function(n){
+      return '<button class="namebtn" onclick="pick(\''+n.replace(/'/g,"\\'")+'\')">'+esc(n)+'</button>'; }).join('');
+    app.innerHTML='<header><div><div class="t">'+esc(CFG.holiday||CFG.week)+' Floral</div>'+
+      '<div class="s">Orders due '+esc(CFG.due)+'</div></div></header>'+
+      '<div class="who"><h2>Who are you?</h2><div class="namegrid">'+g+'</div></div>';
+    return;
+  }
+  var stores=CFG.supervisors[SUP]||[], N=totalItems();
+  var h='<header><div><div class="t">'+esc(SUP)+'</div><div class="s">'+
+        stores.length+' stores &middot; '+N+' items &middot; due '+esc(CFG.due)+'</div></div>'+
+        '<button class="chip" onclick="switchSup()">Not you?</button></header><div class="wrap">';
+  if(loadedFlag) h+='<div class="banner">&#10003; Your saved progress was restored. '+
+     'Come back as often as you like &mdash; nothing is sent until you tap Send.</div>';
+  stores.forEach(function(st,si){
+    var seen=seenCount(st.store), done=seen>=N;
+    h+='<div class="store"><div class="store-head" onclick="toggle('+si+')">'+
+       '<div><div class="n">Store '+st.store+'<span class="bn'+(st.banner!=='Lowes'?' fk':'')+'" style="margin-left:7px">'+
+       esc(st.banner==='Lowes'?'Lowes':'Food King')+'</span></div>'+
+       '<div class="c">'+esc(st.city)+', '+esc(st.state)+'</div></div>'+
+       '<div class="prog'+(done?' done':'')+'" id="p'+si+'">'+seen+' of '+N+'</div></div>'+
+       '<div id="b'+si+'" style="display:none">';
+    (CFG.sections||[]).forEach(function(sec,xi){
+      h+='<details class="sec"><summary><span>'+esc(sec.label)+'</span>'+
+         '<span style="color:var(--sub);font-weight:600">'+sec.items.length+'</span></summary>'+
+         '<div class="passrow"><span>Not ordering any of these?</span>'+
+         '<button class="passbtn" onclick="passAll('+si+','+xi+')">Pass on all '+sec.items.length+'</button></div>';
+      sec.items.forEach(function(it,i){
+        var key=sec.key+':'+i, v=(QTY[st.store]||{})[key];
+        h+='<div class="irow'+(it.ad?' ad':'')+'"><div class="info">'+
+           '<div class="nm">'+(it.ad?'<span class="adtag">AD</span>':'')+esc(it.desc)+'</div>'+
+           '<div class="dt">'+esc(it.pack)+' '+esc(it.size)+' &middot; case '+money(it.cost)+
+           ' &middot; retail '+money(retailFor(st,it))+'</div></div>'+
+           '<input class="qty'+(v===undefined?'':(Number(v)?' set':' zero'))+'" type="number" min="0" '+
+           'inputmode="numeric" pattern="[0-9]*" value="'+(v===undefined?'':v)+'" '+
+           'data-st="'+st.store+'" data-k="'+key+'" data-si="'+si+'" onchange="setQ(this)" oninput="setQ(this)"></div>';
+      });
+      h+='</details>';
+    });
+    h+='</div></div>';
+  });
+  h+='</div><div class="foot"><button class="send" id="sendbtn" onclick="review()">Review &amp; send order</button></div>';
+  app.innerHTML=h;
+  loadedFlag=false;
+}
+var loadedFlag=false;
+function toggle(si){ var b=document.getElementById('b'+si); b.style.display = b.style.display==='none'?'block':'none'; }
+function pick(n){ SUP=n; QTY=QTY||{}; (CFG.supervisors[n]||[]).forEach(function(s){ QTY[s.store]=QTY[s.store]||{}; }); save(); render(); }
+function switchSup(){ if(confirm('Switch supervisor? Your entries stay saved on this phone.')){ SUP=null; render(); } }
+function setQ(el){
+  var st=el.getAttribute('data-st'), k=el.getAttribute('data-k'), si=el.getAttribute('data-si');
+  QTY[st]=QTY[st]||{};
+  if(el.value===''){ delete QTY[st][k]; el.className='qty'; }
+  else { var n=Math.max(0,parseInt(el.value,10)||0); QTY[st][k]=n; el.className='qty'+(n?' set':' zero'); }
+  var N=totalItems(), seen=Object.keys(QTY[st]).length, p=document.getElementById('p'+si);
+  if(p){ p.textContent=seen+' of '+N; p.className='prog'+(seen>=N?' done':''); }
+  save();
+}
+function passAll(si,xi){
+  var st=(CFG.supervisors[SUP]||[])[si], sec=CFG.sections[xi];
+  QTY[st.store]=QTY[st.store]||{};
+  sec.items.forEach(function(it,i){ QTY[st.store][sec.key+':'+i]=0; });
+  /* update inputs in place - a re-render would collapse the section being worked */
+  var inputs=document.querySelectorAll('#b'+si+' input.qty');
+  Array.prototype.forEach.call(inputs,function(el){
+    if(el.getAttribute('data-k').indexOf(sec.key+':')===0){ el.value=0; el.className='qty zero'; }
+  });
+  var N=totalItems(), seen=Object.keys(QTY[st.store]).length, p=document.getElementById('p'+si);
+  if(p){ p.textContent=seen+' of '+N; p.className='prog'+(seen>=N?' done':''); }
+  save();
+}
+
+/* ---------- review, with the size guard ---------- */
+function review(){
+  var stores=CFG.supervisors[SUP]||[];
+  var sub=(CFG.holiday||CFG.week||'Floral')+' Floral Order - '+SUP;
+  var body=orderText(stores), url=mailtoURL(sub,body), over=url.length>MAILTO_MAX;
+  var untouched=stores.filter(function(s){ return seenCount(s.store)===0; });
+  var h='<h3>'+(over?'This order is too big to send by tapping':'Send your order')+'</h3>';
+  if(untouched.length) h+='<div class="warn"><b>'+untouched.length+' store'+(untouched.length>1?'s':'')+
+      ' not looked at yet:</b> '+untouched.map(function(s){return s.store;}).join(', ')+
+      '. Blank means nobody reviewed it. Use <b>Pass on all</b> if there is genuinely no order.</div>';
+  if(over){
+    h+='<div class="warn"><b>Do not paste this into a phone email app and hope.</b> An order this long '+
+       'gets silently cut off by most mail apps. Copy it below and paste into a new email, or send it in parts.</div>'+
+       '<p class="kv"><b>To:</b> '+esc(CFG.email)+'</p><p class="kv"><b>Cc:</b> '+esc(CFG.cc)+'</p>'+
+       '<p class="kv"><b>Subject:</b> '+esc(sub)+'</p>';
+  }
+  h+='<textarea class="ta" id="ordertext" readonly>'+esc(body)+'</textarea>'+
+     '<div class="row2">'+
+     (over ? '<button class="primary" onclick="copyText()">Copy order text</button>'+
+             '<button class="ghost" onclick="sendParts()">Send in parts</button>'
+           : '<button class="primary" onclick="doSend()">Open email</button>'+
+             '<button class="ghost" onclick="closeModal()">Back</button>')+
+     '</div>'+(over?'<div class="row2"><button class="ghost" onclick="closeModal()">Back</button></div>':'');
+  document.getElementById('sheet').innerHTML=h;
+  document.getElementById('modal').className='modal on';
+}
+function closeModal(){ document.getElementById('modal').className='modal'; }
+function doSend(){
+  var sub=(CFG.holiday||CFG.week||'Floral')+' Floral Order - '+SUP;
+  location.href=mailtoURL(sub, orderText(CFG.supervisors[SUP]||[]));
+  try{ localStorage.setItem(KEY+'-sent', new Date().toLocaleString()); }catch(e){}
+}
+function copyText(){
+  var t=document.getElementById('ordertext'); t.select(); t.setSelectionRange(0,999999);
+  var ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+  if(navigator.clipboard){ navigator.clipboard.writeText(t.value).then(function(){},function(){}); ok=true; }
+  alert(ok?'Order text copied. Paste it into a new email to '+CFG.email
+          :'Select the text above and copy it manually.');
+  try{ localStorage.setItem(KEY+'-sent', new Date().toLocaleString()); }catch(e){}
+}
+/* split by store into chunks that each fit under the limit */
+function sendParts(){
+  var parts=splitParts(CFG.supervisors[SUP]||[]);
+  if(!parts.length){ alert('Nothing entered yet.'); return; }
+  if(!confirm('This will open '+parts.length+' email'+(parts.length>1?'s':'')+
+              ', one after another. Send each one as it appears.')) return;
+  var i=0;
+  (function next(){
+    if(i>=parts.length){ try{ localStorage.setItem(KEY+'-sent',new Date().toLocaleString()); }catch(e){} return; }
+    var lab='(part '+(i+1)+' of '+parts.length+')';
+    var sub=(CFG.holiday||CFG.week||'Floral')+' Floral Order - '+SUP+' '+lab;
+    location.href=mailtoURL(sub, renderUnits(parts[i], lab)); i++;
+    setTimeout(next, 2500);
+  })();
+}
+
+/* ---------- boot ---------- */
+(function(){
+  var d=load();
+  if(d){ SUP=d.sup; QTY=d.qty||{}; loadedFlag=true; }
+  render();
+})();
+</script>
+</body>
+</html>
