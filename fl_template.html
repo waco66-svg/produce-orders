@@ -91,6 +91,7 @@
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <script>
 var CFG = __CFG__;
+var SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwFt2hW6uRMtnIo3JDeoOkjscGIGNosE2g6i-TE1Tj2QyFZoNNtDXV3lc7r4aRRKNtT/exec';
 var MAILTO_MAX = 1900;   // conservative: Outlook desktop and several mobile clients truncate above ~2k
 var SUP = null, QTY = {}, KEY = 'fl-' + (CFG.holiday || CFG.week || 'x');
 
@@ -234,7 +235,7 @@ function render(){
     });
     h+='</div></div>';
   });
-  h+='</div><div class="foot"><button class="send" id="sendbtn" onclick="review()">Review &amp; send order</button></div>';
+  h+='</div><div class="foot"><button class="send" id="sendbtn" onclick="review()">Review &amp; submit order</button></div>';
   app.innerHTML=h;
   loadedFlag=false;
 }
@@ -265,29 +266,82 @@ function passAll(si,xi){
   save();
 }
 
+/* ---------- structured payload for the Apps Script submit ----------
+   Carries BOTH the human text (for Matthew's email + sweeps) and the raw
+   quantities (so the nightly reconcile can write the workbook without
+   parsing email). Untouched items are simply absent - never sent as 0. */
+function buildPayload(){
+  var stores=CFG.supervisors[SUP]||[], out=[], cases=0, touchedStores=0;
+  stores.forEach(function(st){
+    var q=QTY[st.store]||{}, secs={}, any=false;
+    (CFG.sections||[]).forEach(function(sec){
+      var m={};
+      sec.items.forEach(function(it,i){ var v=q[sec.key+':'+i];
+        if(v!==undefined){ m[String(it.order)+'|'+it.desc]=Number(v)||0; any=true; cases+=Number(v)||0; } });
+      if(Object.keys(m).length) secs[sec.key]=m;
+    });
+    if(any){ touchedStores++; out.push({store:st.store, city:st.city, banner:st.banner, sections:secs}); }
+  });
+  return {program:'fl', holiday:CFG.holiday||CFG.week, due:CFG.due, supervisor:SUP,
+          submittedAt:new Date().toISOString(), totalCases:cases, storeCount:touchedStores,
+          stores:out, text:orderText(stores)};
+}
+function submitOrder(){
+  var btn=document.getElementById('submitbtn'); if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
+  var payload=buildPayload();
+  var ctl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+  var timer = ctl ? setTimeout(function(){ ctl.abort(); }, 25000) : null;
+  fetch(SUBMIT_URL, {method:'POST', mode:'cors', redirect:'follow', cache:'no-store',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},   // simple request: no CORS preflight
+        body: JSON.stringify(payload), signal: ctl?ctl.signal:undefined})
+   .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+   .then(function(j){
+      if(timer) clearTimeout(timer);
+      if(j && j.ok){ receipt(j, payload); }
+      else { throw new Error((j&&j.error)||'server said no'); }
+   })
+   .catch(function(err){ if(timer) clearTimeout(timer); submitFailed(err, payload); });
+}
+function receipt(j, payload){
+  var when=new Date().toLocaleString();
+  try{ localStorage.setItem(KEY+'-sent', when); localStorage.setItem(KEY+'-receipt', JSON.stringify({when:when,file:j.file,cases:payload.totalCases,stores:payload.storeCount})); }catch(e){}
+  document.getElementById('sheet').innerHTML=
+    '<h3>&#10003; Order received</h3>'+
+    '<p><b>'+payload.totalCases+' cases</b> across <b>'+payload.storeCount+' store'+(payload.storeCount===1?'':'s')+'</b> for '+esc(SUP)+
+    ' went to Matthew at '+esc(when)+'.</p>'+
+    '<p>Nothing else to do. If you change something later, just come back and submit again &mdash; '+
+    'the newest submission is the one that counts.</p>'+
+    (j.file?'<p class="kv">Receipt: '+esc(j.file)+'</p>':'')+
+    '<div class="row2"><button class="primary" onclick="closeModal()">Done</button></div>';
+}
+function submitFailed(err, payload){
+  var sub=(CFG.holiday||CFG.week||'Floral')+' Floral Order - '+SUP;
+  document.getElementById('sheet').innerHTML=
+    '<h3>Could not reach the order server</h3>'+
+    '<div class="warn"><b>Your order is NOT sent yet</b> &mdash; but nothing is lost, it is still saved on this phone. '+
+    'Try Submit again in a moment. If it keeps failing, copy the order below and paste it into a new email.</div>'+
+    '<p class="kv"><b>To:</b> '+esc(CFG.email)+'</p><p class="kv"><b>Cc:</b> '+esc(CFG.cc)+'</p>'+
+    '<p class="kv"><b>Subject:</b> '+esc(sub)+'</p>'+
+    '<textarea class="ta" id="ordertext" readonly>'+esc(payload.text)+'</textarea>'+
+    '<div class="row2"><button class="primary" onclick="submitOrder()">Try Submit again</button>'+
+    '<button class="ghost" onclick="copyText()">Copy order text</button></div>'+
+    '<div class="row2"><button class="ghost" onclick="closeModal()">Back</button></div>'+
+    '<p class="kv" style="margin-top:8px">'+esc(String(err&&err.message||err))+'</p>';
+}
+
 /* ---------- review, with the size guard ---------- */
 function review(){
   var stores=CFG.supervisors[SUP]||[];
-  var sub=(CFG.holiday||CFG.week||'Floral')+' Floral Order - '+SUP;
-  var body=orderText(stores), url=mailtoURL(sub,body), over=url.length>MAILTO_MAX;
+  var body=orderText(stores);
   var untouched=stores.filter(function(s){ return seenCount(s.store)===0; });
-  var h='<h3>'+(over?'This order is too big to send by tapping':'Send your order')+'</h3>';
+  var h='<h3>Submit your order</h3>';
   if(untouched.length) h+='<div class="warn"><b>'+untouched.length+' store'+(untouched.length>1?'s':'')+
       ' not looked at yet:</b> '+untouched.map(function(s){return s.store;}).join(', ')+
       '. Blank means nobody reviewed it. Use <b>Pass on all</b> if there is genuinely no order.</div>';
-  if(over){
-    h+='<div class="warn"><b>Do not paste this into a phone email app and hope.</b> An order this long '+
-       'gets silently cut off by most mail apps. Copy it below and paste into a new email, or send it in parts.</div>'+
-       '<p class="kv"><b>To:</b> '+esc(CFG.email)+'</p><p class="kv"><b>Cc:</b> '+esc(CFG.cc)+'</p>'+
-       '<p class="kv"><b>Subject:</b> '+esc(sub)+'</p>';
-  }
-  h+='<textarea class="ta" id="ordertext" readonly>'+esc(body)+'</textarea>'+
-     '<div class="row2">'+
-     (over ? '<button class="primary" onclick="copyText()">Copy order text</button>'+
-             '<button class="ghost" onclick="sendParts()">Send in parts</button>'
-           : '<button class="primary" onclick="doSend()">Open email</button>'+
-             '<button class="ghost" onclick="closeModal()">Back</button>')+
-     '</div>'+(over?'<div class="row2"><button class="ghost" onclick="closeModal()">Back</button></div>':'');
+  h+='<p>Check it over, then tap Submit. It goes straight to Matthew &mdash; you do not need to send an email.</p>'+
+     '<textarea class="ta" id="ordertext" readonly>'+esc(body)+'</textarea>'+
+     '<div class="row2"><button class="primary" id="submitbtn" onclick="submitOrder()">Submit order</button>'+
+     '<button class="ghost" onclick="closeModal()">Back</button></div>';
   document.getElementById('sheet').innerHTML=h;
   document.getElementById('modal').className='modal on';
 }
