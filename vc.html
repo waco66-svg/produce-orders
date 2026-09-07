@@ -157,6 +157,13 @@ function callRow(r, c){
   var d = STATE.calls[c.id], cell;
   if (d) {
     cell = '<span class="decided"><span class="val">'+esc(d.label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+'</span><button data-undo-call="'+esc(c.id)+'">Change</button></span>';
+  } else if (c.options && c.options.length) {
+    // AFI pack/size: several generated candidates plus a free write-in (Matthew, 9/7/26).
+    cell = '<span class="opts">' +
+      c.options.map(function(o,i){ return '<button class="'+(i===0?'primary':'')+'" data-call="'+esc(c.id)+
+        '" data-choice="proposal" data-value="'+esc(o.value)+'" title="'+esc(o.label)+'">'+esc(o.value)+'</button>'; }).join('') +
+      '<input class="custom" placeholder="Pack and size" data-custom-for="'+esc(c.id)+'" aria-label="Pack and size">' +
+      '<button data-call="'+esc(c.id)+'" data-choice="custom">Use that</button></span>';
   } else {
     cell = '<span class="opts">' +
       (c.proposal!=null ? '<button class="primary" data-call="'+esc(c.id)+'" data-choice="proposal" data-value="'+esc(c.proposal)+'">'+(c.alt!=null?(c.field==='Item Code'?'Accept item code ':'Accept vendor pack '):'Use ')+esc(c.proposal)+'</button>' : '') +
