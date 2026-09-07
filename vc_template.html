@@ -84,6 +84,7 @@ button.big { font-family:"Barlow Semi Condensed",sans-serif; font-size:15px; pad
 button[disabled] { opacity:.5; cursor:not-allowed; }
 .opts input { font:inherit; font-size:13px; width:80px; padding:4px 7px; border:1px solid var(--line); border-radius:4px; background:var(--surface); color:var(--ink); }
 .opts input.custom { width:110px; }
+.opts input.custom.pack { width:64px; }
 .decided { display:inline-flex; align-items:center; gap:8px; }
 .decided .val { font-family:"IBM Plex Mono",monospace; font-weight:500; color:var(--good); }
 .decided .by { color:var(--muted); font-size:12.5px; }
@@ -162,8 +163,9 @@ function callRow(r, c){
     cell = '<span class="opts">' +
       c.options.map(function(o,i){ return '<button class="'+(i===0?'primary':'')+'" data-call="'+esc(c.id)+
         '" data-choice="proposal" data-value="'+esc(o.value)+'" title="'+esc(o.label)+'">'+esc(o.value)+'</button>'; }).join('') +
-      '<input class="custom" placeholder="Pack and size" data-custom-for="'+esc(c.id)+'" aria-label="Pack and size">' +
-      '<button data-call="'+esc(c.id)+'" data-choice="custom">Use that</button></span>';
+      '<input class="custom pack" placeholder="Pack" data-custom-pack-for="'+esc(c.id)+'" aria-label="Pack" inputmode="decimal">' +
+      '<input class="custom" placeholder="Size" data-custom-size-for="'+esc(c.id)+'" aria-label="Size">' +
+      '<button data-call="'+esc(c.id)+'" data-choice="packsize">Use that</button></span>';
   } else {
     cell = '<span class="opts">' +
       (c.proposal!=null ? '<button class="primary" data-call="'+esc(c.id)+'" data-choice="proposal" data-value="'+esc(c.proposal)+'">'+(c.alt!=null?(c.field==='Item Code'?'Accept item code ':'Accept vendor pack '):'Use ')+esc(c.proposal)+'</button>' : '') +
@@ -290,13 +292,21 @@ document.addEventListener('click', function(e){
   var name = needName(); if (!name) return;
   var at = when();
   if (b.dataset.call) {
-    var id = b.dataset.call, label, value;
+    var id = b.dataset.call, label, value, choice = b.dataset.choice;
     var fld = id.split(':').pop();   // CasePack | CaseCost | ItemCode — "the book" only means a pack
     if (b.dataset.choice==='proposal') { value = b.dataset.value; label = 'Use ' + value; }
     else if (b.dataset.choice==='alt') { value = b.dataset.value; label = (fld==='CasePack' ? 'Keep book ' : 'Keep ') + value; }
     else if (b.dataset.choice==='skip') { value = null; label = 'Skipped'; }
+    else if (b.dataset.choice==='packsize') {
+      // AFI writes a pack and a size; two boxes read clearer than one (Matthew, 9/7/26).
+      var pk = document.querySelector('input[data-custom-pack-for="'+id+'"]');
+      var sz = document.querySelector('input[data-custom-size-for="'+id+'"]');
+      var p = (pk.value||'').trim(), z = (sz.value||'').trim();
+      if (!p) { toast('Type a pack first'); pk.focus(); return; }
+      value = (p + ' ' + z).trim(); label = 'Use ' + value; choice = 'custom';
+    }
     else { var inp = document.querySelector('input[data-custom-for="'+id+'"]'); value = (inp.value||'').trim(); if (!value) { toast('Type a value first'); inp.focus(); return; } label = 'Use ' + value; }
-    STATE.calls[id] = {choice:b.dataset.choice, value:value, label:label, by:name, at:at};
+    STATE.calls[id] = {choice:choice, value:value, label:label, by:name, at:at};
     STATE.log.push(at+' — '+name+' decided '+id+': '+label);
   } else if (b.dataset.undoCall) {
     delete STATE.calls[b.dataset.undoCall]; STATE.log.push(at+' — '+name+' reopened '+b.dataset.undoCall);
