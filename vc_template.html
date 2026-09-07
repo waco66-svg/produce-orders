@@ -323,7 +323,18 @@ function sendBar(scope){
 function render(){
   var V = CFG.vendors || [];
   if (CFG.closed || !V.length) {
-    document.getElementById('root').innerHTML = '<div class="wrap"><header class="masthead"><div><div class="eyebrow">Lowe\'s Market · DSD Produce</div><h1>Vendor Change Report</h1></div></header><p class="empty" style="font-size:17px;margin-top:30px">'+esc(CFG.closedMessage || 'No vendor report is open right now. Check back after the bid forms come in.')+'</p></div>';
+    // The waiting state is dated too. An undated "nothing here yet" page is just as capable of
+    // being a week old as a full one. (Matthew, 9/7/26)
+    var msg = CFG.closedMessage || ((META.week ? 'No vendor forms have arrived yet for ' + META.week + '.' : 'No vendor report is open right now.')
+              + ' Bid forms are due Tuesday 8 AM \u2014 this page fills in as they land.');
+    var miss = (META.missing && META.missing.length)
+      ? '<p class="empty" style="margin-top:10px">Still to send: ' + esc(META.missing.join(', ')) + '</p>' : '';
+    document.getElementById('root').innerHTML =
+      '<div class="wrap"><header class="masthead"><div><div class="eyebrow">Lowe\'s Market · DSD Produce</div><h1>Vendor Change Report</h1></div>' +
+      '<div class="stamp">' + (META.week ? '<b>'+esc(META.week)+'</b><br>' : '') +
+      (META.built ? '<span class="built">Page built '+esc(META.built)+'</span>'
+                  : '<span class="built stale">Page build time unknown</span>') +
+      '</div></header><p class="empty" style="font-size:17px;margin-top:30px">'+esc(msg)+'</p>' + miss + '</div>';
     return;
   }
   var sts = V.map(status);
