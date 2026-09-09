@@ -1,5 +1,5 @@
 {
-"version":"2026-09-09",
+"version":"2026-09-09b",
 "note":"147 stores: the 144 on the current banner roster plus 15, 16 and 39 (Hobbs / Denver City, join Oct 2026).",
 "stores":[
 {
@@ -1477,10 +1477,10 @@
 {
 "num":"home",
 "name":"Home",
-"addr":"134 E 23rd St",
-"city":"Littlefield",
-"st":"TX",
-"zip":"79339",
+"addr":"",
+"city":"",
+"st":"",
+"zip":"",
 "phone":"",
 "grp":"place"
 },
