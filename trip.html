@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Store Trip Calculator</title>
+<link rel="manifest" href="trip.webmanifest">
+<meta name="theme-color" content="#1B2437">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Store Trips">
+<link rel="apple-touch-icon" href="trip-icon-192.png">
+<link rel="icon" href="trip-icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF0F3; --card:#FFFFFF; --ink:#1B2437; --ink-2:#4B566B; --line:#CBD3DD;
+  --shield:#F2B705; --route:#C8371F; --ok:#2E7D4F; --focus:#2456C4;
+  --hd:'Barlow Condensed',Impact,'Arial Narrow',sans-serif; --bd:'Barlow',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--bd);font-size:15px;line-height:1.4}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+header{background:var(--ink);color:#fff;padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+header h1{font-family:var(--hd);font-weight:700;font-size:30px;letter-spacing:.5px;margin:0;line-height:1}
+header h1 small{display:block;font-family:var(--bd);font-weight:400;font-size:12px;color:#B9C3D3;letter-spacing:0}
+.trips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;align-items:center}
+.trips button{background:transparent;border:1px solid #3B4760;color:#D7DEE9;border-radius:4px;padding:6px 12px;font-family:var(--hd);font-size:17px}
+.trips button.on{background:var(--shield);border-color:var(--shield);color:var(--ink)}
+.trips button.new{border-style:dashed}
+
+main{max-width:1180px;margin:0 auto;padding:18px 22px 60px;display:grid;grid-template-columns:1fr 300px;gap:18px}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:6px}
+.setup{padding:14px 16px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;align-items:end}
+@media(max-width:700px){.setup{grid-template-columns:1fr 1fr}}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2);font-weight:500}
+label.f input,label.f select{border:1px solid var(--line);border-radius:4px;padding:8px 9px;background:#fff;font-size:15px;width:100%}
+
+/* route */
+.route{margin-top:18px;padding:6px 16px 14px}
+.row{display:grid;grid-template-columns:42px 34px minmax(230px,1.6fr) 84px 110px 96px 30px;gap:8px;align-items:center;padding:8px 0;position:relative}
+.row.head{color:var(--ink-2);font-size:12px;font-weight:500;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.row .mark{position:relative;height:100%;min-height:36px}
+.row .mark::before{content:"";position:absolute;left:11px;top:-14px;bottom:-14px;border-left:4px solid var(--route);opacity:.85}
+.row.first .mark::before{top:50%}
+.row.last .mark::before{bottom:50%}
+.row.head .mark::before,.row.empty .mark::before{display:none}
+.row .mark i{position:absolute;left:4px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:#fff;border:4px solid var(--route)}
+.row.first .mark i,.row.last .mark i{background:var(--route);border-radius:3px}
+.row .n{font-family:var(--hd);font-size:20px;font-weight:600;color:var(--ink-2);text-align:right}
+.row input{border:1px solid transparent;border-bottom-color:var(--line);border-radius:0;padding:7px 6px;background:transparent;width:100%}
+.row input:hover{border-color:var(--line)}
+.row input:focus{background:#fff;border-color:var(--focus)}
+.row .arr{font-family:var(--hd);font-size:22px;font-weight:600;text-align:right;white-space:nowrap}
+.row .drv{font-family:var(--hd);font-size:18px;color:var(--ink-2);text-align:right;display:flex;justify-content:flex-end;gap:6px;align-items:baseline}
+.row .drv input{width:62px;text-align:right;font-family:var(--hd);font-size:18px;padding:3px 4px}
+.row .drv .mi{font-size:12px;font-family:var(--bd);color:#7B8699}
+.row .stay input{width:100%;text-align:right}
+.row .place{display:flex;flex-direction:column;gap:2px;min-width:0}
+.row .place .sub{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:6px}
+.row .place .sub.warn{color:var(--route)}
+.row .x{background:none;border:0;color:#9AA5B6;font-size:20px;line-height:1;padding:4px;border-radius:4px}
+.row .x:hover{color:var(--route);background:#FBE9E4}
+@media(max-width:700px){
+  main{padding:12px 12px 40px}
+  header{padding:10px 12px}
+  header h1{font-size:24px}
+  .row{grid-template-columns:26px 24px 1fr 56px 34px;grid-template-areas:"mark n place stay x" "mark n meta meta meta";gap:4px 8px;padding:10px 0;border-bottom:1px solid #EEF1F4}
+  .row.head{display:none}
+  .row .mark{grid-area:mark}.row .n{grid-area:n}.row .place{grid-area:place}.row .stay{grid-area:stay}.row .x{grid-area:x}
+  .row .arr,.row .drv{grid-area:meta;font-size:18px;text-align:left;justify-content:flex-start}
+  .row .arr{display:inline-flex}
+  .row .drv{display:inline-flex;margin-left:120px}
+  
+  .row .arr::before{content:"arrive ";font-family:var(--bd);font-size:12px;color:var(--ink-2);margin-right:4px;align-self:baseline}
+  .row .drv::before{content:"drive ";font-family:var(--bd);font-size:12px;color:var(--ink-2);margin-right:4px;align-self:baseline}
+  .row .drv input{width:56px;font-size:16px}
+  .row .stay input{font-size:14px;padding:6px 4px}
+  .row .place input{font-size:16px}
+  .routebar .status{margin-left:0;width:100%}
+  .tot dd{font-size:26px}.tot .big dd{font-size:36px}
+}
+.routebar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 0 0;border-top:1px solid var(--line);margin-top:6px}
+.btn{border:1px solid var(--ink);background:#fff;border-radius:4px;padding:8px 14px;font-weight:500}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:disabled{opacity:.55;cursor:wait}
+.btn.shield{background:var(--shield);border-color:var(--shield)}
+.status{font-size:13px;color:var(--ink-2);margin-left:auto}
+.status.err{color:var(--route)}
+
+/* totals */
+aside .panel{padding:16px}
+.tot{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:baseline}
+.tot dt{color:var(--ink-2);font-size:13px;margin:0}
+.tot dd{margin:0;font-family:var(--hd);font-size:34px;font-weight:700;text-align:right;line-height:1.05}
+.tot dd.small{font-size:24px;font-weight:600}
+.tot .big{grid-column:1/-1;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+.tot .big dd{font-size:46px;color:var(--route)}
+.hint{font-size:12.5px;color:var(--ink-2);margin:12px 0 0;line-height:1.45}
+.hint b{color:var(--ink)}
+.stack{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.stack .btn{text-align:left}
+.sched{margin-top:14px;font-size:13px}
+.sched div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.sched span:first-child{font-family:var(--hd);font-size:16px;font-weight:600;white-space:nowrap}
+.sched span:last-child{text-align:right;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.sug{position:absolute;z-index:20;left:0;right:0;top:100%;background:#fff;border:1px solid var(--line);border-radius:4px;box-shadow:0 8px 24px rgba(27,36,55,.14);max-height:280px;overflow:auto}
+.sug div{padding:7px 10px;cursor:pointer;display:flex;gap:10px;align-items:baseline;border-bottom:1px solid #F0F2F5}
+.sug div:hover,.sug div.sel{background:#FFF6D6}
+.sug b{font-family:var(--hd);font-size:17px;min-width:44px;color:var(--ink)}
+.sug small{color:var(--ink-2);margin-left:auto;white-space:nowrap}
+.sug .typed{color:var(--ink-2);font-style:italic}
+.row .place{position:relative}
+.modal{position:fixed;inset:0;background:rgba(27,36,55,.55);display:none;align-items:flex-start;justify-content:center;padding:30px 16px;overflow:auto;z-index:50}
+.modal.open{display:flex}
+.modal .box{background:#fff;border-radius:8px;width:min(920px,100%);padding:18px 20px}
+.modal h2{font-family:var(--hd);font-size:26px;margin:0 0 4px}
+.modal p{margin:0 0 12px;color:var(--ink-2);font-size:13.5px}
+.modal table{width:100%;border-collapse:collapse;font-size:13px}
+.modal th{text-align:left;color:var(--ink-2);font-weight:500;padding:6px 4px;border-bottom:1px solid var(--line)}
+.modal td{padding:2px}
+.modal td input{width:100%;border:1px solid transparent;border-bottom:1px solid #E3E8EF;padding:5px 6px;background:transparent}
+.modal td input:focus{border-color:var(--focus);background:#fff}
+.modal tr.missing td input{background:#FFF3F0}
+.modal .bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.modal .bar input[type=search]{flex:1;min-width:180px;border:1px solid var(--line);border-radius:4px;padding:8px}
+.modal .tbl{max-height:55vh;overflow:auto;border:1px solid var(--line);border-radius:4px}
+@media print{header .trips,.routebar,.stack,.hint,.row .x{display:none!important}main{grid-template-columns:1fr 240px}body{background:#fff}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Store Trip Calculator<small>Lowe's Market store runs · times from your start, stay, and drive</small></h1>
+  <div class="trips" id="tripTabs"></div>
+  <button class="btn" id="openStores" style="background:transparent;color:#D7DEE9;border-color:#3B4760">Stores &amp; places</button>
+</header>
+
+<main>
+<section>
+  <div class="panel setup">
+    <label class="f">Starting from
+      <input id="startAddr" autocomplete="off" placeholder="home, office, store #, hotel…">
+    </label>
+    <label class="f">Leave at
+      <input id="startTime" type="time" value="07:00">
+    </label>
+    <label class="f">Store stay (min)
+      <input id="defStay" type="number" min="0" step="5" value="45">
+    </label>
+    <label class="f">Trip name
+      <input id="tripName" placeholder="Big Lake run">
+    </label>
+  </div>
+
+  <div class="panel route">
+    <div class="row head"><span></span><span></span><span>Stop — store # or any place</span><span style="text-align:right">Stay</span><span style="text-align:right">Arrive</span><span style="text-align:right">Drive</span><span></span></div>
+    <div id="rows"></div>
+    <div class="routebar">
+      <button class="btn primary" id="calc">Get drive times</button>
+      <button class="btn" id="addStop">+ Add stop</button>
+      <button class="btn" id="homeBtn">End at home</button>
+      <span class="status" id="status">Enter stops, then get drive times. You can also type a drive time by hand.</span>
+    </div>
+  </div>
+</section>
+
+<aside>
+  <div class="panel">
+    <dl class="tot">
+      <dt>Drive time</dt><dd id="tDrive">0:00</dd>
+      <dt>Time in stores</dt><dd class="small" id="tStay">0:00</dd>
+      <dt>Miles</dt><dd class="small" id="tMiles">—</dd>
+      <div class="big"><dt>Total trip</dt><dd id="tTotal">0:00</dd></div>
+      <dt>Back / done at</dt><dd class="small" id="tEnd">—</dd>
+    </dl>
+    <div class="sched" id="sched"></div>
+    <div class="stack">
+      <button class="btn shield" id="gmaps">Open route in Google Maps</button>
+      <button class="btn" id="copy">Copy itinerary as text</button>
+      <button class="btn" id="csv">Download CSV</button>
+      <button class="btn" id="print">Print</button>
+      <button class="btn" id="del">Delete this trip</button>
+    </div>
+    <p class="hint">Drive times come from OpenStreetMap routing (no key needed) and lean a few minutes fast — they don't know about fuel or traffic. Store addresses are looked up once and remembered on this device. Search by <b>store #, city, or name</b> — "Odessa" lists all five, "37" picks Food King Odessa, "office" is the corporate office. Anything else is looked up as typed. Keep the list current under <b>Stores &amp; places</b> (import the master CSV when it changes).</p>
+  </div>
+</aside>
+</main>
+
+<div class="modal" id="storeModal">
+  <div class="box">
+    <h2>Stores &amp; places</h2>
+    <p><span id="rosterNote"></span> This is the list the trip search uses. Edit any cell, add new stores or regular places (hotels, the office), or import the latest master CSV. Rows tinted red are missing an address — fill them in when you have it.</p>
+    <div class="bar">
+      <input type="search" id="sFilter" placeholder="Filter by number, city, name…">
+      <button class="btn" id="sAdd">+ Add row</button>
+      <button class="btn" id="sImport">Import CSV</button>
+      <input type="file" id="sFile" accept=".csv" hidden>
+      <button class="btn" id="sExport">Export CSV</button>
+      <button class="btn" id="sReset">Reset to built-in list</button>
+      <button class="btn primary" id="sClose">Done</button>
+    </div>
+    <div class="tbl"><table><thead><tr><th style="width:56px">#</th><th>Name</th><th>Street</th><th>City</th><th style="width:42px">ST</th><th style="width:64px">ZIP</th><th>Phone</th><th>Ad group</th><th style="width:30px"></th></tr></thead><tbody id="sBody"></tbody></table></div>
+  </div>
+</div>
+
+<script>
+const BUILTIN_STORES = [{"num":1,"name":"Lowe's #01","addr":"912 S. Main","city":"Perryton","st":"TX","zip":"79070","phone":"806-435-5511","grp":"TEXAS"},{"num":3,"name":"Lowe's #03","addr":"1205 W Hwy 60","city":"Friona","st":"TX","zip":"79035","phone":"806-250-3913","grp":"TEXAS"},{"num":4,"name":"Lowe's #04","addr":"1326 Ave J","city":"Eunice","st":"NM","zip":"88231","phone":"575-394-2930","grp":"New Mexico"},{"num":6,"name":"Lowe's #06","addr":"220 S 2nd Street","city":"Floydada","st":"TX","zip":"79235","phone":"806-983-3149","grp":"TEXAS"},{"num":7,"name":"Lowe's #07","addr":"304 Mechum Drive","city":"Ruidoso","st":"NM","zip":"88355","phone":"575-257-6544","grp":"Corner Market"},{"num":8,"name":"Food King #08","addr":"102 W Waylon Jennings Blvd","city":"Littlefield","st":"TX","zip":"79339","phone":"806-385-4711","grp":"Food King TX"},{"num":9,"name":"Lowe's #09","addr":"710 Cowboy Way","city":"Plains","st":"TX","zip":"79355","phone":"806-456-3434","grp":"TEXAS CASE READY"},{"num":10,"name":"Lowe's #10","addr":"103 W Belsher","city":"Dimmitt","st":"TX","zip":"79027","phone":"806-647-2488","grp":"TEXAS"},{"num":11,"name":"Lowe's #11","addr":"405 Ave D","city":"Abernathy","st":"TX","zip":"79311","phone":"806-298-2627","grp":"TEXAS"},{"num":12,"name":"Lowe's #12","addr":"845 Garza","city":"Tuscola","st":"TX","zip":"79562","phone":"325-554-7641","grp":"TEXAS"},{"num":13,"name":"Lowe's #13","addr":"512 Main St.","city":"Antonito","st":"CO","zip":"81120","phone":"719-376-2483","grp":"Resort"},{"num":14,"name":"Lowe's #14","addr":"100 Curry","city":"Jal","st":"NM","zip":"88252","phone":"575-395-2957","grp":"New Mexico"},{"num":15,"name":"Food King #15","addr":"1317 N Turner St","city":"Hobbs","st":"NM","zip":"88240","phone":"","grp":"joins Oct 2026"},{"num":16,"name":"Lowe's #16","addr":"420 E Marland St","city":"Hobbs","st":"NM","zip":"88240","phone":"","grp":"joins Oct 2026"},{"num":17,"name":"Lowe's #17","addr":"116 W 14th Street","city":"Clovis","st":"NM","zip":"88101","phone":"575-763-6660","grp":"New Mexico"},{"num":18,"name":"Lowe's #18","addr":"2451 Hwy 84","city":"Chama","st":"NM","zip":"87520","phone":"575-756-2545","grp":"Resort"},{"num":19,"name":"Lowe's #19","addr":"213 W. Oklahoma Ave.","city":"Ulysses","st":"KS","zip":"67880","phone":"620-356-2134","grp":"TEXAS"},{"num":20,"name":"Lowe's #20","addr":"404 2nd Street","city":"Canadian","st":"TX","zip":"79014","phone":"806-323-6141","grp":"TEXAS"},{"num":21,"name":"Lowe's #21","addr":"1120 E. Hwy 66","city":"Gallup","st":"NM","zip":"87301","phone":"505-863-3877","grp":"GALLUP"},{"num":22,"name":"Lowe's #22","addr":"41769-A Highway US 191","city":"Ganado","st":"AZ","zip":"86505","phone":"928-255-5710","grp":"GALLUP"},{"num":23,"name":"Lowe's #23","addr":"200 Marguerite St.","city":"Gallup","st":"NM","zip":"87301","phone":"505-722-3888","grp":"GALLUP"},{"num":24,"name":"Lowe's #24","addr":"Hwy 264 & Rt 12","city":"Window Rock","st":"AZ","zip":"86515","phone":"928-871-4900","grp":"GALLUP"},{"num":25,"name":"Lowe's #25","addr":"1215 Grand Ave.","city":"Del Norte","st":"CO","zip":"81132","phone":"719-657-3505","grp":"Resort"},{"num":26,"name":"Lowe's #26","addr":"401 W. Park","city":"Iowa Park","st":"TX","zip":"76367","phone":"940-592-9831","grp":"TEXAS North East"},{"num":27,"name":"Lowe's #27","addr":"510 W. 2nd Street","city":"Clarendon","st":"TX","zip":"79226","phone":"806-874-3164","grp":"TEXAS"},{"num":28,"name":"Food King #28","addr":"101 W. 10th St.","city":"Borger","st":"TX","zip":"79007","phone":"806-273-5649","grp":"Food King TX"},{"num":29,"name":"Lowe's #29","addr":"316 E. Broadway","city":"Fritch","st":"TX","zip":"79036","phone":"806-857-2976","grp":"TEXAS"},{"num":31,"name":"Lowe's #31","addr":"310 E Austin","city":"Kermit","st":"TX","zip":"79745","phone":"432-586-2861","grp":"TEXAS"},{"num":32,"name":"Lowe's #32","addr":"826 W Clements","city":"Odessa","st":"TX","zip":"79763","phone":"432-333-6291","grp":"TEXAS ODESSA"},{"num":33,"name":"Food King #33","addr":"401 W American Blvd","city":"Muleshoe","st":"TX","zip":"79347","phone":"806-272-4585","grp":"Food King TX"},{"num":34,"name":"Lowe's #34","addr":"1600 N Grant","city":"Odessa","st":"TX","zip":"79761","phone":"432-337-1563","grp":"TEXAS ODESSA"},{"num":35,"name":"Lowe's #35","addr":"7528 W University","city":"Odessa","st":"TX","zip":"79764","phone":"432-381-0096","grp":"TEXAS ODESSA"},{"num":36,"name":"Lowe's #36","addr":"1107 E 42nd Street","city":"Odessa","st":"TX","zip":"79762","phone":"432-366-8371","grp":"TEXAS ODESSA"},{"num":37,"name":"Food King #37","addr":"2021 E 8th Street","city":"Odessa","st":"TX","zip":"79761","phone":"432-337-2242","grp":"Food King Odessa"},{"num":38,"name":"Food King #38","addr":"2 S. Main St.","city":"San Angelo","st":"TX","zip":"76903","phone":"325-655-2821","grp":"Food King TX"},{"num":39,"name":"Lowe's #39","addr":"713 W Broadway St","city":"Denver City","st":"TX","zip":"79323","phone":"","grp":"joins Oct 2026"},{"num":40,"name":"Lowe's #40","addr":"905 Railroad Ave","city":"Seagraves","st":"TX","zip":"79359","phone":"806-546-2521","grp":"TEXAS"},{"num":43,"name":"Lowe's #43","addr":"1300 W. Dickinson Blvd.","city":"Ft. Stockton","st":"TX","zip":"79735","phone":"432-336-3341","grp":"TEXAS"},{"num":45,"name":"Lowe's #45","addr":"1201 Stockton Ave.","city":"Monahans","st":"TX","zip":"79756","phone":"432-943-4275","grp":"TEXAS"},{"num":47,"name":"Lowe's #47","addr":"405 Hickory St.","city":"Colorado City","st":"TX","zip":"79512","phone":"325-728-3781","grp":"South Base"},{"num":48,"name":"Food King #48","addr":"105 E. Park Ave.","city":"Hereford","st":"TX","zip":"79045","phone":"806-364-1621","grp":"Food King TX"},{"num":49,"name":"Lowe's #49","addr":"100 S.E. 2nd St.","city":"Tulia","st":"TX","zip":"79088","phone":"806-995-3559","grp":"TEXAS"},{"num":52,"name":"SuperSave #52","addr":"519 Paseo Del Pueblo Sur","city":"Taos","st":"NM","zip":"87571","phone":"575-751-2801","grp":"Super Save TAOS"},{"num":53,"name":"SuperSave #53","addr":"1265 South 2nd Street","city":"Raton","st":"NM","zip":"87740","phone":"575-445-2331","grp":"Super Save"},{"num":55,"name":"Signature #55","addr":"675 E 10th Street","city":"Alamogordo","st":"NM","zip":"88310","phone":"575-437-5150","grp":"Alamo"},{"num":56,"name":"Lowe's #56","addr":"601 Reinken Blvd","city":"Belen","st":"NM","zip":"87002","phone":"505-864-0786","grp":"New Mexico"},{"num":57,"name":"Lowe's #57","addr":"2180 N Main","city":"Las Cruces","st":"NM","zip":"88001","phone":"575-527-2624","grp":"Las Cruces"},{"num":58,"name":"Lowe's #58","addr":"1410 E Missouri","city":"Las Cruces","st":"NM","zip":"88001","phone":"575-522-0794","grp":"Las Cruces"},{"num":59,"name":"Lowe's #59","addr":"560 Central Ave","city":"Tularosa","st":"NM","zip":"88352","phone":"575-585-2401","grp":"New Mexico"},{"num":60,"name":"Lowe's #60","addr":"3373 Mountain View Blvd","city":"Angel Fire","st":"NM","zip":"87710","phone":"575-377-2354","grp":"NONE"},{"num":62,"name":"Lowe's #62","addr":"622 Ave G","city":"Hale Center","st":"TX","zip":"79041","phone":"806-839-2222","grp":"TEXAS"},{"num":64,"name":"Lowe's #64","addr":"505 TX-207","city":"Spearman","st":"TX","zip":"79081","phone":"806-659-3212","grp":"TEXAS"},{"num":65,"name":"Lowe's #65","addr":"212 W Birch","city":"Crosbyton","st":"TX","zip":"79322","phone":"806-675-2534","grp":"TEXAS"},{"num":67,"name":"Lowe's #67","addr":"1119 E 1st","city":"Dumas","st":"TX","zip":"79029","phone":"806-935-9215","grp":"TEXAS"},{"num":68,"name":"Food King #68","addr":"3518 Montana Ave.","city":"El Paso","st":"TX","zip":"79903","phone":"915-565-4040","grp":"Food King EP"},{"num":69,"name":"Food King #69","addr":"9817 Dyer Street","city":"El Paso","st":"TX","zip":"79924","phone":"915-751-8700","grp":"Food King EP"},{"num":70,"name":"Food King #70","addr":"9480 Viscount Ave.","city":"El Paso","st":"TX","zip":"79925","phone":"915-599-1363","grp":"Food King EP"},{"num":71,"name":"Food King #71","addr":"3333 N. Yarbrough Dr.","city":"El Paso","st":"TX","zip":"79925","phone":"915-595-0123","grp":"Food King EP"},{"num":72,"name":"Food King #72","addr":"1840 Lee Trevino","city":"El Paso","st":"TX","zip":"79936","phone":"915-590-2326","grp":"Food King EP"},{"num":73,"name":"Food King #73","addr":"1480 George Dieter Drive","city":"El Paso","st":"TX","zip":"79936","phone":"915-857-6080","grp":"Food King EP"},{"num":74,"name":"Food King #74","addr":"5514 Alameda Ave.","city":"El Paso","st":"TX","zip":"79905","phone":"915-778-4746","grp":"Food King EP"},{"num":76,"name":"Food King #76","addr":"9016 Alameda Ave.","city":"El Paso","st":"TX","zip":"79907","phone":"915-859-7441","grp":"Food King EP"},{"num":77,"name":"Food King #77","addr":"10720 North Loop Dr.","city":"Socorro","st":"TX","zip":"79927","phone":"915-858-4011","grp":"Food King EP"},{"num":80,"name":"Food King #80","addr":"7945 North Mesa St.","city":"El Paso","st":"TX","zip":"79932","phone":"915-584-0881","grp":"Food King EP"},{"num":81,"name":"Food King #81","addr":"8208 Slide Road","city":"Lubbock","st":"TX","zip":"79424","phone":"806-794-9728","grp":"Food King LB"},{"num":82,"name":"Food King #82","addr":"5725 19th Street","city":"Lubbock","st":"TX","zip":"79407","phone":"806-780-6745","grp":"Food King LB"},{"num":83,"name":"Food King #83","addr":"6021 North Mesa St.","city":"El Paso","st":"TX","zip":"79912","phone":"915-584-2070","grp":"Food King EP"},{"num":85,"name":"Food King #85","addr":"2706 26th Street","city":"Lubbock","st":"TX","zip":"79410","phone":"806-744-4766","grp":"Food King LB"},{"num":87,"name":"Food King #87","addr":"8201 Dyer Street","city":"El Paso","st":"TX","zip":"79904","phone":"915-755-3012","grp":"Food King EP"},{"num":89,"name":"Food King #89","addr":"1700 Saint Michaels Drive","city":"Santa Fe","st":"NM","zip":"87505","phone":"505-424-1535","grp":"Food King SF"},{"num":90,"name":"Lowe's #90","addr":"319 S Main St.","city":"Anthony","st":"TX","zip":"79821","phone":"915-886-5050","grp":"ANTHONY"},{"num":91,"name":"SuperSave #91","addr":"2400 7th Street","city":"Las Vegas","st":"NM","zip":"87701","phone":"505-425-6721","grp":"Super Save"},{"num":92,"name":"SuperSave #92","addr":"605 Mills Ave","city":"Las Vegas","st":"NM","zip":"87701","phone":"505-425-7199","grp":"Super Save"},{"num":93,"name":"Food King #93","addr":"930 Riverside Drive","city":"Espanola","st":"NM","zip":"87532","phone":"505-753-8869","grp":"Food King SF"},{"num":94,"name":"Lowe's #94","addr":"105 W Tucumcari Blvd.","city":"Tucumcari","st":"NM","zip":"88401","phone":"575-461-2350","grp":"New Mexico"},{"num":96,"name":"Food King #96","addr":"1025 N Carolina Drive","city":"El Paso","st":"TX","zip":"79915","phone":"915-592-2022","grp":"Food King EP"},{"num":97,"name":"Food King #97","addr":"9120 Dyer Street","city":"El Paso","st":"TX","zip":"79924","phone":"915-751-6555","grp":"Food King EP"},{"num":98,"name":"Lowe's #98","addr":"701 11th Street NW","city":"Albuquerque","st":"NM","zip":"87102","phone":"505-247-8399","grp":"Corner Market"},{"num":99,"name":"Food King #99","addr":"4701 4th Street NW","city":"Albuquerque","st":"NM","zip":"87107","phone":"505-341-0088","grp":"Food King SF"},{"num":102,"name":"Lowe's #102","addr":"907 N. Main","city":"Bandera","st":"TX","zip":"78003","phone":"830-796-4401","grp":"South Base Meal Solutions"},{"num":103,"name":"Lowe's #103","addr":"306 S. Eagle","city":"Weimar","st":"TX","zip":"78962","phone":"979-725-8253","grp":"South Base"},{"num":104,"name":"Lowe's #104","addr":"305 Ave. E.","city":"Ozona","st":"TX","zip":"76943","phone":"325-392-3324","grp":"South Base"},{"num":105,"name":"Lowe's #105","addr":"3214 School St.","city":"Needville","st":"TX","zip":"77461","phone":"979-793-4464","grp":"South Base"},{"num":106,"name":"Lowe's #106","addr":"501 Nueces St.","city":"George West","st":"TX","zip":"78022","phone":"361-449-2796","grp":"South Base"},{"num":108,"name":"Lowe's #108","addr":"8010 FM 2673","city":"Canyon Lake","st":"TX","zip":"78133","phone":"830-899-8574","grp":"South Base"},{"num":109,"name":"Lowe's #109","addr":"50 Main St.","city":"Westcliffe","st":"CO","zip":"81252","phone":"719-783-0550","grp":"Resort"},{"num":110,"name":"Lowe's #110","addr":"210 Orange Ave.","city":"Orange Grove","st":"TX","zip":"78372","phone":"361-384-2761","grp":"South Base"},{"num":111,"name":"Lowe's #111","addr":"1407 N. Smith St.","city":"Hebbronville","st":"TX","zip":"78361","phone":"361-527-5711","grp":"South Base"},{"num":112,"name":"Lowe's #112","addr":"204 N. Dibrell Ave","city":"Three Rivers","st":"TX","zip":"78071","phone":"361-786-2503","grp":"South Base"},{"num":113,"name":"Lowe's #113","addr":"702 Henderson","city":"Palacios","st":"TX","zip":"77465","phone":"361-972-2534","grp":"South Base"},{"num":115,"name":"Lowe's #115","addr":"833 South Dill St.","city":"East Bernard","st":"TX","zip":"77435","phone":"979-335-7322","grp":"South Base"},{"num":116,"name":"Lowe's #116","addr":"418 S Alister St","city":"Port Aransas","st":"TX","zip":"78373","phone":"361-749-6233","grp":"South Base"},{"num":117,"name":"Lowe's #117","addr":"7305 Pecos St.","city":"Denver","st":"CO","zip":"80221","phone":"720-540-3883","grp":"Mercado"},{"num":118,"name":"Lowe's #118","addr":"1320 S. Federal Blvd.","city":"Denver","st":"CO","zip":"80219","phone":"303-922-7412","grp":"Mercado"},{"num":119,"name":"Lowe's #119","addr":"600 Crockett","city":"Sonora","st":"TX","zip":"76950","phone":"325-387-3438","grp":"South Base"},{"num":120,"name":"Lowe's #120","addr":"102 State HWY 55 South","city":"Rocksprings","st":"TX","zip":"78880","phone":"830-683-2178","grp":"South Base"},{"num":121,"name":"Lowe's #121","addr":"300 East 3rd","city":"Hico","st":"TX","zip":"76457","phone":"254-796-4623","grp":"South Base"},{"num":122,"name":"Lowe's #122","addr":"10777 E. Colfax Ave.","city":"Aurora","st":"CO","zip":"80010","phone":"303-363-3321","grp":"Mercado"},{"num":123,"name":"Food King #123","addr":"100 E. Colonial Pkwy.","city":"Devine","st":"TX","zip":"78016","phone":"830-663-4252","grp":"Food King TX"},{"num":124,"name":"Lowe's #124","addr":"505 2nd St.","city":"Big Lake","st":"TX","zip":"76932","phone":"325-884-2644","grp":"South Base"},{"num":127,"name":"Lowe's #127","addr":"19860 Somerset Rd.","city":"Somerset","st":"TX","zip":"78069","phone":"830-429-3612","grp":"South Base"},{"num":128,"name":"Food King #128","addr":"3635 W. 10th St.","city":"Greeley","st":"CO","zip":"80634","phone":"970-351-0727","grp":"Food King GR"},{"num":129,"name":"Lowe's #129","addr":"806 W. 17th St.","city":"Brady","st":"TX","zip":"76825","phone":"325-597-3798","grp":"South Base"},{"num":130,"name":"Lowe's #130","addr":"1204 W. Wallace","city":"San Saba","st":"TX","zip":"76877","phone":"325-372-4191","grp":"South Base"},{"num":131,"name":"Lowe's #131","addr":"103 E. Richardson","city":"Sundown","st":"TX","zip":"79372","phone":"806-229-6410","grp":"TEXAS CASE READY"},{"num":133,"name":"Lowe's #133","addr":"1102 Main St.","city":"Junction","st":"TX","zip":"76849","phone":"325-446-2650","grp":"South Base"},{"num":134,"name":"Lowe's #134","addr":"315 E. Broadway","city":"Eden","st":"TX","zip":"76837","phone":"325-869-4741","grp":"South Base"},{"num":135,"name":"Lowe's #135","addr":"201 S. Divide","city":"Eldorado","st":"TX","zip":"76936","phone":"325-853-3208","grp":"South Base"},{"num":136,"name":"Lowe's #136","addr":"111 Blanco","city":"Blanco","st":"TX","zip":"78606","phone":"830-833-4521","grp":"South Base"},{"num":137,"name":"Lowe's #137","addr":"405 US-281 South","city":"Johnson City","st":"TX","zip":"78636","phone":"830-868-4274","grp":"South Base"},{"num":138,"name":"Lowe's #138","addr":"824 San Antonio St.","city":"Mason","st":"TX","zip":"76856","phone":"325-347-5906","grp":"South Base"},{"num":139,"name":"Lowe's #139","addr":"104 West Young","city":"Llano","st":"TX","zip":"78643","phone":"325-247-5059","grp":"South Base"},{"num":140,"name":"Lowe's #140","addr":"410 Ellis","city":"Menard","st":"TX","zip":"76859","phone":"325-396-4592","grp":"South Base"},{"num":141,"name":"Lowe's #141","addr":"1345 Sattler Rd.","city":"Canyon Lake","st":"TX","zip":"78133","phone":"830-964-3231","grp":"South Base"},{"num":142,"name":"Lowe's #142","addr":"205 N. Ann St.","city":"Brackettville","st":"TX","zip":"78832","phone":"830-563-2500","grp":"South Base"},{"num":145,"name":"Lowe's #145","addr":"1203 North Main","city":"Cotulla","st":"TX","zip":"78014","phone":"830-879-2625","grp":"South Base"},{"num":146,"name":"Lowe's #146","addr":"103 E. 5th Street","city":"Iraan","st":"TX","zip":"79744","phone":"432-639-2587","grp":"TEXAS"},{"num":147,"name":"Lowe's #147","addr":"803 E. Gravis","city":"San Diego","st":"TX","zip":"78384","phone":"361-279-3395","grp":"South Base"},{"num":148,"name":"Lowe's #148","addr":"17255 IH 35 South","city":"Dilley","st":"TX","zip":"78017","phone":"830-965-1211","grp":"South Base"},{"num":150,"name":"Lowe's #150","addr":"1102 E Riley St., Suite A","city":"Freer","st":"TX","zip":"78357","phone":"361-394-6055","grp":"South Base"},{"num":151,"name":"Lowe's #151","addr":"9014 Hwy 16 North","city":"Poteet","st":"TX","zip":"78065","phone":"830-742-3358","grp":"South Base"},{"num":152,"name":"Lowe's #152","addr":"3000 Santa Maria","city":"Laredo","st":"TX","zip":"78040","phone":"956-722-2722","grp":"VALLEY"},{"num":153,"name":"Lowe's #153","addr":"102 N Nixon Ave","city":"Nixon","st":"TX","zip":"78140","phone":"830-582-1251","grp":"South Base"},{"num":154,"name":"Lowe's #154","addr":"224 East 6th Street","city":"McCamey","st":"TX","zip":"79752","phone":"432-652-8881","grp":"TEXAS"},{"num":155,"name":"Lowe's #155","addr":"909 Hwy 83 North","city":"Zapata","st":"TX","zip":"78076","phone":"956-765-4861","grp":"South Base"},{"num":156,"name":"Lowe's #156","addr":"400 W. Pearl","city":"Goliad","st":"TX","zip":"77963","phone":"361-645-3364","grp":"South Base"},{"num":157,"name":"Lowe's #157","addr":"1707 W. Main","city":"Yorktown","st":"TX","zip":"78164","phone":"361-564-2215","grp":"South Base"},{"num":158,"name":"Lowe's #158","addr":"417 SW 5th St.","city":"Cross Plains","st":"TX","zip":"76443","phone":"254-725-7131","grp":"TEXAS"},{"num":159,"name":"Lowe's #159","addr":"619 Front St.","city":"Comfort","st":"TX","zip":"78013","phone":"830-995-2380","grp":"South Base"},{"num":160,"name":"Lowe's #160","addr":"1202 S FM 51","city":"Decatur","st":"TX","zip":"76234","phone":"940-627-6438","grp":"TEXAS North East"},{"num":161,"name":"Lowe's #161","addr":"7708 Lohmann Ford Rd., Ste C","city":"Lago Vista","st":"TX","zip":"78645","phone":"512-267-0355","grp":"South Base LAGO"},{"num":163,"name":"Lowe's #163","addr":"1501 Halsell St.","city":"Bridgeport","st":"TX","zip":"76426","phone":"940-683-4006","grp":"TEXAS North East"},{"num":165,"name":"Lowe's #165","addr":"200 West Rock Island","city":"Boyd","st":"TX","zip":"76023","phone":"940-433-2325","grp":"TEXAS North East"},{"num":166,"name":"Lowe's #166","addr":"503 N. Main","city":"Jacksboro","st":"TX","zip":"76458","phone":"940-567-5301","grp":"TEXAS North East"},{"num":167,"name":"Lowe's #167","addr":"100 E. Maginnis","city":"Chico","st":"TX","zip":"76431","phone":"940-644-2426","grp":"TEXAS North East"},{"num":168,"name":"Lowe's #168","addr":"303 W. Franklin","city":"Alvord","st":"TX","zip":"76225","phone":"940-427-8591","grp":"TEXAS North East"},{"num":169,"name":"Lowe's #169","addr":"517 W. California","city":"Gainesville","st":"TX","zip":"76240","phone":"940-665-4131","grp":"TEXAS North East"},{"num":171,"name":"Lowe's #171","addr":"1401 S Main St","city":"Seminole","st":"TX","zip":"79360","phone":"432-758-9869","grp":"TEXAS"},{"num":172,"name":"Lowe's #172","addr":"1201 N Main","city":"Andrews","st":"TX","zip":"79714","phone":"432-523-9023","grp":"TEXAS"},{"num":173,"name":"Lowe's #173","addr":"501 Birdwell Lane Suite 1","city":"Big Spring","st":"TX","zip":"79720","phone":"432-296-4540","grp":"TEXAS"},{"num":174,"name":"Lowe's #174","addr":"703 E Front St","city":"Midland","st":"TX","zip":"79701","phone":"432-683-6666","grp":"TEXAS"},{"num":175,"name":"Lowe's #175","addr":"1506 S Gaston","city":"Crane","st":"TX","zip":"79731","phone":"432-558-2911","grp":"TEXAS"},{"num":176,"name":"Lowe's #176","addr":"1807 W Broadway St","city":"Van Horn","st":"TX","zip":"79855","phone":"432-283-2155","grp":"TEXAS"},{"num":177,"name":"Lowe's #177","addr":"712 N State St","city":"Fort Davis","st":"TX","zip":"79734","phone":"432-426-3812","grp":"TEXAS"},{"num":178,"name":"Lowe's #178","addr":"104 N 2nd St","city":"Alpine","st":"TX","zip":"79830","phone":"432-837-3295","grp":"TEXAS"},{"num":179,"name":"Lowe's #179","addr":"717 W San Antonio St","city":"Marfa","st":"TX","zip":"79843","phone":"432-729-4375","grp":"TEXAS"},{"num":181,"name":"Lowe's #181","addr":"1000 Hwy 67","city":"Presidio","st":"TX","zip":"79845","phone":"432-229-3776","grp":"TEXAS"}];
+const ROSTER_NOTE = "147 stores: the 144 on the current banner roster plus 15, 16 and 39 (Hobbs / Denver City, join Oct 2026). Updated 9/9/26.";
+const BUILTIN_PLACES = [
+  {num:'home', name:'Home', addr:'134 E 23rd St', city:'Littlefield', st:'TX', zip:'79339', phone:'', grp:'place'},
+  {num:'office', name:"Lowe's Corporate Office", addr:'1804 Hall Ave', city:'Littlefield', st:'TX', zip:'79339', phone:'', grp:'place'},
+];
+const LS = {trips:'stc.trips', geo:'stc.geo', cur:'stc.cur', stores:'stc.stores'};
+let ROSTER_VER='2026-09-09';
+let STORES = (localStorage.getItem('stc.rosterVer')===ROSTER_VER && JSON.parse(localStorage.getItem(LS.stores)||'null')) || [...BUILTIN_STORES, ...BUILTIN_PLACES];
+localStorage.setItem('stc.rosterVer',ROSTER_VER);
+// Published roster: trip-data.json beside this page. A newer version replaces the store rows
+// but keeps any places the user added themselves (hotels, etc.).
+async function loadRemoteRoster(){
+  try{
+    const j=await (await fetch('trip-data.json?v='+Date.now(),{cache:'no-store'})).json();
+    if(!j.version || j.version===localStorage.getItem('stc.rosterVer')) return;
+    const remote=[...j.stores,...(j.places||[])]; const rkeys=new Set(remote.map(s=>String(s.num).toLowerCase()));
+    const mine=STORES.filter(s=>isPlace(s)&&!rkeys.has(String(s.num).toLowerCase()));
+    STORES=[...remote,...mine]; ROSTER_VER=j.version; if(j.note) ROSTER_NOTE_LIVE=j.note;
+    saveStores(); localStorage.setItem('stc.rosterVer',j.version); renderRows();
+  }catch(e){ /* offline or opened as a local file — embedded roster stays in use */ }
+}
+let ROSTER_NOTE_LIVE=null;
+let byNum = {};
+function indexStores(){ byNum={}; STORES.forEach(s=>{ byNum[String(s.num).toLowerCase()]=s; }); }
+indexStores();
+function saveStores(){ localStorage.setItem(LS.stores, JSON.stringify(STORES)); indexStores(); }
+const norm = s=>String(s||'').toLowerCase().replace(/[^a-z0-9#]+/g,' ').trim();
+const isPlace = s=>isNaN(+s.num);
+// ranked matches for a free-text query
+function matches(q){
+  q=norm(q); if(!q) return [];
+  const digits=q.match(/^#?\s*(\d{1,3})\b/);
+  const out=[];
+  for(const s of STORES){
+    let score=0; const nm=norm(s.name), ct=norm(s.city), key=norm(String(s.num));
+    if(digits && key===digits[1]) score=100;
+    else if(digits && key.startsWith(digits[1])) score=60;
+    else if(key===q) score=100;
+    else if(ct===q) score=90;
+    else if(ct.startsWith(q)) score=80;
+    else if(nm.includes(q)) score=70;
+    else if(q.split(' ').every(w=>(nm+' '+ct+' '+key+' '+norm(s.grp)).includes(w))) score=50;
+    if(score) out.push([score,s]);
+  }
+  return out.sort((a,b)=>b[0]-a[0]||(+a[1].num||999)-(+b[1].num||999)).map(x=>x[1]);
+}
+
+// ---------- helpers ----------
+const $ = id=>document.getElementById(id);
+const hm = s=>{ s=Math.round(s||0); const h=Math.floor(s/3600), m=Math.round((s%3600)/60); return h+':'+String(m).padStart(2,'0'); };
+const clock = s=>{ if(s==null) return '—'; s=Math.round(s)%86400; let h=Math.floor(s/3600), m=Math.floor((s%3600)/60); const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+String(m).padStart(2,'0')+' '+ap; };
+const parseHM = v=>{ if(!v) return 0; v=String(v).trim(); if(/^\d+$/.test(v)) return +v*60; const m=v.match(/^(\d+):(\d{1,2})$/); return m? (+m[1]*3600 + +m[2]*60) : 0; };
+const timeToSec = v=>{ const [h,m]=(v||'0:0').split(':').map(Number); return h*3600+m*60; };
+const storeLabel = s=>`${s.name} — ${s.city}, ${s.st}`;
+const fullAddr = s=>[s.addr, s.city, (s.st+' '+(s.zip||'')).trim()].filter(Boolean).join(', ');
+
+// resolve what the user typed into {label, addr, store}
+function resolve(txt){
+  txt=(txt||'').trim();
+  if(!txt) return null;
+  const m = txt.match(/^#?\s*(\d{1,3})\b/);
+  let s = m ? byNum[m[1]] : byNum[norm(txt)];
+  if(!s){ // exact city or exact name match only — anything looser is offered as a suggestion, not auto-picked
+    const c=STORES.filter(x=>norm(x.city)===norm(txt)||norm(x.name)===norm(txt)); if(c.length===1) s=c[0];
+  }
+  if(s){ const a=fullAddr(s); return {label:txt, store:s, addr:a, sub:s.addr? `${s.name} · ${a}${s.phone?' · '+s.phone:''}` : `${s.name} · no street address on file — add one under Stores & places`, missing:!s.addr}; }
+  return {label:txt, addr:txt, sub:'as typed — will be looked up on the map'};
+}
+
+// ---------- state ----------
+let trips = JSON.parse(localStorage.getItem(LS.trips)||'null');
+if(!trips || !trips.length){
+  trips=[{name:'Big Lake', start:'home', startTime:'07:00', stay:45,
+    stops:[{q:'124',stay:45},{q:'154',stay:45},{q:'146',stay:45},{q:'home',stay:0}], legs:[]}];
+}
+let cur = Math.min(+localStorage.getItem(LS.cur)||0, trips.length-1);
+let geo = localStorage.getItem('stc.geoVer')==='2'? JSON.parse(localStorage.getItem(LS.geo)||'{}') : {}; localStorage.setItem('stc.geoVer','2');
+const T = ()=>trips[cur];
+function save(){ localStorage.setItem(LS.trips, JSON.stringify(trips)); localStorage.setItem(LS.cur, cur); }
+
+// ---------- rendering ----------
+function renderTabs(){
+  const el=$('tripTabs'); el.innerHTML='';
+  trips.forEach((t,i)=>{ const b=document.createElement('button'); b.textContent=t.name||('Trip '+(i+1)); if(i===cur) b.className='on'; b.onclick=()=>{cur=i; save(); renderAll();}; el.appendChild(b); });
+  const n=document.createElement('button'); n.className='new'; n.textContent='+ New trip';
+  n.onclick=()=>{ trips.push({name:'Trip '+(trips.length+1), start:'home', startTime:'07:00', stay:45, stops:[{q:'',stay:45}], legs:[]}); cur=trips.length-1; save(); renderAll(); };
+  el.appendChild(n);
+}
+
+function renderSetup(){
+  const t=T(); $('startAddr').value=t.start; $('startTime').value=t.startTime; $('defStay').value=t.stay; $('tripName').value=t.name;
+}
+
+function renderRows(){
+  const t=T(), wrap=$('rows'); wrap.innerHTML='';
+  const points = [{q:t.start, stay:0, isStart:true}, ...t.stops];
+  let clockS = timeToSec(t.startTime);
+  const arrivals=[];
+  points.forEach((p,i)=>{
+    const r=resolve(p.q);
+    const leg = i>0 ? (t.legs[i-1]||{}) : null;
+    const drive = leg ? (leg.override!=null ? leg.override : (leg.sec||0)) : 0;
+    if(i>0) clockS += drive;
+    arrivals.push(clockS);
+    const row=document.createElement('div');
+    row.className='row'+(i===0?' first':'')+(i===points.length-1?' last':'')+(!r?' empty':'');
+    row.innerHTML=`
+      <span class="mark"><i></i></span>
+      <span class="n">${i===0?'':i}</span>
+      <div class="place">
+        <input autocomplete="off" value="${esc(p.q)}" placeholder="${i===0?'Start':'Store #, city, name, or any place'}" data-i="${i}" ${i===0?'data-start="1"':''}>
+        <span class="sub ${r&&r.missing?'warn':''}">${r?esc(r.sub):''}</span>
+      </div>
+      <span class="stay">${i===0?'':`<input type="text" value="${esc(String(p.stay??''))}" data-stay="${i}" placeholder="min">`}</span>
+      <span class="arr">${r?clock(clockS):''}</span>
+      <span class="drv">${i===0?'':`<input type="text" value="${drive?hm(drive):''}" data-leg="${i-1}" placeholder="h:mm" title="from previous stop">${leg&&leg.mi?`<span class="mi">${Math.round(leg.mi)} mi</span>`:''}`}</span>
+      <span>${i===0?'':`<button class="x" data-del="${i}" title="Remove stop">×</button>`}</span>`;
+    wrap.appendChild(row);
+    clockS += parseHM(p.stay)*0 + (i>0 ? (+p.stay||0)*60 : 0);
+  });
+  renderTotals(points, arrivals);
+}
+const esc = s=>String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+function renderTotals(points, arrivals){
+  const t=T();
+  const drive = t.legs.slice(0,points.length-1).reduce((a,l)=>a+((l&&(l.override!=null?l.override:l.sec))||0),0);
+  const stay = t.stops.reduce((a,s)=>a+(+s.stay||0)*60,0);
+  const miles = t.legs.slice(0,points.length-1).reduce((a,l)=>a+((l&&l.mi)||0),0);
+  const lastArr = arrivals[arrivals.length-1] + (points.length>1 ? (+points.at(-1).stay||0)*60 : 0);
+  const total = points.length>1 ? lastArr - timeToSec(t.startTime) : 0;
+  $('tDrive').textContent=hm(drive); $('tStay').textContent=hm(stay);
+  $('tMiles').textContent=miles?Math.round(miles).toLocaleString():'—';
+  $('tTotal').textContent=hm(total); $('tEnd').textContent=points.length>1&&resolve(points.at(-1).q)?clock(lastArr):'—';
+  const sc=$('sched'); sc.innerHTML='';
+  points.forEach((p,i)=>{ const r=resolve(p.q); if(!r) return; const d=document.createElement('div'); d.innerHTML=`<span>${clock(arrivals[i])}</span><span>${esc(r.store?r.store.name+' '+r.store.city:r.label)}</span>`; sc.appendChild(d); });
+}
+
+function renderAll(){ renderTabs(); renderSetup(); renderRows(); }
+
+// ---------- events ----------
+$('rows').addEventListener('change', e=>{
+  const el=e.target, t=T();
+  if(el.dataset.start){ t.start=el.value; t.legs[0]={}; }
+  else if(el.dataset.i){ const i=+el.dataset.i-1; const r=resolve(el.value); const old=t.stops[i].q; t.stops[i].q=el.value;
+    if(r&&r.store&&(!old||!resolve(old))) t.stops[i].stay=t.stay; if(/^home$/i.test(el.value)) t.stops[i].stay=0;
+    t.legs[i]={}; if(t.legs[i+1]) t.legs[i+1]={}; }
+  else if(el.dataset.stay!=null){ t.stops[+el.dataset.stay-1].stay=+el.value||0; }
+  else if(el.dataset.leg!=null){ const L=t.legs[+el.dataset.leg]||(t.legs[+el.dataset.leg]={}); const v=parseHM(el.value); L.override = el.value.trim()? v : null; }
+  save(); renderRows();
+});
+$('rows').addEventListener('click', e=>{ const b=e.target.closest('[data-del]'); if(!b) return; const i=+b.dataset.del-1; T().stops.splice(i,1); T().legs.splice(i,1); if(T().legs[i]) T().legs[i]={}; save(); renderRows(); });
+$('addStop').onclick=()=>{ const t=T(); const last=t.stops.at(-1); if(last && /^home$/i.test(last.q)) t.stops.splice(t.stops.length-1,0,{q:'',stay:t.stay}); else t.stops.push({q:'',stay:t.stay}); save(); renderRows(); $('rows').querySelectorAll('input[data-i]')[t.stops.length-(/^home$/i.test(t.stops.at(-1).q)?1:0)]?.focus(); };
+$('homeBtn').onclick=()=>{ const t=T(); if(!t.stops.some(s=>/^home$/i.test(s.q))) t.stops.push({q:'home',stay:0}); save(); renderRows(); };
+$('startAddr').onchange=e=>{ T().start=e.target.value; T().legs[0]={}; save(); renderRows(); };
+$('startTime').onchange=e=>{ T().startTime=e.target.value; save(); renderRows(); };
+$('defStay').onchange=e=>{ T().stay=+e.target.value||0; save(); };
+$('tripName').oninput=e=>{ T().name=e.target.value; save(); renderTabs(); };
+$('del').onclick=()=>{ if(!confirm('Delete "'+(T().name||'this trip')+'"?')) return; trips.splice(cur,1); if(!trips.length) trips.push({name:'Trip 1',start:'home',startTime:'07:00',stay:45,stops:[{q:'',stay:45}],legs:[]}); cur=Math.max(0,cur-1); save(); renderAll(); };
+$('print').onclick=()=>print();
+
+// ---------- autocomplete ----------
+let sugBox=null, sugSel=-1;
+function closeSug(){ if(sugBox){ sugBox.remove(); sugBox=null; sugSel=-1; } }
+function showSug(input){
+  closeSug(); const q=input.value; const list=matches(q).slice(0,12); if(!q.trim()) return;
+  sugBox=document.createElement('div'); sugBox.className='sug';
+  list.forEach(s=>{ const d=document.createElement('div'); d.innerHTML=`<b>${esc(isPlace(s)?'':'#'+s.num)}</b><span>${esc(isPlace(s)?s.name:s.name.replace(/\s*#\d+/,'')+' · '+s.city+', '+s.st)}</span><small>${esc(s.addr||'no address')}</small>`;
+    d.onmousedown=e=>{ e.preventDefault(); input.value=isPlace(s)?String(s.num):String(s.num); input.dispatchEvent(new Event('change',{bubbles:true})); closeSug(); }; sugBox.appendChild(d); });
+  const t=document.createElement('div'); t.className='typed'; t.textContent=`Use "${q}" as a place name or address`; t.onmousedown=e=>{e.preventDefault(); input.dispatchEvent(new Event('change',{bubbles:true})); closeSug();}; sugBox.appendChild(t);
+  const host=input.closest('.place')||input.parentElement; host.style.position='relative'; host.appendChild(sugBox);
+}
+document.addEventListener('input',e=>{ const el=e.target; if(el.matches('#rows input[data-i], #startAddr')) showSug(el); });
+document.addEventListener('keydown',e=>{ if(!sugBox) return; const items=[...sugBox.children];
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); sugSel=(sugSel+(e.key==='ArrowDown'?1:-1)+items.length)%items.length; items.forEach((d,i)=>d.classList.toggle('sel',i===sugSel)); }
+  else if(e.key==='Enter'&&sugSel>=0){ e.preventDefault(); items[sugSel].dispatchEvent(new MouseEvent('mousedown')); }
+  else if(e.key==='Escape') closeSug(); });
+document.addEventListener('focusout',e=>{ if(e.target.matches('#rows input[data-i], #startAddr')) setTimeout(closeSug,120); });
+
+// ---------- stores & places editor ----------
+const COLS=['num','name','addr','city','st','zip','phone','grp'];
+function renderStoreTable(){
+  const f=norm($('sFilter').value), tb=$('sBody'); tb.innerHTML='';
+  STORES.forEach((s,i)=>{ if(f && !norm(Object.values(s).join(' ')).includes(f)) return;
+    const tr=document.createElement('tr'); if(!s.addr) tr.className='missing';
+    tr.innerHTML=COLS.map(c=>`<td><input value="${esc(s[c]??'')}" data-si="${i}" data-c="${c}"></td>`).join('')+`<td><button class="x" data-sdel="${i}" title="Remove">×</button></td>`;
+    tb.appendChild(tr); });
+}
+$('openStores').onclick=()=>{ $('rosterNote').textContent=ROSTER_NOTE_LIVE||ROSTER_NOTE; $('storeModal').classList.add('open'); renderStoreTable(); $('sFilter').focus(); };
+$('sClose').onclick=()=>{ $('storeModal').classList.remove('open'); renderRows(); };
+$('sFilter').oninput=renderStoreTable;
+$('sBody').addEventListener('change',e=>{ const el=e.target; if(el.dataset.si==null) return; const s=STORES[+el.dataset.si]; let v=el.value.trim(); if(el.dataset.c==='num'&&/^\d+$/.test(v)) v=+v; s[el.dataset.c]=v; saveStores(); el.closest('tr').classList.toggle('missing',!s.addr); });
+$('sBody').addEventListener('click',e=>{ const b=e.target.closest('[data-sdel]'); if(!b) return; const s=STORES[+b.dataset.sdel]; if(confirm('Remove '+s.name+'?')){ STORES.splice(+b.dataset.sdel,1); saveStores(); renderStoreTable(); } });
+$('sAdd').onclick=()=>{ STORES.push({num:'',name:'',addr:'',city:'',st:'TX',zip:'',phone:'',grp:''}); saveStores(); $('sFilter').value=''; renderStoreTable(); $('sBody').lastElementChild.querySelector('input').focus(); $('sBody').lastElementChild.scrollIntoView(); };
+$('sReset').onclick=()=>{ if(!confirm('Replace your edited list with the built-in list?')) return; STORES=[...BUILTIN_STORES,...BUILTIN_PLACES]; saveStores(); renderStoreTable(); };
+$('sExport').onclick=()=>{ const head=['Store #','Name','Address','City','ST','ZIP','Phone','Ad Group']; const rows=[head,...STORES.map(s=>COLS.map(c=>s[c]??''))];
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'})); a.download='Store Master.csv'; a.click(); };
+$('sImport').onclick=()=>$('sFile').click();
+$('sFile').onchange=async e=>{ const f=e.target.files[0]; if(!f) return; const txt=await f.text();
+  const parse=l=>{ const o=[]; let cur='',q=false; for(const ch of l){ if(ch==='"'){q=!q;continue;} if(ch===','&&!q){o.push(cur);cur='';} else cur+=ch; } o.push(cur); return o.map(x=>x.trim()); };
+  const lines=txt.split(/\r?\n/).filter(x=>x.trim()); const head=parse(lines[0]).map(norm);
+  const col=(...names)=>head.findIndex(hh=>names.some(n=>hh.includes(n)));
+  const ix={num:col('store #','store','num'),name:col('name','store'),addr:col('address','street'),city:col('city'),st:col('st'),zip:col('zip'),phone:col('phone'),grp:col('ad group','group')};
+  if(ix.num<0||ix.city<0){ alert('Need at least a Store # column and a City column.'); return; }
+  const rows=lines.slice(1).map(parse).filter(r=>r[ix.num]);
+  const merged=[]; let added=0,updated=0;
+  rows.forEach(r=>{ const num=/^\d+$/.test(r[ix.num])?+r[ix.num]:r[ix.num]; const rec={num,name:ix.name>=0?r[ix.name]:'',addr:ix.addr>=0?r[ix.addr]:'',city:r[ix.city],st:ix.st>=0?r[ix.st]:'',zip:ix.zip>=0?r[ix.zip]:'',phone:ix.phone>=0?r[ix.phone]:'',grp:ix.grp>=0?r[ix.grp]:''};
+    const ex=STORES.find(s=>String(s.num)===String(num)); if(ex){ Object.keys(rec).forEach(k=>{ if(rec[k]) ex[k]=rec[k]; }); updated++; } else { STORES.push(rec); added++; } });
+  saveStores(); renderStoreTable(); alert(`Imported: ${added} added, ${updated} updated.`); e.target.value=''; };
+
+// ---------- routing ----------
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const BBOX={minLat:25.5,maxLat:41.5,minLon:-114.5,maxLon:-93.0}; // Lowe's territory: TX NM CO AZ KS OK
+const inBox=c=>c&&c.lat>=BBOX.minLat&&c.lat<=BBOX.maxLat&&c.lon>=BBOX.minLon&&c.lon<=BBOX.maxLon;
+const milesBetween=(a,b)=>{ const R=3959,d=Math.PI/180; const x=(b.lon-a.lon)*d*Math.cos((a.lat+b.lat)/2*d), y=(b.lat-a.lat)*d; return R*Math.sqrt(x*x+y*y); };
+async function nominatim(q){ try{ const j=await (await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=us&q='+encodeURIComponent(q))).json(); const r=j.map(x=>({lat:+x.lat,lon:+x.lon})).find(inBox); return r||null; }catch(e){ return null; } }
+async function photon(q,near){ try{ const j=await (await fetch('https://photon.komoot.io/api/?limit=8&lat='+(near?near.lat:33.9)+'&lon='+(near?near.lon:-102.3)+'&location_bias_scale=0.8&q='+encodeURIComponent(q))).json();
+  const pts=(j.features||[]).map(f=>({lat:f.geometry.coordinates[1],lon:f.geometry.coordinates[0],name:f.properties.name||''})).filter(inBox);
+  if(near) return pts.find(p=>milesBetween(p,near)<=35)||null;
+  return pts[0]||null; }catch(e){ return null; } }
+const STATES='TX|NM|CO|AZ|KS|OK|Texas|New Mexico|Colorado|Arizona|Kansas|Oklahoma';
+// pull a town out of free text: a known store city, or "Something, ST" at the end
+function findTown(txt){
+  const t=' '+norm(txt)+' ';
+  let best=null;
+  for(const s of STORES){ const c=norm(s.city); if(c && t.includes(' '+c+' ') && (!best||c.length>best.city.length)) best={city:s.city,st:s.st,key:c}; }
+  if(best) return best;
+  const m=txt.match(new RegExp('([A-Za-z .\'-]+?),?\\s+('+STATES+')\\.?\\s*\\d{0,5}\\s*$','i'));
+  if(m){ const words=m[1].trim().split(/\s+/); const city=words.slice(-2).join(' ').replace(/^(in|near|at)\s+/i,''); return {city, st:m[2], key:norm(city)}; }
+  return null;
+}
+async function geocode(addr){
+  if(geo[addr]) return geo[addr];
+  let hit=null;
+  const looksLikeStreet=/^\d+\s+\S/.test(addr.trim());
+  if(looksLikeStreet){ hit=await nominatim(addr); }
+  if(!hit){
+    const town=findTown(addr);
+    if(town){
+      const tc=await nominatim(town.city+', '+town.st);
+      if(tc){
+        // strip the town/state from the text; what's left is the business or hotel name
+        let name=norm(addr).replace(town.key,' ').replace(new RegExp('\\b('+STATES.toLowerCase()+')\\b','g'),' ').replace(/\b\d{5}\b/g,' ').replace(/\s+/g,' ').trim();
+        if(name){ await sleep(300); hit=await photon(name,tc); }
+        if(!hit){ hit={...tc,approx:true}; }
+      }
+    }
+  }
+  if(!hit){ await sleep(300); hit=await photon(addr); }
+  if(!hit) throw new Error('Could not find "'+addr+'" on the map. Add the town, e.g. "Best Western, Littlefield TX", or use a street address.');
+  geo[addr]=hit; localStorage.setItem(LS.geo,JSON.stringify(geo)); return hit;
+}
+$('calc').onclick=async()=>{
+  const t=T(), st=$('status'), btn=$('calc');
+  const points=[{q:t.start},...t.stops].map(p=>resolve(p.q));
+  if(points.some(p=>!p)){ st.className='status err'; st.textContent='Fill in or remove the blank stops first.'; return; }
+  btn.disabled=true; st.className='status';
+  try{
+    const coords=[];
+    for(let i=0;i<points.length;i++){ const a=points[i].addr; if(!geo[a]){ st.textContent=`Finding ${points[i].label}…`; await sleep(1100);} if(points[i].missing && !geo[a]) throw new Error(`${points[i].store.name} has no street address yet — add it under Stores & places.`); coords.push(await geocode(a)); }
+    st.textContent='Routing…';
+    const url='https://router.project-osrm.org/route/v1/driving/'+coords.map(c=>c.lon+','+c.lat).join(';')+'?overview=false';
+    const j=await (await fetch(url)).json();
+    if(j.code!=='Ok') throw new Error('Routing failed: '+(j.message||j.code));
+    j.routes[0].legs.forEach((L,i)=>{ const o=t.legs[i]&&t.legs[i].override; t.legs[i]={sec:L.duration*1.06, mi:L.distance/1609.34, override:o??null}; });
+    const approx=coords.some(c=>c.approx);
+    const far=j.routes[0].legs.some(L=>L.distance/1609.34>900);
+st.textContent='Drive times updated'+(approx?' — a stop matched to its town center, not an exact address.':'.')+(far?' One leg is over 900 miles; check that stop.':'');
+    save(); renderRows();
+  }catch(e){ st.className='status err'; st.textContent=e.message; }
+  btn.disabled=false;
+};
+
+// ---------- exports ----------
+function itinerary(){
+  const t=T(); const points=[{q:t.start,stay:0},...t.stops]; let c=timeToSec(t.startTime); const lines=[];
+  points.forEach((p,i)=>{ const r=resolve(p.q); if(!r) return; const leg=t.legs[i-1]; const d=leg?(leg.override??leg.sec??0):0; if(i>0) c+=d;
+    lines.push(`${clock(c).padEnd(9)} ${r.store?r.store.name+'  '+fullAddr(r.store):r.label}${i>0&&d?`  (drive ${hm(d)})`:''}${i>0&&i<points.length-1&&p.stay?`  stay ${p.stay} min`:''}`);
+    if(i>0) c+=(+p.stay||0)*60; });
+  return `${t.name}\nLeave ${clock(timeToSec(t.startTime))}\n\n`+lines.join('\n')+`\n\nDrive ${$('tDrive').textContent} · Total ${$('tTotal').textContent}`;
+}
+$('copy').onclick=async()=>{ await navigator.clipboard.writeText(itinerary()); $('status').textContent='Itinerary copied.'; };
+$('csv').onclick=()=>{
+  const t=T(); const points=[{q:t.start,stay:0},...t.stops]; let c=timeToSec(t.startTime);
+  const rows=[['Stop','Store #','Name','Address','Arrive','Stay (min)','Drive from previous','Miles']];
+  points.forEach((p,i)=>{ const r=resolve(p.q); if(!r) return; const leg=t.legs[i-1]; const d=leg?(leg.override??leg.sec??0):0; if(i>0) c+=d;
+    rows.push([i,r.store?r.store.num:'',r.store?r.store.name:r.label,r.addr,clock(c),i>0?p.stay:'',i>0?hm(d):'',leg&&leg.mi?Math.round(leg.mi):'']); if(i>0) c+=(+p.stay||0)*60; });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=(t.name||'trip')+'.csv'; a.click();
+};
+$('gmaps').onclick=()=>{
+  const t=T(); const pts=[{q:t.start},...t.stops].map(p=>resolve(p.q)).filter(Boolean).map(p=>p.addr);
+  if(pts.length<2){ $('status').textContent='Add at least one stop first.'; return; }
+  const u='https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+encodeURIComponent(pts[0])+'&destination='+encodeURIComponent(pts.at(-1))+(pts.length>2?'&waypoints='+encodeURIComponent(pts.slice(1,-1).join('|')):'');
+  window.open(u,'_blank');
+};
+
+renderAll();
+loadRemoteRoster();
+</script>
+</body>
+</html>

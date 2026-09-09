@@ -1,0 +1,1498 @@
+{
+"version":"2026-09-09",
+"note":"147 stores: the 144 on the current banner roster plus 15, 16 and 39 (Hobbs / Denver City, join Oct 2026).",
+"stores":[
+{
+"num":1,
+"name":"Lowe's #01",
+"addr":"912 S. Main",
+"city":"Perryton",
+"st":"TX",
+"zip":"79070",
+"phone":"806-435-5511",
+"grp":"TEXAS"
+},
+{
+"num":3,
+"name":"Lowe's #03",
+"addr":"1205 W Hwy 60",
+"city":"Friona",
+"st":"TX",
+"zip":"79035",
+"phone":"806-250-3913",
+"grp":"TEXAS"
+},
+{
+"num":4,
+"name":"Lowe's #04",
+"addr":"1326 Ave J",
+"city":"Eunice",
+"st":"NM",
+"zip":"88231",
+"phone":"575-394-2930",
+"grp":"New Mexico"
+},
+{
+"num":6,
+"name":"Lowe's #06",
+"addr":"220 S 2nd Street",
+"city":"Floydada",
+"st":"TX",
+"zip":"79235",
+"phone":"806-983-3149",
+"grp":"TEXAS"
+},
+{
+"num":7,
+"name":"Lowe's #07",
+"addr":"304 Mechum Drive",
+"city":"Ruidoso",
+"st":"NM",
+"zip":"88355",
+"phone":"575-257-6544",
+"grp":"Corner Market"
+},
+{
+"num":8,
+"name":"Food King #08",
+"addr":"102 W Waylon Jennings Blvd",
+"city":"Littlefield",
+"st":"TX",
+"zip":"79339",
+"phone":"806-385-4711",
+"grp":"Food King TX"
+},
+{
+"num":9,
+"name":"Lowe's #09",
+"addr":"710 Cowboy Way",
+"city":"Plains",
+"st":"TX",
+"zip":"79355",
+"phone":"806-456-3434",
+"grp":"TEXAS CASE READY"
+},
+{
+"num":10,
+"name":"Lowe's #10",
+"addr":"103 W Belsher",
+"city":"Dimmitt",
+"st":"TX",
+"zip":"79027",
+"phone":"806-647-2488",
+"grp":"TEXAS"
+},
+{
+"num":11,
+"name":"Lowe's #11",
+"addr":"405 Ave D",
+"city":"Abernathy",
+"st":"TX",
+"zip":"79311",
+"phone":"806-298-2627",
+"grp":"TEXAS"
+},
+{
+"num":12,
+"name":"Lowe's #12",
+"addr":"845 Garza",
+"city":"Tuscola",
+"st":"TX",
+"zip":"79562",
+"phone":"325-554-7641",
+"grp":"TEXAS"
+},
+{
+"num":13,
+"name":"Lowe's #13",
+"addr":"512 Main St.",
+"city":"Antonito",
+"st":"CO",
+"zip":"81120",
+"phone":"719-376-2483",
+"grp":"Resort"
+},
+{
+"num":14,
+"name":"Lowe's #14",
+"addr":"100 Curry",
+"city":"Jal",
+"st":"NM",
+"zip":"88252",
+"phone":"575-395-2957",
+"grp":"New Mexico"
+},
+{
+"num":15,
+"name":"Food King #15",
+"addr":"1317 N Turner St",
+"city":"Hobbs",
+"st":"NM",
+"zip":"88240",
+"phone":"",
+"grp":"joins Oct 2026"
+},
+{
+"num":16,
+"name":"Lowe's #16",
+"addr":"420 E Marland St",
+"city":"Hobbs",
+"st":"NM",
+"zip":"88240",
+"phone":"",
+"grp":"joins Oct 2026"
+},
+{
+"num":17,
+"name":"Lowe's #17",
+"addr":"116 W 14th Street",
+"city":"Clovis",
+"st":"NM",
+"zip":"88101",
+"phone":"575-763-6660",
+"grp":"New Mexico"
+},
+{
+"num":18,
+"name":"Lowe's #18",
+"addr":"2451 Hwy 84",
+"city":"Chama",
+"st":"NM",
+"zip":"87520",
+"phone":"575-756-2545",
+"grp":"Resort"
+},
+{
+"num":19,
+"name":"Lowe's #19",
+"addr":"213 W. Oklahoma Ave.",
+"city":"Ulysses",
+"st":"KS",
+"zip":"67880",
+"phone":"620-356-2134",
+"grp":"TEXAS"
+},
+{
+"num":20,
+"name":"Lowe's #20",
+"addr":"404 2nd Street",
+"city":"Canadian",
+"st":"TX",
+"zip":"79014",
+"phone":"806-323-6141",
+"grp":"TEXAS"
+},
+{
+"num":21,
+"name":"Lowe's #21",
+"addr":"1120 E. Hwy 66",
+"city":"Gallup",
+"st":"NM",
+"zip":"87301",
+"phone":"505-863-3877",
+"grp":"GALLUP"
+},
+{
+"num":22,
+"name":"Lowe's #22",
+"addr":"41769-A Highway US 191",
+"city":"Ganado",
+"st":"AZ",
+"zip":"86505",
+"phone":"928-255-5710",
+"grp":"GALLUP"
+},
+{
+"num":23,
+"name":"Lowe's #23",
+"addr":"200 Marguerite St.",
+"city":"Gallup",
+"st":"NM",
+"zip":"87301",
+"phone":"505-722-3888",
+"grp":"GALLUP"
+},
+{
+"num":24,
+"name":"Lowe's #24",
+"addr":"Hwy 264 & Rt 12",
+"city":"Window Rock",
+"st":"AZ",
+"zip":"86515",
+"phone":"928-871-4900",
+"grp":"GALLUP"
+},
+{
+"num":25,
+"name":"Lowe's #25",
+"addr":"1215 Grand Ave.",
+"city":"Del Norte",
+"st":"CO",
+"zip":"81132",
+"phone":"719-657-3505",
+"grp":"Resort"
+},
+{
+"num":26,
+"name":"Lowe's #26",
+"addr":"401 W. Park",
+"city":"Iowa Park",
+"st":"TX",
+"zip":"76367",
+"phone":"940-592-9831",
+"grp":"TEXAS North East"
+},
+{
+"num":27,
+"name":"Lowe's #27",
+"addr":"510 W. 2nd Street",
+"city":"Clarendon",
+"st":"TX",
+"zip":"79226",
+"phone":"806-874-3164",
+"grp":"TEXAS"
+},
+{
+"num":28,
+"name":"Food King #28",
+"addr":"101 W. 10th St.",
+"city":"Borger",
+"st":"TX",
+"zip":"79007",
+"phone":"806-273-5649",
+"grp":"Food King TX"
+},
+{
+"num":29,
+"name":"Lowe's #29",
+"addr":"316 E. Broadway",
+"city":"Fritch",
+"st":"TX",
+"zip":"79036",
+"phone":"806-857-2976",
+"grp":"TEXAS"
+},
+{
+"num":31,
+"name":"Lowe's #31",
+"addr":"310 E Austin",
+"city":"Kermit",
+"st":"TX",
+"zip":"79745",
+"phone":"432-586-2861",
+"grp":"TEXAS"
+},
+{
+"num":32,
+"name":"Lowe's #32",
+"addr":"826 W Clements",
+"city":"Odessa",
+"st":"TX",
+"zip":"79763",
+"phone":"432-333-6291",
+"grp":"TEXAS ODESSA"
+},
+{
+"num":33,
+"name":"Food King #33",
+"addr":"401 W American Blvd",
+"city":"Muleshoe",
+"st":"TX",
+"zip":"79347",
+"phone":"806-272-4585",
+"grp":"Food King TX"
+},
+{
+"num":34,
+"name":"Lowe's #34",
+"addr":"1600 N Grant",
+"city":"Odessa",
+"st":"TX",
+"zip":"79761",
+"phone":"432-337-1563",
+"grp":"TEXAS ODESSA"
+},
+{
+"num":35,
+"name":"Lowe's #35",
+"addr":"7528 W University",
+"city":"Odessa",
+"st":"TX",
+"zip":"79764",
+"phone":"432-381-0096",
+"grp":"TEXAS ODESSA"
+},
+{
+"num":36,
+"name":"Lowe's #36",
+"addr":"1107 E 42nd Street",
+"city":"Odessa",
+"st":"TX",
+"zip":"79762",
+"phone":"432-366-8371",
+"grp":"TEXAS ODESSA"
+},
+{
+"num":37,
+"name":"Food King #37",
+"addr":"2021 E 8th Street",
+"city":"Odessa",
+"st":"TX",
+"zip":"79761",
+"phone":"432-337-2242",
+"grp":"Food King Odessa"
+},
+{
+"num":38,
+"name":"Food King #38",
+"addr":"2 S. Main St.",
+"city":"San Angelo",
+"st":"TX",
+"zip":"76903",
+"phone":"325-655-2821",
+"grp":"Food King TX"
+},
+{
+"num":39,
+"name":"Lowe's #39",
+"addr":"713 W Broadway St",
+"city":"Denver City",
+"st":"TX",
+"zip":"79323",
+"phone":"",
+"grp":"joins Oct 2026"
+},
+{
+"num":40,
+"name":"Lowe's #40",
+"addr":"905 Railroad Ave",
+"city":"Seagraves",
+"st":"TX",
+"zip":"79359",
+"phone":"806-546-2521",
+"grp":"TEXAS"
+},
+{
+"num":43,
+"name":"Lowe's #43",
+"addr":"1300 W. Dickinson Blvd.",
+"city":"Ft. Stockton",
+"st":"TX",
+"zip":"79735",
+"phone":"432-336-3341",
+"grp":"TEXAS"
+},
+{
+"num":45,
+"name":"Lowe's #45",
+"addr":"1201 Stockton Ave.",
+"city":"Monahans",
+"st":"TX",
+"zip":"79756",
+"phone":"432-943-4275",
+"grp":"TEXAS"
+},
+{
+"num":47,
+"name":"Lowe's #47",
+"addr":"405 Hickory St.",
+"city":"Colorado City",
+"st":"TX",
+"zip":"79512",
+"phone":"325-728-3781",
+"grp":"South Base"
+},
+{
+"num":48,
+"name":"Food King #48",
+"addr":"105 E. Park Ave.",
+"city":"Hereford",
+"st":"TX",
+"zip":"79045",
+"phone":"806-364-1621",
+"grp":"Food King TX"
+},
+{
+"num":49,
+"name":"Lowe's #49",
+"addr":"100 S.E. 2nd St.",
+"city":"Tulia",
+"st":"TX",
+"zip":"79088",
+"phone":"806-995-3559",
+"grp":"TEXAS"
+},
+{
+"num":52,
+"name":"SuperSave #52",
+"addr":"519 Paseo Del Pueblo Sur",
+"city":"Taos",
+"st":"NM",
+"zip":"87571",
+"phone":"575-751-2801",
+"grp":"Super Save TAOS"
+},
+{
+"num":53,
+"name":"SuperSave #53",
+"addr":"1265 South 2nd Street",
+"city":"Raton",
+"st":"NM",
+"zip":"87740",
+"phone":"575-445-2331",
+"grp":"Super Save"
+},
+{
+"num":55,
+"name":"Signature #55",
+"addr":"675 E 10th Street",
+"city":"Alamogordo",
+"st":"NM",
+"zip":"88310",
+"phone":"575-437-5150",
+"grp":"Alamo"
+},
+{
+"num":56,
+"name":"Lowe's #56",
+"addr":"601 Reinken Blvd",
+"city":"Belen",
+"st":"NM",
+"zip":"87002",
+"phone":"505-864-0786",
+"grp":"New Mexico"
+},
+{
+"num":57,
+"name":"Lowe's #57",
+"addr":"2180 N Main",
+"city":"Las Cruces",
+"st":"NM",
+"zip":"88001",
+"phone":"575-527-2624",
+"grp":"Las Cruces"
+},
+{
+"num":58,
+"name":"Lowe's #58",
+"addr":"1410 E Missouri",
+"city":"Las Cruces",
+"st":"NM",
+"zip":"88001",
+"phone":"575-522-0794",
+"grp":"Las Cruces"
+},
+{
+"num":59,
+"name":"Lowe's #59",
+"addr":"560 Central Ave",
+"city":"Tularosa",
+"st":"NM",
+"zip":"88352",
+"phone":"575-585-2401",
+"grp":"New Mexico"
+},
+{
+"num":60,
+"name":"Lowe's #60",
+"addr":"3373 Mountain View Blvd",
+"city":"Angel Fire",
+"st":"NM",
+"zip":"87710",
+"phone":"575-377-2354",
+"grp":"NONE"
+},
+{
+"num":62,
+"name":"Lowe's #62",
+"addr":"622 Ave G",
+"city":"Hale Center",
+"st":"TX",
+"zip":"79041",
+"phone":"806-839-2222",
+"grp":"TEXAS"
+},
+{
+"num":64,
+"name":"Lowe's #64",
+"addr":"505 TX-207",
+"city":"Spearman",
+"st":"TX",
+"zip":"79081",
+"phone":"806-659-3212",
+"grp":"TEXAS"
+},
+{
+"num":65,
+"name":"Lowe's #65",
+"addr":"212 W Birch",
+"city":"Crosbyton",
+"st":"TX",
+"zip":"79322",
+"phone":"806-675-2534",
+"grp":"TEXAS"
+},
+{
+"num":67,
+"name":"Lowe's #67",
+"addr":"1119 E 1st",
+"city":"Dumas",
+"st":"TX",
+"zip":"79029",
+"phone":"806-935-9215",
+"grp":"TEXAS"
+},
+{
+"num":68,
+"name":"Food King #68",
+"addr":"3518 Montana Ave.",
+"city":"El Paso",
+"st":"TX",
+"zip":"79903",
+"phone":"915-565-4040",
+"grp":"Food King EP"
+},
+{
+"num":69,
+"name":"Food King #69",
+"addr":"9817 Dyer Street",
+"city":"El Paso",
+"st":"TX",
+"zip":"79924",
+"phone":"915-751-8700",
+"grp":"Food King EP"
+},
+{
+"num":70,
+"name":"Food King #70",
+"addr":"9480 Viscount Ave.",
+"city":"El Paso",
+"st":"TX",
+"zip":"79925",
+"phone":"915-599-1363",
+"grp":"Food King EP"
+},
+{
+"num":71,
+"name":"Food King #71",
+"addr":"3333 N. Yarbrough Dr.",
+"city":"El Paso",
+"st":"TX",
+"zip":"79925",
+"phone":"915-595-0123",
+"grp":"Food King EP"
+},
+{
+"num":72,
+"name":"Food King #72",
+"addr":"1840 Lee Trevino",
+"city":"El Paso",
+"st":"TX",
+"zip":"79936",
+"phone":"915-590-2326",
+"grp":"Food King EP"
+},
+{
+"num":73,
+"name":"Food King #73",
+"addr":"1480 George Dieter Drive",
+"city":"El Paso",
+"st":"TX",
+"zip":"79936",
+"phone":"915-857-6080",
+"grp":"Food King EP"
+},
+{
+"num":74,
+"name":"Food King #74",
+"addr":"5514 Alameda Ave.",
+"city":"El Paso",
+"st":"TX",
+"zip":"79905",
+"phone":"915-778-4746",
+"grp":"Food King EP"
+},
+{
+"num":76,
+"name":"Food King #76",
+"addr":"9016 Alameda Ave.",
+"city":"El Paso",
+"st":"TX",
+"zip":"79907",
+"phone":"915-859-7441",
+"grp":"Food King EP"
+},
+{
+"num":77,
+"name":"Food King #77",
+"addr":"10720 North Loop Dr.",
+"city":"Socorro",
+"st":"TX",
+"zip":"79927",
+"phone":"915-858-4011",
+"grp":"Food King EP"
+},
+{
+"num":80,
+"name":"Food King #80",
+"addr":"7945 North Mesa St.",
+"city":"El Paso",
+"st":"TX",
+"zip":"79932",
+"phone":"915-584-0881",
+"grp":"Food King EP"
+},
+{
+"num":81,
+"name":"Food King #81",
+"addr":"8208 Slide Road",
+"city":"Lubbock",
+"st":"TX",
+"zip":"79424",
+"phone":"806-794-9728",
+"grp":"Food King LB"
+},
+{
+"num":82,
+"name":"Food King #82",
+"addr":"5725 19th Street",
+"city":"Lubbock",
+"st":"TX",
+"zip":"79407",
+"phone":"806-780-6745",
+"grp":"Food King LB"
+},
+{
+"num":83,
+"name":"Food King #83",
+"addr":"6021 North Mesa St.",
+"city":"El Paso",
+"st":"TX",
+"zip":"79912",
+"phone":"915-584-2070",
+"grp":"Food King EP"
+},
+{
+"num":85,
+"name":"Food King #85",
+"addr":"2706 26th Street",
+"city":"Lubbock",
+"st":"TX",
+"zip":"79410",
+"phone":"806-744-4766",
+"grp":"Food King LB"
+},
+{
+"num":87,
+"name":"Food King #87",
+"addr":"8201 Dyer Street",
+"city":"El Paso",
+"st":"TX",
+"zip":"79904",
+"phone":"915-755-3012",
+"grp":"Food King EP"
+},
+{
+"num":89,
+"name":"Food King #89",
+"addr":"1700 Saint Michaels Drive",
+"city":"Santa Fe",
+"st":"NM",
+"zip":"87505",
+"phone":"505-424-1535",
+"grp":"Food King SF"
+},
+{
+"num":90,
+"name":"Lowe's #90",
+"addr":"319 S Main St.",
+"city":"Anthony",
+"st":"TX",
+"zip":"79821",
+"phone":"915-886-5050",
+"grp":"ANTHONY"
+},
+{
+"num":91,
+"name":"SuperSave #91",
+"addr":"2400 7th Street",
+"city":"Las Vegas",
+"st":"NM",
+"zip":"87701",
+"phone":"505-425-6721",
+"grp":"Super Save"
+},
+{
+"num":92,
+"name":"SuperSave #92",
+"addr":"605 Mills Ave",
+"city":"Las Vegas",
+"st":"NM",
+"zip":"87701",
+"phone":"505-425-7199",
+"grp":"Super Save"
+},
+{
+"num":93,
+"name":"Food King #93",
+"addr":"930 Riverside Drive",
+"city":"Espanola",
+"st":"NM",
+"zip":"87532",
+"phone":"505-753-8869",
+"grp":"Food King SF"
+},
+{
+"num":94,
+"name":"Lowe's #94",
+"addr":"105 W Tucumcari Blvd.",
+"city":"Tucumcari",
+"st":"NM",
+"zip":"88401",
+"phone":"575-461-2350",
+"grp":"New Mexico"
+},
+{
+"num":96,
+"name":"Food King #96",
+"addr":"1025 N Carolina Drive",
+"city":"El Paso",
+"st":"TX",
+"zip":"79915",
+"phone":"915-592-2022",
+"grp":"Food King EP"
+},
+{
+"num":97,
+"name":"Food King #97",
+"addr":"9120 Dyer Street",
+"city":"El Paso",
+"st":"TX",
+"zip":"79924",
+"phone":"915-751-6555",
+"grp":"Food King EP"
+},
+{
+"num":98,
+"name":"Lowe's #98",
+"addr":"701 11th Street NW",
+"city":"Albuquerque",
+"st":"NM",
+"zip":"87102",
+"phone":"505-247-8399",
+"grp":"Corner Market"
+},
+{
+"num":99,
+"name":"Food King #99",
+"addr":"4701 4th Street NW",
+"city":"Albuquerque",
+"st":"NM",
+"zip":"87107",
+"phone":"505-341-0088",
+"grp":"Food King SF"
+},
+{
+"num":102,
+"name":"Lowe's #102",
+"addr":"907 N. Main",
+"city":"Bandera",
+"st":"TX",
+"zip":"78003",
+"phone":"830-796-4401",
+"grp":"South Base Meal Solutions"
+},
+{
+"num":103,
+"name":"Lowe's #103",
+"addr":"306 S. Eagle",
+"city":"Weimar",
+"st":"TX",
+"zip":"78962",
+"phone":"979-725-8253",
+"grp":"South Base"
+},
+{
+"num":104,
+"name":"Lowe's #104",
+"addr":"305 Ave. E.",
+"city":"Ozona",
+"st":"TX",
+"zip":"76943",
+"phone":"325-392-3324",
+"grp":"South Base"
+},
+{
+"num":105,
+"name":"Lowe's #105",
+"addr":"3214 School St.",
+"city":"Needville",
+"st":"TX",
+"zip":"77461",
+"phone":"979-793-4464",
+"grp":"South Base"
+},
+{
+"num":106,
+"name":"Lowe's #106",
+"addr":"501 Nueces St.",
+"city":"George West",
+"st":"TX",
+"zip":"78022",
+"phone":"361-449-2796",
+"grp":"South Base"
+},
+{
+"num":108,
+"name":"Lowe's #108",
+"addr":"8010 FM 2673",
+"city":"Canyon Lake",
+"st":"TX",
+"zip":"78133",
+"phone":"830-899-8574",
+"grp":"South Base"
+},
+{
+"num":109,
+"name":"Lowe's #109",
+"addr":"50 Main St.",
+"city":"Westcliffe",
+"st":"CO",
+"zip":"81252",
+"phone":"719-783-0550",
+"grp":"Resort"
+},
+{
+"num":110,
+"name":"Lowe's #110",
+"addr":"210 Orange Ave.",
+"city":"Orange Grove",
+"st":"TX",
+"zip":"78372",
+"phone":"361-384-2761",
+"grp":"South Base"
+},
+{
+"num":111,
+"name":"Lowe's #111",
+"addr":"1407 N. Smith St.",
+"city":"Hebbronville",
+"st":"TX",
+"zip":"78361",
+"phone":"361-527-5711",
+"grp":"South Base"
+},
+{
+"num":112,
+"name":"Lowe's #112",
+"addr":"204 N. Dibrell Ave",
+"city":"Three Rivers",
+"st":"TX",
+"zip":"78071",
+"phone":"361-786-2503",
+"grp":"South Base"
+},
+{
+"num":113,
+"name":"Lowe's #113",
+"addr":"702 Henderson",
+"city":"Palacios",
+"st":"TX",
+"zip":"77465",
+"phone":"361-972-2534",
+"grp":"South Base"
+},
+{
+"num":115,
+"name":"Lowe's #115",
+"addr":"833 South Dill St.",
+"city":"East Bernard",
+"st":"TX",
+"zip":"77435",
+"phone":"979-335-7322",
+"grp":"South Base"
+},
+{
+"num":116,
+"name":"Lowe's #116",
+"addr":"418 S Alister St",
+"city":"Port Aransas",
+"st":"TX",
+"zip":"78373",
+"phone":"361-749-6233",
+"grp":"South Base"
+},
+{
+"num":117,
+"name":"Lowe's #117",
+"addr":"7305 Pecos St.",
+"city":"Denver",
+"st":"CO",
+"zip":"80221",
+"phone":"720-540-3883",
+"grp":"Mercado"
+},
+{
+"num":118,
+"name":"Lowe's #118",
+"addr":"1320 S. Federal Blvd.",
+"city":"Denver",
+"st":"CO",
+"zip":"80219",
+"phone":"303-922-7412",
+"grp":"Mercado"
+},
+{
+"num":119,
+"name":"Lowe's #119",
+"addr":"600 Crockett",
+"city":"Sonora",
+"st":"TX",
+"zip":"76950",
+"phone":"325-387-3438",
+"grp":"South Base"
+},
+{
+"num":120,
+"name":"Lowe's #120",
+"addr":"102 State HWY 55 South",
+"city":"Rocksprings",
+"st":"TX",
+"zip":"78880",
+"phone":"830-683-2178",
+"grp":"South Base"
+},
+{
+"num":121,
+"name":"Lowe's #121",
+"addr":"300 East 3rd",
+"city":"Hico",
+"st":"TX",
+"zip":"76457",
+"phone":"254-796-4623",
+"grp":"South Base"
+},
+{
+"num":122,
+"name":"Lowe's #122",
+"addr":"10777 E. Colfax Ave.",
+"city":"Aurora",
+"st":"CO",
+"zip":"80010",
+"phone":"303-363-3321",
+"grp":"Mercado"
+},
+{
+"num":123,
+"name":"Food King #123",
+"addr":"100 E. Colonial Pkwy.",
+"city":"Devine",
+"st":"TX",
+"zip":"78016",
+"phone":"830-663-4252",
+"grp":"Food King TX"
+},
+{
+"num":124,
+"name":"Lowe's #124",
+"addr":"505 2nd St.",
+"city":"Big Lake",
+"st":"TX",
+"zip":"76932",
+"phone":"325-884-2644",
+"grp":"South Base"
+},
+{
+"num":127,
+"name":"Lowe's #127",
+"addr":"19860 Somerset Rd.",
+"city":"Somerset",
+"st":"TX",
+"zip":"78069",
+"phone":"830-429-3612",
+"grp":"South Base"
+},
+{
+"num":128,
+"name":"Food King #128",
+"addr":"3635 W. 10th St.",
+"city":"Greeley",
+"st":"CO",
+"zip":"80634",
+"phone":"970-351-0727",
+"grp":"Food King GR"
+},
+{
+"num":129,
+"name":"Lowe's #129",
+"addr":"806 W. 17th St.",
+"city":"Brady",
+"st":"TX",
+"zip":"76825",
+"phone":"325-597-3798",
+"grp":"South Base"
+},
+{
+"num":130,
+"name":"Lowe's #130",
+"addr":"1204 W. Wallace",
+"city":"San Saba",
+"st":"TX",
+"zip":"76877",
+"phone":"325-372-4191",
+"grp":"South Base"
+},
+{
+"num":131,
+"name":"Lowe's #131",
+"addr":"103 E. Richardson",
+"city":"Sundown",
+"st":"TX",
+"zip":"79372",
+"phone":"806-229-6410",
+"grp":"TEXAS CASE READY"
+},
+{
+"num":133,
+"name":"Lowe's #133",
+"addr":"1102 Main St.",
+"city":"Junction",
+"st":"TX",
+"zip":"76849",
+"phone":"325-446-2650",
+"grp":"South Base"
+},
+{
+"num":134,
+"name":"Lowe's #134",
+"addr":"315 E. Broadway",
+"city":"Eden",
+"st":"TX",
+"zip":"76837",
+"phone":"325-869-4741",
+"grp":"South Base"
+},
+{
+"num":135,
+"name":"Lowe's #135",
+"addr":"201 S. Divide",
+"city":"Eldorado",
+"st":"TX",
+"zip":"76936",
+"phone":"325-853-3208",
+"grp":"South Base"
+},
+{
+"num":136,
+"name":"Lowe's #136",
+"addr":"111 Blanco",
+"city":"Blanco",
+"st":"TX",
+"zip":"78606",
+"phone":"830-833-4521",
+"grp":"South Base"
+},
+{
+"num":137,
+"name":"Lowe's #137",
+"addr":"405 US-281 South",
+"city":"Johnson City",
+"st":"TX",
+"zip":"78636",
+"phone":"830-868-4274",
+"grp":"South Base"
+},
+{
+"num":138,
+"name":"Lowe's #138",
+"addr":"824 San Antonio St.",
+"city":"Mason",
+"st":"TX",
+"zip":"76856",
+"phone":"325-347-5906",
+"grp":"South Base"
+},
+{
+"num":139,
+"name":"Lowe's #139",
+"addr":"104 West Young",
+"city":"Llano",
+"st":"TX",
+"zip":"78643",
+"phone":"325-247-5059",
+"grp":"South Base"
+},
+{
+"num":140,
+"name":"Lowe's #140",
+"addr":"410 Ellis",
+"city":"Menard",
+"st":"TX",
+"zip":"76859",
+"phone":"325-396-4592",
+"grp":"South Base"
+},
+{
+"num":141,
+"name":"Lowe's #141",
+"addr":"1345 Sattler Rd.",
+"city":"Canyon Lake",
+"st":"TX",
+"zip":"78133",
+"phone":"830-964-3231",
+"grp":"South Base"
+},
+{
+"num":142,
+"name":"Lowe's #142",
+"addr":"205 N. Ann St.",
+"city":"Brackettville",
+"st":"TX",
+"zip":"78832",
+"phone":"830-563-2500",
+"grp":"South Base"
+},
+{
+"num":145,
+"name":"Lowe's #145",
+"addr":"1203 North Main",
+"city":"Cotulla",
+"st":"TX",
+"zip":"78014",
+"phone":"830-879-2625",
+"grp":"South Base"
+},
+{
+"num":146,
+"name":"Lowe's #146",
+"addr":"103 E. 5th Street",
+"city":"Iraan",
+"st":"TX",
+"zip":"79744",
+"phone":"432-639-2587",
+"grp":"TEXAS"
+},
+{
+"num":147,
+"name":"Lowe's #147",
+"addr":"803 E. Gravis",
+"city":"San Diego",
+"st":"TX",
+"zip":"78384",
+"phone":"361-279-3395",
+"grp":"South Base"
+},
+{
+"num":148,
+"name":"Lowe's #148",
+"addr":"17255 IH 35 South",
+"city":"Dilley",
+"st":"TX",
+"zip":"78017",
+"phone":"830-965-1211",
+"grp":"South Base"
+},
+{
+"num":150,
+"name":"Lowe's #150",
+"addr":"1102 E Riley St., Suite A",
+"city":"Freer",
+"st":"TX",
+"zip":"78357",
+"phone":"361-394-6055",
+"grp":"South Base"
+},
+{
+"num":151,
+"name":"Lowe's #151",
+"addr":"9014 Hwy 16 North",
+"city":"Poteet",
+"st":"TX",
+"zip":"78065",
+"phone":"830-742-3358",
+"grp":"South Base"
+},
+{
+"num":152,
+"name":"Lowe's #152",
+"addr":"3000 Santa Maria",
+"city":"Laredo",
+"st":"TX",
+"zip":"78040",
+"phone":"956-722-2722",
+"grp":"VALLEY"
+},
+{
+"num":153,
+"name":"Lowe's #153",
+"addr":"102 N Nixon Ave",
+"city":"Nixon",
+"st":"TX",
+"zip":"78140",
+"phone":"830-582-1251",
+"grp":"South Base"
+},
+{
+"num":154,
+"name":"Lowe's #154",
+"addr":"224 East 6th Street",
+"city":"McCamey",
+"st":"TX",
+"zip":"79752",
+"phone":"432-652-8881",
+"grp":"TEXAS"
+},
+{
+"num":155,
+"name":"Lowe's #155",
+"addr":"909 Hwy 83 North",
+"city":"Zapata",
+"st":"TX",
+"zip":"78076",
+"phone":"956-765-4861",
+"grp":"South Base"
+},
+{
+"num":156,
+"name":"Lowe's #156",
+"addr":"400 W. Pearl",
+"city":"Goliad",
+"st":"TX",
+"zip":"77963",
+"phone":"361-645-3364",
+"grp":"South Base"
+},
+{
+"num":157,
+"name":"Lowe's #157",
+"addr":"1707 W. Main",
+"city":"Yorktown",
+"st":"TX",
+"zip":"78164",
+"phone":"361-564-2215",
+"grp":"South Base"
+},
+{
+"num":158,
+"name":"Lowe's #158",
+"addr":"417 SW 5th St.",
+"city":"Cross Plains",
+"st":"TX",
+"zip":"76443",
+"phone":"254-725-7131",
+"grp":"TEXAS"
+},
+{
+"num":159,
+"name":"Lowe's #159",
+"addr":"619 Front St.",
+"city":"Comfort",
+"st":"TX",
+"zip":"78013",
+"phone":"830-995-2380",
+"grp":"South Base"
+},
+{
+"num":160,
+"name":"Lowe's #160",
+"addr":"1202 S FM 51",
+"city":"Decatur",
+"st":"TX",
+"zip":"76234",
+"phone":"940-627-6438",
+"grp":"TEXAS North East"
+},
+{
+"num":161,
+"name":"Lowe's #161",
+"addr":"7708 Lohmann Ford Rd., Ste C",
+"city":"Lago Vista",
+"st":"TX",
+"zip":"78645",
+"phone":"512-267-0355",
+"grp":"South Base LAGO"
+},
+{
+"num":163,
+"name":"Lowe's #163",
+"addr":"1501 Halsell St.",
+"city":"Bridgeport",
+"st":"TX",
+"zip":"76426",
+"phone":"940-683-4006",
+"grp":"TEXAS North East"
+},
+{
+"num":165,
+"name":"Lowe's #165",
+"addr":"200 West Rock Island",
+"city":"Boyd",
+"st":"TX",
+"zip":"76023",
+"phone":"940-433-2325",
+"grp":"TEXAS North East"
+},
+{
+"num":166,
+"name":"Lowe's #166",
+"addr":"503 N. Main",
+"city":"Jacksboro",
+"st":"TX",
+"zip":"76458",
+"phone":"940-567-5301",
+"grp":"TEXAS North East"
+},
+{
+"num":167,
+"name":"Lowe's #167",
+"addr":"100 E. Maginnis",
+"city":"Chico",
+"st":"TX",
+"zip":"76431",
+"phone":"940-644-2426",
+"grp":"TEXAS North East"
+},
+{
+"num":168,
+"name":"Lowe's #168",
+"addr":"303 W. Franklin",
+"city":"Alvord",
+"st":"TX",
+"zip":"76225",
+"phone":"940-427-8591",
+"grp":"TEXAS North East"
+},
+{
+"num":169,
+"name":"Lowe's #169",
+"addr":"517 W. California",
+"city":"Gainesville",
+"st":"TX",
+"zip":"76240",
+"phone":"940-665-4131",
+"grp":"TEXAS North East"
+},
+{
+"num":171,
+"name":"Lowe's #171",
+"addr":"1401 S Main St",
+"city":"Seminole",
+"st":"TX",
+"zip":"79360",
+"phone":"432-758-9869",
+"grp":"TEXAS"
+},
+{
+"num":172,
+"name":"Lowe's #172",
+"addr":"1201 N Main",
+"city":"Andrews",
+"st":"TX",
+"zip":"79714",
+"phone":"432-523-9023",
+"grp":"TEXAS"
+},
+{
+"num":173,
+"name":"Lowe's #173",
+"addr":"501 Birdwell Lane Suite 1",
+"city":"Big Spring",
+"st":"TX",
+"zip":"79720",
+"phone":"432-296-4540",
+"grp":"TEXAS"
+},
+{
+"num":174,
+"name":"Lowe's #174",
+"addr":"703 E Front St",
+"city":"Midland",
+"st":"TX",
+"zip":"79701",
+"phone":"432-683-6666",
+"grp":"TEXAS"
+},
+{
+"num":175,
+"name":"Lowe's #175",
+"addr":"1506 S Gaston",
+"city":"Crane",
+"st":"TX",
+"zip":"79731",
+"phone":"432-558-2911",
+"grp":"TEXAS"
+},
+{
+"num":176,
+"name":"Lowe's #176",
+"addr":"1807 W Broadway St",
+"city":"Van Horn",
+"st":"TX",
+"zip":"79855",
+"phone":"432-283-2155",
+"grp":"TEXAS"
+},
+{
+"num":177,
+"name":"Lowe's #177",
+"addr":"712 N State St",
+"city":"Fort Davis",
+"st":"TX",
+"zip":"79734",
+"phone":"432-426-3812",
+"grp":"TEXAS"
+},
+{
+"num":178,
+"name":"Lowe's #178",
+"addr":"104 N 2nd St",
+"city":"Alpine",
+"st":"TX",
+"zip":"79830",
+"phone":"432-837-3295",
+"grp":"TEXAS"
+},
+{
+"num":179,
+"name":"Lowe's #179",
+"addr":"717 W San Antonio St",
+"city":"Marfa",
+"st":"TX",
+"zip":"79843",
+"phone":"432-729-4375",
+"grp":"TEXAS"
+},
+{
+"num":181,
+"name":"Lowe's #181",
+"addr":"1000 Hwy 67",
+"city":"Presidio",
+"st":"TX",
+"zip":"79845",
+"phone":"432-229-3776",
+"grp":"TEXAS"
+}
+],
+"places":[
+{
+"num":"home",
+"name":"Home",
+"addr":"134 E 23rd St",
+"city":"Littlefield",
+"st":"TX",
+"zip":"79339",
+"phone":"",
+"grp":"place"
+},
+{
+"num":"office",
+"name":"Lowe's Corporate Office",
+"addr":"1804 Hall Ave",
+"city":"Littlefield",
+"st":"TX",
+"zip":"79339",
+"phone":"",
+"grp":"place"
+}
+]
+}
