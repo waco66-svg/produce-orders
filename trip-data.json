@@ -1,5 +1,5 @@
 {
-"version":"2026-09-09b",
+"version":"2026-09-09c",
 "note":"147 stores: the 144 on the current banner roster plus 15, 16 and 39 (Hobbs / Denver City, join Oct 2026).",
 "stores":[
 {
@@ -10,7 +10,8 @@
 "st":"TX",
 "zip":"79070",
 "phone":"806-435-5511",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":3,
@@ -20,7 +21,8 @@
 "st":"TX",
 "zip":"79035",
 "phone":"806-250-3913",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":4,
@@ -30,7 +32,8 @@
 "st":"NM",
 "zip":"88231",
 "phone":"575-394-2930",
-"grp":"New Mexico"
+"grp":"New Mexico",
+"tz":"America/Denver"
 },
 {
 "num":6,
@@ -40,7 +43,8 @@
 "st":"TX",
 "zip":"79235",
 "phone":"806-983-3149",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":7,
@@ -50,7 +54,8 @@
 "st":"NM",
 "zip":"88355",
 "phone":"575-257-6544",
-"grp":"Corner Market"
+"grp":"Corner Market",
+"tz":"America/Denver"
 },
 {
 "num":8,
@@ -60,7 +65,8 @@
 "st":"TX",
 "zip":"79339",
 "phone":"806-385-4711",
-"grp":"Food King TX"
+"grp":"Food King TX",
+"tz":"America/Chicago"
 },
 {
 "num":9,
@@ -70,7 +76,8 @@
 "st":"TX",
 "zip":"79355",
 "phone":"806-456-3434",
-"grp":"TEXAS CASE READY"
+"grp":"TEXAS CASE READY",
+"tz":"America/Chicago"
 },
 {
 "num":10,
@@ -80,7 +87,8 @@
 "st":"TX",
 "zip":"79027",
 "phone":"806-647-2488",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":11,
@@ -90,7 +98,8 @@
 "st":"TX",
 "zip":"79311",
 "phone":"806-298-2627",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":12,
@@ -100,7 +109,8 @@
 "st":"TX",
 "zip":"79562",
 "phone":"325-554-7641",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":13,
@@ -110,7 +120,8 @@
 "st":"CO",
 "zip":"81120",
 "phone":"719-376-2483",
-"grp":"Resort"
+"grp":"Resort",
+"tz":"America/Denver"
 },
 {
 "num":14,
@@ -120,7 +131,8 @@
 "st":"NM",
 "zip":"88252",
 "phone":"575-395-2957",
-"grp":"New Mexico"
+"grp":"New Mexico",
+"tz":"America/Denver"
 },
 {
 "num":15,
@@ -130,7 +142,8 @@
 "st":"NM",
 "zip":"88240",
 "phone":"",
-"grp":"joins Oct 2026"
+"grp":"joins Oct 2026",
+"tz":"America/Denver"
 },
 {
 "num":16,
@@ -140,7 +153,8 @@
 "st":"NM",
 "zip":"88240",
 "phone":"",
-"grp":"joins Oct 2026"
+"grp":"joins Oct 2026",
+"tz":"America/Denver"
 },
 {
 "num":17,
@@ -150,7 +164,8 @@
 "st":"NM",
 "zip":"88101",
 "phone":"575-763-6660",
-"grp":"New Mexico"
+"grp":"New Mexico",
+"tz":"America/Denver"
 },
 {
 "num":18,
@@ -160,7 +175,8 @@
 "st":"NM",
 "zip":"87520",
 "phone":"575-756-2545",
-"grp":"Resort"
+"grp":"Resort",
+"tz":"America/Denver"
 },
 {
 "num":19,
@@ -170,7 +186,8 @@
 "st":"KS",
 "zip":"67880",
 "phone":"620-356-2134",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":20,
@@ -180,7 +197,8 @@
 "st":"TX",
 "zip":"79014",
 "phone":"806-323-6141",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":21,
@@ -190,7 +208,8 @@
 "st":"NM",
 "zip":"87301",
 "phone":"505-863-3877",
-"grp":"GALLUP"
+"grp":"GALLUP",
+"tz":"America/Denver"
 },
 {
 "num":22,
@@ -200,7 +219,8 @@
 "st":"AZ",
 "zip":"86505",
 "phone":"928-255-5710",
-"grp":"GALLUP"
+"grp":"GALLUP",
+"tz":"America/Denver"
 },
 {
 "num":23,
@@ -210,7 +230,8 @@
 "st":"NM",
 "zip":"87301",
 "phone":"505-722-3888",
-"grp":"GALLUP"
+"grp":"GALLUP",
+"tz":"America/Denver"
 },
 {
 "num":24,
@@ -220,7 +241,8 @@
 "st":"AZ",
 "zip":"86515",
 "phone":"928-871-4900",
-"grp":"GALLUP"
+"grp":"GALLUP",
+"tz":"America/Denver"
 },
 {
 "num":25,
@@ -230,7 +252,8 @@
 "st":"CO",
 "zip":"81132",
 "phone":"719-657-3505",
-"grp":"Resort"
+"grp":"Resort",
+"tz":"America/Denver"
 },
 {
 "num":26,
@@ -240,7 +263,8 @@
 "st":"TX",
 "zip":"76367",
 "phone":"940-592-9831",
-"grp":"TEXAS North East"
+"grp":"TEXAS North East",
+"tz":"America/Chicago"
 },
 {
 "num":27,
@@ -250,7 +274,8 @@
 "st":"TX",
 "zip":"79226",
 "phone":"806-874-3164",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":28,
@@ -260,7 +285,8 @@
 "st":"TX",
 "zip":"79007",
 "phone":"806-273-5649",
-"grp":"Food King TX"
+"grp":"Food King TX",
+"tz":"America/Chicago"
 },
 {
 "num":29,
@@ -270,7 +296,8 @@
 "st":"TX",
 "zip":"79036",
 "phone":"806-857-2976",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":31,
@@ -280,7 +307,8 @@
 "st":"TX",
 "zip":"79745",
 "phone":"432-586-2861",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":32,
@@ -290,7 +318,8 @@
 "st":"TX",
 "zip":"79763",
 "phone":"432-333-6291",
-"grp":"TEXAS ODESSA"
+"grp":"TEXAS ODESSA",
+"tz":"America/Chicago"
 },
 {
 "num":33,
@@ -300,7 +329,8 @@
 "st":"TX",
 "zip":"79347",
 "phone":"806-272-4585",
-"grp":"Food King TX"
+"grp":"Food King TX",
+"tz":"America/Chicago"
 },
 {
 "num":34,
@@ -310,7 +340,8 @@
 "st":"TX",
 "zip":"79761",
 "phone":"432-337-1563",
-"grp":"TEXAS ODESSA"
+"grp":"TEXAS ODESSA",
+"tz":"America/Chicago"
 },
 {
 "num":35,
@@ -320,7 +351,8 @@
 "st":"TX",
 "zip":"79764",
 "phone":"432-381-0096",
-"grp":"TEXAS ODESSA"
+"grp":"TEXAS ODESSA",
+"tz":"America/Chicago"
 },
 {
 "num":36,
@@ -330,7 +362,8 @@
 "st":"TX",
 "zip":"79762",
 "phone":"432-366-8371",
-"grp":"TEXAS ODESSA"
+"grp":"TEXAS ODESSA",
+"tz":"America/Chicago"
 },
 {
 "num":37,
@@ -340,7 +373,8 @@
 "st":"TX",
 "zip":"79761",
 "phone":"432-337-2242",
-"grp":"Food King Odessa"
+"grp":"Food King Odessa",
+"tz":"America/Chicago"
 },
 {
 "num":38,
@@ -350,7 +384,8 @@
 "st":"TX",
 "zip":"76903",
 "phone":"325-655-2821",
-"grp":"Food King TX"
+"grp":"Food King TX",
+"tz":"America/Chicago"
 },
 {
 "num":39,
@@ -360,7 +395,8 @@
 "st":"TX",
 "zip":"79323",
 "phone":"",
-"grp":"joins Oct 2026"
+"grp":"joins Oct 2026",
+"tz":"America/Chicago"
 },
 {
 "num":40,
@@ -370,7 +406,8 @@
 "st":"TX",
 "zip":"79359",
 "phone":"806-546-2521",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":43,
@@ -380,7 +417,8 @@
 "st":"TX",
 "zip":"79735",
 "phone":"432-336-3341",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":45,
@@ -390,7 +428,8 @@
 "st":"TX",
 "zip":"79756",
 "phone":"432-943-4275",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":47,
@@ -400,7 +439,8 @@
 "st":"TX",
 "zip":"79512",
 "phone":"325-728-3781",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":48,
@@ -410,7 +450,8 @@
 "st":"TX",
 "zip":"79045",
 "phone":"806-364-1621",
-"grp":"Food King TX"
+"grp":"Food King TX",
+"tz":"America/Chicago"
 },
 {
 "num":49,
@@ -420,7 +461,8 @@
 "st":"TX",
 "zip":"79088",
 "phone":"806-995-3559",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":52,
@@ -430,7 +472,8 @@
 "st":"NM",
 "zip":"87571",
 "phone":"575-751-2801",
-"grp":"Super Save TAOS"
+"grp":"Super Save TAOS",
+"tz":"America/Denver"
 },
 {
 "num":53,
@@ -440,7 +483,8 @@
 "st":"NM",
 "zip":"87740",
 "phone":"575-445-2331",
-"grp":"Super Save"
+"grp":"Super Save",
+"tz":"America/Denver"
 },
 {
 "num":55,
@@ -450,7 +494,8 @@
 "st":"NM",
 "zip":"88310",
 "phone":"575-437-5150",
-"grp":"Alamo"
+"grp":"Alamo",
+"tz":"America/Denver"
 },
 {
 "num":56,
@@ -460,7 +505,8 @@
 "st":"NM",
 "zip":"87002",
 "phone":"505-864-0786",
-"grp":"New Mexico"
+"grp":"New Mexico",
+"tz":"America/Denver"
 },
 {
 "num":57,
@@ -470,7 +516,8 @@
 "st":"NM",
 "zip":"88001",
 "phone":"575-527-2624",
-"grp":"Las Cruces"
+"grp":"Las Cruces",
+"tz":"America/Denver"
 },
 {
 "num":58,
@@ -480,7 +527,8 @@
 "st":"NM",
 "zip":"88001",
 "phone":"575-522-0794",
-"grp":"Las Cruces"
+"grp":"Las Cruces",
+"tz":"America/Denver"
 },
 {
 "num":59,
@@ -490,7 +538,8 @@
 "st":"NM",
 "zip":"88352",
 "phone":"575-585-2401",
-"grp":"New Mexico"
+"grp":"New Mexico",
+"tz":"America/Denver"
 },
 {
 "num":60,
@@ -500,7 +549,8 @@
 "st":"NM",
 "zip":"87710",
 "phone":"575-377-2354",
-"grp":"NONE"
+"grp":"NONE",
+"tz":"America/Denver"
 },
 {
 "num":62,
@@ -510,7 +560,8 @@
 "st":"TX",
 "zip":"79041",
 "phone":"806-839-2222",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":64,
@@ -520,7 +571,8 @@
 "st":"TX",
 "zip":"79081",
 "phone":"806-659-3212",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":65,
@@ -530,7 +582,8 @@
 "st":"TX",
 "zip":"79322",
 "phone":"806-675-2534",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":67,
@@ -540,7 +593,8 @@
 "st":"TX",
 "zip":"79029",
 "phone":"806-935-9215",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":68,
@@ -550,7 +604,8 @@
 "st":"TX",
 "zip":"79903",
 "phone":"915-565-4040",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":69,
@@ -560,7 +615,8 @@
 "st":"TX",
 "zip":"79924",
 "phone":"915-751-8700",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":70,
@@ -570,7 +626,8 @@
 "st":"TX",
 "zip":"79925",
 "phone":"915-599-1363",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":71,
@@ -580,7 +637,8 @@
 "st":"TX",
 "zip":"79925",
 "phone":"915-595-0123",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":72,
@@ -590,7 +648,8 @@
 "st":"TX",
 "zip":"79936",
 "phone":"915-590-2326",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":73,
@@ -600,7 +659,8 @@
 "st":"TX",
 "zip":"79936",
 "phone":"915-857-6080",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":74,
@@ -610,7 +670,8 @@
 "st":"TX",
 "zip":"79905",
 "phone":"915-778-4746",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":76,
@@ -620,7 +681,8 @@
 "st":"TX",
 "zip":"79907",
 "phone":"915-859-7441",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":77,
@@ -630,7 +692,8 @@
 "st":"TX",
 "zip":"79927",
 "phone":"915-858-4011",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":80,
@@ -640,7 +703,8 @@
 "st":"TX",
 "zip":"79932",
 "phone":"915-584-0881",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":81,
@@ -650,7 +714,8 @@
 "st":"TX",
 "zip":"79424",
 "phone":"806-794-9728",
-"grp":"Food King LB"
+"grp":"Food King LB",
+"tz":"America/Chicago"
 },
 {
 "num":82,
@@ -660,7 +725,8 @@
 "st":"TX",
 "zip":"79407",
 "phone":"806-780-6745",
-"grp":"Food King LB"
+"grp":"Food King LB",
+"tz":"America/Chicago"
 },
 {
 "num":83,
@@ -670,7 +736,8 @@
 "st":"TX",
 "zip":"79912",
 "phone":"915-584-2070",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":85,
@@ -680,7 +747,8 @@
 "st":"TX",
 "zip":"79410",
 "phone":"806-744-4766",
-"grp":"Food King LB"
+"grp":"Food King LB",
+"tz":"America/Chicago"
 },
 {
 "num":87,
@@ -690,7 +758,8 @@
 "st":"TX",
 "zip":"79904",
 "phone":"915-755-3012",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":89,
@@ -700,7 +769,8 @@
 "st":"NM",
 "zip":"87505",
 "phone":"505-424-1535",
-"grp":"Food King SF"
+"grp":"Food King SF",
+"tz":"America/Denver"
 },
 {
 "num":90,
@@ -710,7 +780,8 @@
 "st":"TX",
 "zip":"79821",
 "phone":"915-886-5050",
-"grp":"ANTHONY"
+"grp":"ANTHONY",
+"tz":"America/Denver"
 },
 {
 "num":91,
@@ -720,7 +791,8 @@
 "st":"NM",
 "zip":"87701",
 "phone":"505-425-6721",
-"grp":"Super Save"
+"grp":"Super Save",
+"tz":"America/Denver"
 },
 {
 "num":92,
@@ -730,7 +802,8 @@
 "st":"NM",
 "zip":"87701",
 "phone":"505-425-7199",
-"grp":"Super Save"
+"grp":"Super Save",
+"tz":"America/Denver"
 },
 {
 "num":93,
@@ -740,7 +813,8 @@
 "st":"NM",
 "zip":"87532",
 "phone":"505-753-8869",
-"grp":"Food King SF"
+"grp":"Food King SF",
+"tz":"America/Denver"
 },
 {
 "num":94,
@@ -750,7 +824,8 @@
 "st":"NM",
 "zip":"88401",
 "phone":"575-461-2350",
-"grp":"New Mexico"
+"grp":"New Mexico",
+"tz":"America/Denver"
 },
 {
 "num":96,
@@ -760,7 +835,8 @@
 "st":"TX",
 "zip":"79915",
 "phone":"915-592-2022",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":97,
@@ -770,7 +846,8 @@
 "st":"TX",
 "zip":"79924",
 "phone":"915-751-6555",
-"grp":"Food King EP"
+"grp":"Food King EP",
+"tz":"America/Denver"
 },
 {
 "num":98,
@@ -780,7 +857,8 @@
 "st":"NM",
 "zip":"87102",
 "phone":"505-247-8399",
-"grp":"Corner Market"
+"grp":"Corner Market",
+"tz":"America/Denver"
 },
 {
 "num":99,
@@ -790,7 +868,8 @@
 "st":"NM",
 "zip":"87107",
 "phone":"505-341-0088",
-"grp":"Food King SF"
+"grp":"Food King SF",
+"tz":"America/Denver"
 },
 {
 "num":102,
@@ -800,7 +879,8 @@
 "st":"TX",
 "zip":"78003",
 "phone":"830-796-4401",
-"grp":"South Base Meal Solutions"
+"grp":"South Base Meal Solutions",
+"tz":"America/Chicago"
 },
 {
 "num":103,
@@ -810,7 +890,8 @@
 "st":"TX",
 "zip":"78962",
 "phone":"979-725-8253",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":104,
@@ -820,7 +901,8 @@
 "st":"TX",
 "zip":"76943",
 "phone":"325-392-3324",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":105,
@@ -830,7 +912,8 @@
 "st":"TX",
 "zip":"77461",
 "phone":"979-793-4464",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":106,
@@ -840,7 +923,8 @@
 "st":"TX",
 "zip":"78022",
 "phone":"361-449-2796",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":108,
@@ -850,7 +934,8 @@
 "st":"TX",
 "zip":"78133",
 "phone":"830-899-8574",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":109,
@@ -860,7 +945,8 @@
 "st":"CO",
 "zip":"81252",
 "phone":"719-783-0550",
-"grp":"Resort"
+"grp":"Resort",
+"tz":"America/Denver"
 },
 {
 "num":110,
@@ -870,7 +956,8 @@
 "st":"TX",
 "zip":"78372",
 "phone":"361-384-2761",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":111,
@@ -880,7 +967,8 @@
 "st":"TX",
 "zip":"78361",
 "phone":"361-527-5711",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":112,
@@ -890,7 +978,8 @@
 "st":"TX",
 "zip":"78071",
 "phone":"361-786-2503",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":113,
@@ -900,7 +989,8 @@
 "st":"TX",
 "zip":"77465",
 "phone":"361-972-2534",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":115,
@@ -910,7 +1000,8 @@
 "st":"TX",
 "zip":"77435",
 "phone":"979-335-7322",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":116,
@@ -920,7 +1011,8 @@
 "st":"TX",
 "zip":"78373",
 "phone":"361-749-6233",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":117,
@@ -930,7 +1022,8 @@
 "st":"CO",
 "zip":"80221",
 "phone":"720-540-3883",
-"grp":"Mercado"
+"grp":"Mercado",
+"tz":"America/Denver"
 },
 {
 "num":118,
@@ -940,7 +1033,8 @@
 "st":"CO",
 "zip":"80219",
 "phone":"303-922-7412",
-"grp":"Mercado"
+"grp":"Mercado",
+"tz":"America/Denver"
 },
 {
 "num":119,
@@ -950,7 +1044,8 @@
 "st":"TX",
 "zip":"76950",
 "phone":"325-387-3438",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":120,
@@ -960,7 +1055,8 @@
 "st":"TX",
 "zip":"78880",
 "phone":"830-683-2178",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":121,
@@ -970,7 +1066,8 @@
 "st":"TX",
 "zip":"76457",
 "phone":"254-796-4623",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":122,
@@ -980,7 +1077,8 @@
 "st":"CO",
 "zip":"80010",
 "phone":"303-363-3321",
-"grp":"Mercado"
+"grp":"Mercado",
+"tz":"America/Denver"
 },
 {
 "num":123,
@@ -990,7 +1088,8 @@
 "st":"TX",
 "zip":"78016",
 "phone":"830-663-4252",
-"grp":"Food King TX"
+"grp":"Food King TX",
+"tz":"America/Chicago"
 },
 {
 "num":124,
@@ -1000,7 +1099,8 @@
 "st":"TX",
 "zip":"76932",
 "phone":"325-884-2644",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":127,
@@ -1010,7 +1110,8 @@
 "st":"TX",
 "zip":"78069",
 "phone":"830-429-3612",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":128,
@@ -1020,7 +1121,8 @@
 "st":"CO",
 "zip":"80634",
 "phone":"970-351-0727",
-"grp":"Food King GR"
+"grp":"Food King GR",
+"tz":"America/Denver"
 },
 {
 "num":129,
@@ -1030,7 +1132,8 @@
 "st":"TX",
 "zip":"76825",
 "phone":"325-597-3798",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":130,
@@ -1040,7 +1143,8 @@
 "st":"TX",
 "zip":"76877",
 "phone":"325-372-4191",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":131,
@@ -1050,7 +1154,8 @@
 "st":"TX",
 "zip":"79372",
 "phone":"806-229-6410",
-"grp":"TEXAS CASE READY"
+"grp":"TEXAS CASE READY",
+"tz":"America/Chicago"
 },
 {
 "num":133,
@@ -1060,7 +1165,8 @@
 "st":"TX",
 "zip":"76849",
 "phone":"325-446-2650",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":134,
@@ -1070,7 +1176,8 @@
 "st":"TX",
 "zip":"76837",
 "phone":"325-869-4741",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":135,
@@ -1080,7 +1187,8 @@
 "st":"TX",
 "zip":"76936",
 "phone":"325-853-3208",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":136,
@@ -1090,7 +1198,8 @@
 "st":"TX",
 "zip":"78606",
 "phone":"830-833-4521",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":137,
@@ -1100,7 +1209,8 @@
 "st":"TX",
 "zip":"78636",
 "phone":"830-868-4274",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":138,
@@ -1110,7 +1220,8 @@
 "st":"TX",
 "zip":"76856",
 "phone":"325-347-5906",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":139,
@@ -1120,7 +1231,8 @@
 "st":"TX",
 "zip":"78643",
 "phone":"325-247-5059",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":140,
@@ -1130,7 +1242,8 @@
 "st":"TX",
 "zip":"76859",
 "phone":"325-396-4592",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":141,
@@ -1140,7 +1253,8 @@
 "st":"TX",
 "zip":"78133",
 "phone":"830-964-3231",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":142,
@@ -1150,7 +1264,8 @@
 "st":"TX",
 "zip":"78832",
 "phone":"830-563-2500",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":145,
@@ -1160,7 +1275,8 @@
 "st":"TX",
 "zip":"78014",
 "phone":"830-879-2625",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":146,
@@ -1170,7 +1286,8 @@
 "st":"TX",
 "zip":"79744",
 "phone":"432-639-2587",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":147,
@@ -1180,7 +1297,8 @@
 "st":"TX",
 "zip":"78384",
 "phone":"361-279-3395",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":148,
@@ -1190,7 +1308,8 @@
 "st":"TX",
 "zip":"78017",
 "phone":"830-965-1211",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":150,
@@ -1200,7 +1319,8 @@
 "st":"TX",
 "zip":"78357",
 "phone":"361-394-6055",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":151,
@@ -1210,7 +1330,8 @@
 "st":"TX",
 "zip":"78065",
 "phone":"830-742-3358",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":152,
@@ -1220,7 +1341,8 @@
 "st":"TX",
 "zip":"78040",
 "phone":"956-722-2722",
-"grp":"VALLEY"
+"grp":"VALLEY",
+"tz":"America/Chicago"
 },
 {
 "num":153,
@@ -1230,7 +1352,8 @@
 "st":"TX",
 "zip":"78140",
 "phone":"830-582-1251",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":154,
@@ -1240,7 +1363,8 @@
 "st":"TX",
 "zip":"79752",
 "phone":"432-652-8881",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":155,
@@ -1250,7 +1374,8 @@
 "st":"TX",
 "zip":"78076",
 "phone":"956-765-4861",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":156,
@@ -1260,7 +1385,8 @@
 "st":"TX",
 "zip":"77963",
 "phone":"361-645-3364",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":157,
@@ -1270,7 +1396,8 @@
 "st":"TX",
 "zip":"78164",
 "phone":"361-564-2215",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":158,
@@ -1280,7 +1407,8 @@
 "st":"TX",
 "zip":"76443",
 "phone":"254-725-7131",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":159,
@@ -1290,7 +1418,8 @@
 "st":"TX",
 "zip":"78013",
 "phone":"830-995-2380",
-"grp":"South Base"
+"grp":"South Base",
+"tz":"America/Chicago"
 },
 {
 "num":160,
@@ -1300,7 +1429,8 @@
 "st":"TX",
 "zip":"76234",
 "phone":"940-627-6438",
-"grp":"TEXAS North East"
+"grp":"TEXAS North East",
+"tz":"America/Chicago"
 },
 {
 "num":161,
@@ -1310,7 +1440,8 @@
 "st":"TX",
 "zip":"78645",
 "phone":"512-267-0355",
-"grp":"South Base LAGO"
+"grp":"South Base LAGO",
+"tz":"America/Chicago"
 },
 {
 "num":163,
@@ -1320,7 +1451,8 @@
 "st":"TX",
 "zip":"76426",
 "phone":"940-683-4006",
-"grp":"TEXAS North East"
+"grp":"TEXAS North East",
+"tz":"America/Chicago"
 },
 {
 "num":165,
@@ -1330,7 +1462,8 @@
 "st":"TX",
 "zip":"76023",
 "phone":"940-433-2325",
-"grp":"TEXAS North East"
+"grp":"TEXAS North East",
+"tz":"America/Chicago"
 },
 {
 "num":166,
@@ -1340,7 +1473,8 @@
 "st":"TX",
 "zip":"76458",
 "phone":"940-567-5301",
-"grp":"TEXAS North East"
+"grp":"TEXAS North East",
+"tz":"America/Chicago"
 },
 {
 "num":167,
@@ -1350,7 +1484,8 @@
 "st":"TX",
 "zip":"76431",
 "phone":"940-644-2426",
-"grp":"TEXAS North East"
+"grp":"TEXAS North East",
+"tz":"America/Chicago"
 },
 {
 "num":168,
@@ -1360,7 +1495,8 @@
 "st":"TX",
 "zip":"76225",
 "phone":"940-427-8591",
-"grp":"TEXAS North East"
+"grp":"TEXAS North East",
+"tz":"America/Chicago"
 },
 {
 "num":169,
@@ -1370,7 +1506,8 @@
 "st":"TX",
 "zip":"76240",
 "phone":"940-665-4131",
-"grp":"TEXAS North East"
+"grp":"TEXAS North East",
+"tz":"America/Chicago"
 },
 {
 "num":171,
@@ -1380,7 +1517,8 @@
 "st":"TX",
 "zip":"79360",
 "phone":"432-758-9869",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":172,
@@ -1390,7 +1528,8 @@
 "st":"TX",
 "zip":"79714",
 "phone":"432-523-9023",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":173,
@@ -1400,7 +1539,8 @@
 "st":"TX",
 "zip":"79720",
 "phone":"432-296-4540",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":174,
@@ -1410,7 +1550,8 @@
 "st":"TX",
 "zip":"79701",
 "phone":"432-683-6666",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":175,
@@ -1420,7 +1561,8 @@
 "st":"TX",
 "zip":"79731",
 "phone":"432-558-2911",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":176,
@@ -1430,7 +1572,8 @@
 "st":"TX",
 "zip":"79855",
 "phone":"432-283-2155",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":177,
@@ -1440,7 +1583,8 @@
 "st":"TX",
 "zip":"79734",
 "phone":"432-426-3812",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":178,
@@ -1450,7 +1594,8 @@
 "st":"TX",
 "zip":"79830",
 "phone":"432-837-3295",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":179,
@@ -1460,7 +1605,8 @@
 "st":"TX",
 "zip":"79843",
 "phone":"432-729-4375",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 },
 {
 "num":181,
@@ -1470,7 +1616,8 @@
 "st":"TX",
 "zip":"79845",
 "phone":"432-229-3776",
-"grp":"TEXAS"
+"grp":"TEXAS",
+"tz":"America/Chicago"
 }
 ],
 "places":[
@@ -1482,7 +1629,8 @@
 "st":"",
 "zip":"",
 "phone":"",
-"grp":"place"
+"grp":"place",
+"tz":"America/Chicago"
 },
 {
 "num":"office",
@@ -1492,7 +1640,8 @@
 "st":"TX",
 "zip":"79339",
 "phone":"",
-"grp":"place"
+"grp":"place",
+"tz":"America/Chicago"
 }
 ]
 }
