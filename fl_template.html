@@ -112,7 +112,7 @@ function allItems(){ var a=[]; (CFG.sections||[]).forEach(function(s){
 function totalItems(){ return allItems().length; }
 function imgKey(it){ var o=it.order; if(o!==undefined&&o!==null&&String(o).trim()!==''&&String(o).toUpperCase()!=='N/A') return String(o).trim();
   return String(it.desc||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40); }
-function imgSrc(it){ return 'img/fl/'+imgKey(it)+'.jpg'; }
+function imgSrc(it){ return 'fl/'+imgKey(it)+'.jpg'; }
 function showImg(el){ var lb=document.getElementById('lb');
   document.getElementById('lbimg').src=el.src; document.getElementById('lbcap').textContent=el.getAttribute('data-n')||'';
   document.getElementById('lbsub').textContent=el.getAttribute('data-d')||''; lb.className='lb on'; }
