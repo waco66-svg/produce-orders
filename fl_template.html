@@ -51,6 +51,14 @@
           border-top:1px solid var(--line); }
   .irow.ad { background:var(--ad); }
   .irow .info { flex:1; min-width:0; }
+  .th { width:54px; height:54px; object-fit:cover; border-radius:8px; flex:0 0 54px;
+        background:#eef2f0; cursor:zoom-in; }
+  .lb { position:fixed; inset:0; background:rgba(20,30,25,.86); display:none; z-index:60;
+        align-items:center; justify-content:center; flex-direction:column; padding:18px; }
+  .lb.on { display:flex; }
+  .lb img { max-width:100%; max-height:74vh; border-radius:12px; background:#fff; }
+  .lb .cap { color:#fff; font-size:15px; font-weight:600; margin-top:12px; text-align:center; }
+  .lb .sub { color:#cfd9d3; font-size:12.5px; margin-top:4px; text-align:center; }
   .irow .nm { font-size:13.5px; font-weight:600; }
   .irow .dt { font-size:11.5px; color:var(--sub); margin-top:2px; }
   .adtag { font-size:9.5px; font-weight:800; letter-spacing:.5px; background:var(--amber);
@@ -88,6 +96,7 @@
 </head>
 <body>
 <div id="app"></div>
+<div class="lb" id="lb" onclick="this.className='lb'"><img id="lbimg" alt=""><div class="cap" id="lbcap"></div><div class="sub" id="lbsub"></div></div>
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <script>
 var CFG = __CFG__;
@@ -101,6 +110,12 @@ function money(v){ return (v==null||isNaN(v))?'-':'$'+Number(v).toFixed(2); }
 function allItems(){ var a=[]; (CFG.sections||[]).forEach(function(s){
   s.items.forEach(function(it,i){ a.push({s:s,it:it,k:s.key+':'+i}); }); }); return a; }
 function totalItems(){ return allItems().length; }
+function imgKey(it){ var o=it.order; if(o!==undefined&&o!==null&&String(o).trim()!==''&&String(o).toUpperCase()!=='N/A') return String(o).trim();
+  return String(it.desc||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40); }
+function imgSrc(it){ return 'img/fl/'+imgKey(it)+'.jpg'; }
+function showImg(el){ var lb=document.getElementById('lb');
+  document.getElementById('lbimg').src=el.src; document.getElementById('lbcap').textContent=el.getAttribute('data-n')||'';
+  document.getElementById('lbsub').textContent=el.getAttribute('data-d')||''; lb.className='lb on'; }
 function retailFor(st,it){ return (st.banner==='Lowes'||!st.banner)? it.retailL : it.retailFK; }
 
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify({sup:SUP,qty:QTY})); }catch(e){} }
@@ -223,7 +238,9 @@ function render(){
          '<button class="passbtn" onclick="passAll('+si+','+xi+')">Pass on all '+sec.items.length+'</button></div>';
       sec.items.forEach(function(it,i){
         var key=sec.key+':'+i, v=(QTY[st.store]||{})[key];
-        h+='<div class="irow'+(it.ad?' ad':'')+'"><div class="info">'+
+        h+='<div class="irow'+(it.ad?' ad':'')+'">'+
+           '<img class="th" loading="lazy" alt="" src="'+imgSrc(it)+'" data-n="'+esc(it.desc)+'" data-d="'+esc(it.pack)+' '+esc(it.size)+' &middot; case '+money(it.cost)+'" onclick="showImg(this)" onerror="this.remove()">'+
+           '<div class="info">'+
            '<div class="nm">'+(it.ad?'<span class="adtag">AD</span>':'')+esc(it.desc)+'</div>'+
            '<div class="dt">'+esc(it.pack)+' '+esc(it.size)+' &middot; case '+money(it.cost)+
            ' &middot; retail '+money(retailFor(st,it))+'</div></div>'+
