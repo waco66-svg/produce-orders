@@ -134,6 +134,38 @@ details.notes summary .muted { font-family:"Source Sans 3",sans-serif; font-size
 .log li { margin:2px 0; }
 @media (max-width:640px) { h1 { font-size:30px; } .wrap { padding:18px 14px 60px; } .vendor { padding:14px; } }
 @media (prefers-reduced-motion: reduce) { .tile { transition:none; } .toast { transition:none; } }
+
+/* ---- AFI review card (B8-B11, 9/15/26): scoreboard, folds, reopenable grids, bottom control ---- */
+.scoreboard { display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 6px; }
+.sc { flex:1 1 200px; background:var(--surface); border:1px solid var(--line); border-top:4px solid var(--line); padding:12px 14px; }
+.sc .n { font-family:"Barlow Semi Condensed",sans-serif; font-size:30px; font-weight:700; line-height:1; letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
+.sc .l { font-size:12.5px; color:var(--muted); margin-top:6px; line-height:1.5; }
+.sc.ask { border-top-color:var(--warn); } .sc.ask .n { color:var(--warn); } .sc.quiet .n { color:var(--muted); }
+h3.sec { margin:22px 0 4px; }
+.why { font-size:13px; color:var(--muted); max-width:86ch; margin:0 0 8px; }
+details.fold { margin:14px 0 4px; border:1px solid var(--line); background:var(--paper); }
+details.fold > summary { cursor:pointer; padding:11px 14px; font-size:14px; color:var(--ink-2); list-style:none; }
+details.fold > summary::-webkit-details-marker { display:none; }
+details.fold > summary:before { content:"\25B8"; display:inline-block; margin-right:8px; transition:transform .15s; }
+details.fold[open] > summary:before { transform:rotate(90deg); }
+details.fold .tw, details.fold > .tw { padding:0 12px 12px; }
+details.fold .pad { padding:2px 16px 15px; font-size:13.5px; color:var(--ink-2); line-height:1.65; max-width:80ch; }
+tr.edited td, tr.answered td { background:var(--good-soft); }
+tr.editor-row td { background:var(--surface); }
+.editor { padding:8px 0 6px; }
+.adj { font-size:13px; padding:4px 10px; white-space:nowrap; }
+.opts-grid .opt.current { border-color:var(--good); background:var(--good-soft); }
+.opts-grid .opt.current i { color:var(--good); }
+.forget { margin-left:auto; font-size:13px; color:var(--crit); background:none; border:none; text-decoration:underline; cursor:pointer; padding:0; }
+.forget:hover { background:none; border:none; }
+.chip.changed { background:var(--good-soft); color:var(--good); }
+.chip.forgot { background:var(--crit-soft); color:var(--crit); }
+.chip.hot { background:var(--warn-soft); color:var(--warn); }
+.chip.kind { background:var(--line-2); color:var(--ink-2); text-transform:uppercase; letter-spacing:.04em; font-size:11px; }
+.note { margin:18px 0 0; padding:12px 16px; border-left:4px solid var(--accent); background:var(--accent-soft); font-size:13.5px; color:var(--ink-2); line-height:1.6; }
+.note.ok { border-left-color:var(--good); background:var(--good-soft); }
+.vfoot { margin-top:18px; padding-top:14px; border-top:1px solid var(--line-2); display:flex; justify-content:flex-end; align-items:center; gap:10px; }
+@media (max-width:640px) { .sc { flex:1 1 100%; } .vfoot { justify-content:stretch; } .vfoot .primary.big { width:100%; } }
 </style>
 </head><body>
 <div id="root"></div>
@@ -143,6 +175,9 @@ var CFG = JSON.parse(document.getElementById('cfg').textContent);
 var META = CFG.meta;
 var KEY = 'vc-' + (META.weekKey || META.week);
 var STATE = load();
+// Which editors are open right now. Deliberately NOT persisted: reopening a grid is a gesture,
+// not a decision. Decisions live in STATE.calls and persist until the email is sent.
+var UI = { open: {}, fold: {} };
 
 function load(){ try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.vendors) return s; } catch(e){} return {vendors:{}, calls:{}, log:[]}; }
 function persist(){ try { localStorage.setItem(KEY, JSON.stringify(STATE)); } catch(e){} }
@@ -158,15 +193,19 @@ var when = function(){ return new Date().toLocaleString('en-US',{month:'short',d
 function rememberedPack(r,c){ var m=(CFG.acceptedPacks||{})[r.id]||{}; return c.field==='Case Pack' && c.alt!=null && String(m[c.plu])===String(c.proposal); }
 function openCalls(r){ return r.needsCall.filter(function(c){ return !rememberedPack(r,c); }); }
 
+// B17 (9/15/26): an approval is of a FILE. If the vendor has since sent a revision, the page has a
+// different r.file and the old approval must not carry over -- the numbers changed.
+function approvalCurrent(r){ var v = STATE.vendors[r.id]; return !!(v && v.approved && (!v.file || v.file === r.file)); }
 function status(r){
   var v = STATE.vendors[r.id];
   var pending = openCalls(r).filter(function(c){ return !STATE.calls[c.id]; });
   if (r.written) return ['written','Written to Vendor Compare'];
+  if (r.revisionAfterWrite && !approvalCurrent(r) && !pending.length) return ['warn','Revision after write \u2014 approve again'];
   // vc_compare blocks a form dated outside the week. That has been detected since 9/1/26 but was
   // never shown here, so a blocked vendor looked ordinary. (Matthew, 9/7/26)
   if (r.error) return ['stale','Stale \u2014 not written'];
   if (!r.plusAligned || r.tamper.length) return ['critical','Form altered'];
-  if (v && v.approved) return ['approved','Approved'];
+  if (approvalCurrent(r)) return ['approved','Approved'];
   if (pending.length) return ['warn', pending.length + (pending.length===1?' needs':' need') + ' your call'];
   if (r.changes.length || r.new.length || r.dropped.length || r.packEdits.length || r.needsCall.length) return ['ready','Ready to approve'];
   return ['loaded','Already loaded'];
@@ -181,36 +220,141 @@ function table(headers, rows, cls){
 }
 var td = function(v,c){ return '<td class="'+(c||'')+'">'+v+'</td>'; };
 
-function callRow(r, c){
-  var d = STATE.calls[c.id], cell;
-  if (d) {
-    cell = '<span class="decided"><span class="val">'+esc(d.label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+'</span><button data-undo-call="'+esc(c.id)+'">Change</button></span>';
-  } else if (c.options && c.options.length) {
+// The option grid for one call. `cur` marks the value currently chosen (green, "chosen"), so a
+// reopened grid shows what stands before anything is changed (Matthew, 9/15/26: "It should work
+// just like the pack sizes previously accepted section. The ability to change after you chose").
+function optionGrid(c, cur){
+  var id = c.id;
+  if (c.field_id === 'AFISize') {
+    // B10: a size call. Two candidates and a single write-in; the decision is the size alone.
+    return '<span class="opts opts-grid">' +
+      c.options.map(function(o){
+        var isCur = cur != null && String(o.value) === String(cur);
+        return '<button class="opt' + (isCur ? ' current' : (o.id === 'A' ? ' primary' : '')) + '" data-call="' + esc(id) +
+               '" data-choice="option" data-value="' + esc(o.value) + '"><b>' + esc(o.value) + '</b><i>' + esc(isCur ? 'chosen' : o.label) + '</i></button>';
+      }).join('') +
+      '<span class="writein"><input class="custom size" placeholder="Type a size" data-custom-size-only-for="' + esc(id) + '" aria-label="Size">' +
+      '<button data-call="' + esc(id) + '" data-choice="sizeonly">Use this</button></span>' +
+      (cur != null ? '<button class="forget" data-undo-call="' + esc(id) + '">Clear this decision</button>' : '') +
+    '</span>';
+  }
+  if (c.options && c.options.length) {
     // AFI pack/size: four generated candidates, plus separate Pack and Size boxes for a
     // write-in. Sean asked for two boxes rather than one -- "less confusing that way".
     // (Matthew, 9/7/26)
-    cell = '<span class="opts opts-grid">' +
+    return '<span class="opts opts-grid">' +
       c.options.map(function(o){
-        return '<button class="opt' + (o.id === 'A' ? ' primary' : '') + '" data-call="' + esc(c.id) +
+        var isCur = cur != null && String(o.value) === String(cur);
+        return '<button class="opt' + (isCur ? ' current' : (o.id === 'A' ? ' primary' : '')) + '" data-call="' + esc(id) +
                '" data-choice="option" data-value="' + esc(o.value) + '">' +
-               '<b>' + esc(o.value) + '</b><i>' + esc(o.label) + '</i></button>';
+               '<b>' + esc(o.value) + '</b><i>' + esc(isCur ? 'chosen' : o.label) + '</i></button>';
       }).join('') +
       '<span class="writein">' +
-        '<input class="custom pack" placeholder="Pack" data-custom-pack-for="' + esc(c.id) + '" inputmode="decimal" aria-label="Pack">' +
-        '<input class="custom size" placeholder="Size" data-custom-size-for="' + esc(c.id) + '" aria-label="Size">' +
-        '<button data-call="' + esc(c.id) + '" data-choice="packsize">Use that</button>' +
+        '<input class="custom pack" placeholder="Pack" data-custom-pack-for="' + esc(id) + '" inputmode="decimal" aria-label="Pack">' +
+        '<input class="custom size" placeholder="Size" data-custom-size-for="' + esc(id) + '" aria-label="Size">' +
+        '<button data-call="' + esc(id) + '" data-choice="packsize">Use that</button>' +
       '</span>' +
-      '<button class="skip" data-call="' + esc(c.id) + '" data-choice="skip" data-value="">Skip this item</button>' +
+      (cur != null ? '<button class="forget" data-undo-call="' + esc(id) + '">Clear this decision</button>'
+                   : '<button class="skip" data-call="' + esc(id) + '" data-choice="skip" data-value="">Skip this item</button>') +
     '</span>';
-  } else {
-    cell = '<span class="opts">' +
-      (c.proposal!=null ? '<button class="primary" data-call="'+esc(c.id)+'" data-choice="proposal" data-value="'+esc(c.proposal)+'">'+(c.alt!=null?(c.field==='Item Code'?'Accept item code ':'Accept vendor pack '):'Use ')+esc(c.proposal)+'</button>' : '') +
-      (c.alt!=null ? '<button data-call="'+esc(c.id)+'" data-choice="alt" data-value="'+esc(c.alt)+'">'+(c.field==='Item Code'?'Keep item code ':'Keep book pack ')+esc(c.alt)+'</button>'
-                   : '<button data-call="'+esc(c.id)+'" data-choice="skip" data-value="">Skip this item</button>') +
-      '<input class="custom" placeholder="Other value" data-custom-for="'+esc(c.id)+'" aria-label="Other value">' +
-      '<button data-call="'+esc(c.id)+'" data-choice="custom">Use that</button></span>';
   }
-  return '<tr class="call-row">'+td(esc(c.plu),'mono')+td(esc(c.desc))+td(esc(c.field))+td('<code>'+esc(c.text)+'</code>')+td(cell)+td(esc(c.why),'muted')+'</tr>';
+  return '<span class="opts">' +
+    (c.proposal!=null ? '<button class="primary" data-call="'+esc(id)+'" data-choice="proposal" data-value="'+esc(c.proposal)+'">'+(c.alt!=null?(c.field==='Item Code'?'Accept item code ':'Accept vendor pack '):'Use ')+esc(c.proposal)+'</button>' : '') +
+    (c.alt!=null ? '<button data-call="'+esc(id)+'" data-choice="alt" data-value="'+esc(c.alt)+'">'+(c.field==='Item Code'?'Keep item code ':'Keep book pack ')+esc(c.alt)+'</button>'
+                 : '<button data-call="'+esc(id)+'" data-choice="skip" data-value="">Skip this item</button>') +
+    '<input class="custom" placeholder="Other value" data-custom-for="'+esc(id)+'" aria-label="Other value">' +
+    '<button data-call="'+esc(id)+'" data-choice="custom">Use that</button>' +
+    (cur != null ? '<button class="forget" data-undo-call="' + esc(id) + '">Clear this decision</button>' : '') +
+    '</span>';
+}
+
+// A decided call: the value, who and when, and a Change button that REOPENS the grid with the
+// current choice marked -- nothing is lost by looking. Clear (in the grid) takes it back entirely.
+function decisionCell(c){
+  var d = STATE.calls[c.id];
+  if (!d) return optionGrid(c, null);
+  var head = '<span class="decided"><span class="val">'+esc(d.label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+'</span>' +
+             '<button data-reopen="'+esc(c.id)+'">'+(UI.open[c.id] ? 'Close' : 'Change')+'</button></span>';
+  return head + (UI.open[c.id] ? '<div class="editor">' + optionGrid(c, d.value) + '</div>' : '');
+}
+
+function callRow(r, c){
+  var d = STATE.calls[c.id];
+  return '<tr class="call-row'+(d?' answered':'')+'">'+td(esc(c.plu),'mono')+td(esc(c.desc))+td(esc(c.field))+td('<code>'+esc(c.text)+'</code>')+td(decisionCell(c))+td(esc(c.why),'muted')+'</tr>';
+}
+
+// AFI's blocking calls carry the cost move that put them in the price change file (B10).
+function afiCallRow(r, c){
+  var d = STATE.calls[c.id];
+  var cost = c.cost ? money(c.cost.old) + ' → <b>' + money(c.cost.new) + '</b> <span class="mv ' + (c.cost.new > c.cost.old ? 'up' : 'dn') + '">' + pct(c.cost.old, c.cost.new) + '</span>' : '—';
+  var ours = (c.ourPack != null ? c.ourPack + ' | ' + c.ourSize : c.why.replace(/^.*our book says /, ''));
+  return '<tr class="call-row'+(d?' answered':'')+'">'+td(esc(c.plu),'mono')+td(esc(c.desc))+td('<code>'+esc(c.text)+'</code>','num')+td(esc(ours),'num mono muted')+td(cost,'num mono')+td(decisionCell(c))+'</tr>';
+}
+
+// B8: a remembered (or shown-but-not-asked) AFI row. Adjust opens the same grid; an edit lands
+// in STATE.calls under the row's callId exactly like a fresh decision, so the email carries it
+// and it can be changed or cleared until the email is sent.
+function afiMemoRow(e, remembered){
+  var id = e.callId, d = STATE.calls[id];
+  var kept = remembered ? e.keptValue : '';
+  var label = d ? (d.choice === 'forget' ? '(will ask again next week)' : d.label) : (remembered ? kept : '—');
+  var dec = d
+    ? '<span class="decided"><span class="val">'+esc(label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+' · '+(d.choice==='forget' ? '<span class="chip forgot">stop remembering</span>' : '<span class="chip changed">changed</span>')+'</span></span>'
+    : (remembered ? '<b>'+esc(label)+'</b>' : '<span class="muted">not asked — cost unchanged</span>');
+  var prov = remembered
+    ? '<span class="by">'+esc(e.by)+(e.at ? ' · '+esc(e.at) : ' · <i>date not recorded</i>')+' · '+esc(e.src)+(e.choice ? ' · '+esc(e.choice==='custom' ? 'typed in' : e.choice) : '')+'</span>'
+    : '<span class="by muted">a real difference; nothing about it is written this week</span>';
+  var main = '<tr class="'+(d?'edited':'')+'">' +
+    td(esc(e.item)+(e.inFile ? ' <span class="chip hot">in file</span>' : ''),'mono') + td(esc(e.desc)) +
+    td('<span class="chip kind">'+esc(e.kind)+'</span>') +
+    td(esc(e.kind === 'size' ? e.afiPack+' | '+e.afiSize : e.afiPack+' '+e.afiSize),'num mono') +
+    td(esc(e.kind === 'size' ? e.ourPack+' | '+e.ourSize : e.ourPack+' '+e.ourSize),'num mono muted') +
+    td(dec,'num') + td(prov) +
+    td('<button class="adj" data-adj="'+esc(id)+'">'+(UI.open[id] ? 'Close' : (d ? 'Change' : (remembered ? 'Adjust' : 'Decide')))+'</button>') + '</tr>';
+  if (!UI.open[id]) return main;
+  var cur = d ? d.value : (remembered ? kept : null);
+  var opts = e.options.map(function(o){
+    var isCur = cur != null && String(o.value) === String(cur);
+    return '<button class="opt'+(isCur?' current':'')+'" data-radj="'+esc(id)+'" data-value="'+esc(o.value)+'"><b>'+esc(o.value)+'</b><i>'+esc(isCur ? (d ? 'chosen' : 'in use now') : o.label)+'</i></button>';
+  }).join('');
+  var writein = e.kind === 'size'
+    ? '<span class="writein"><input class="custom size" placeholder="Type a size" data-rz-for="'+esc(id)+'" aria-label="Size"><button data-rcustom="'+esc(id)+'">Use this</button></span>'
+    : '<span class="writein"><input class="custom pack" placeholder="Pack" data-rp-for="'+esc(id)+'" inputmode="decimal" aria-label="Pack"><input class="custom size" placeholder="Size" data-rs-for="'+esc(id)+'" aria-label="Size"><button data-rcustom="'+esc(id)+'">Use this</button></span>';
+  var tail = (remembered && !(d && d.choice === 'forget') ? '<button class="forget" data-forget="'+esc(id)+'">Stop remembering — ask me again next week</button>' : '') +
+             (d ? '<button class="forget" data-undo-call="'+esc(id)+'">'+(remembered ? 'Undo my change' : 'Clear this decision')+'</button>' : '');
+  return main + '<tr class="editor-row"><td colspan="8"><div class="editor"><span class="opts opts-grid">'+opts+writein+tail+'</span></div></td></tr>';
+}
+
+function afiScoreboard(sc){
+  return '<div class="scoreboard">' +
+    '<div class="sc quiet"><div class="n">'+sc.total+'</div><div class="l">pack and size differences between AFI and the Produce Book this week — '+sc.pack+' pack, '+sc.size+' size</div></div>' +
+    '<div class="sc ask"><div class="n">'+sc.asked+'</div><div class="l"><b>asked</b>, because these items land in the price change file — '+sc.askedPack+' pack, '+sc.askedSize+' size</div></div>' +
+    '<div class="sc quiet"><div class="n">'+sc.notAsked+'</div><div class="l">not asked — real differences on items whose cost did not change, so nothing is written</div></div>' +
+    '<div class="sc quiet"><div class="n">'+sc.remembered+'</div><div class="l">remembered from earlier weeks — '+sc.rememberedInFile+' of them in this week’s price change file</div></div></div>';
+}
+
+function afiBlocks(r){
+  var parts = [];
+  var rem = Array.isArray(r.remembered) ? r.remembered : [];
+  var quiet = r.notAsked || [];
+  if (rem.length) {
+    var inFile = rem.filter(function(e){ return e.inFile; }).length;
+    var edited = rem.filter(function(e){ return STATE.calls[e.callId]; }).length;
+    parts.push('<details class="fold" data-fold="rem"' + ((edited || UI.fold.rem) ? ' open' : '') + '><summary><b>'+rem.length+' pack and size decisions previously accepted</b> — not asked again. <span class="muted">'+inFile+' of them are in this week’s price change file. Open to review or change any of them.</span>' + (edited ? ' <span class="chip changed">'+edited+' changed on this phone</span>' : '') + '</summary>' +
+      '<div class="tw"><table><thead><tr><th>Item</th><th>Description</th><th></th><th class="num">AFI</th><th class="num">Our book</th><th class="num">In use</th><th>Decided</th><th></th></tr></thead><tbody>' +
+      rem.map(function(e){ return afiMemoRow(e, true); }).join('') + '</tbody></table></div>' +
+      '<div class="pad">A remembered decision is re-asked automatically if AFI changes its pack or size, or if the Produce Book changes. Until then the item pastes with the value in use — which is why it can still show pink in column I or blue in column J of the AFI Data tab. ' +
+      (r.written ? '<b>This week’s tab is already written; a change here applies from next Tuesday.</b>' : 'A change made before you approve lands in this week’s file.') + '</div></details>');
+  }
+  if (quiet.length) {
+    var qp = quiet.filter(function(e){ return e.kind === 'pack'; }).length, qs = quiet.length - qp;
+    parts.push('<details class="fold" data-fold="quiet"' + (UI.fold.quiet ? ' open' : '') + '><summary><b>'+quiet.length+' differences not asked about this week</b> <span class="muted">— '+qp+' pack, '+qs+' size. Real differences, on items whose cost did not change.</span></summary>' +
+      '<div class="pad">Nothing about these is written this week, so they do not hold up the morning and they are not questions. They are listed because <b>“already answered” and “not relevant this week” are different kinds of silence</b>. A pack difference can still be decided here if you want to — pack feeds the Master Lists whether or not AFI’s cost moved.</div>' +
+      '<div class="tw"><table><thead><tr><th>Item</th><th>Description</th><th></th><th class="num">AFI</th><th class="num">Our book</th><th class="num"></th><th></th><th></th></tr></thead><tbody>' +
+      quiet.map(function(e){ return afiMemoRow(e, false); }).join('') + '</tbody></table></div></details>');
+  }
+  parts.push('<p class="note ok"><b>Nothing is locked in until you send.</b> Every decision on this card — a new size, an adjusted pack, a “stop remembering” — is held in your browser and can be changed or cleared as many times as you like. The approval email is the commit.</p>');
+  return parts.join('');
 }
 
 function freshFacts(r){
@@ -235,21 +379,38 @@ function freshWarn(r){
 function vendorSection(r){
   var s = status(r), st = s[0], label = s[1], parts = [];
   var ch = r.changes.slice().sort(function(a,b){ return Math.abs((b.new-b.old)/b.old) - Math.abs((a.new-a.old)/a.old); });
-  if (ch.length) parts.push('<h3>Price changes <span class="cnt">'+ch.length+'</span></h3>' + table(['PLU','Item','Last','This week','Move'],
-    ch.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(money(x.old),'num mono')+td(money(x.new),'num mono strong')+td('<span class="mv '+(x.new>x.old?'up':'dn')+'">'+pct(x.old,x.new)+'</span>','num')+'</tr>'; })));
+  var priceTable = ch.length ? table(['PLU','Item','Last','This week','Move'],
+    ch.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(money(x.old),'num mono')+td(money(x.new),'num mono strong')+td('<span class="mv '+(x.new>x.old?'up':'dn')+'">'+pct(x.old,x.new)+'</span>','num')+'</tr>'; })) : '';
+  if (ch.length && !isAfi(r)) parts.push('<h3>Price changes <span class="cnt">'+ch.length+'</span></h3>' + priceTable);
   var nd = r.new.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td('—','num mono muted')+td(money(x.new),'num mono strong')+td('<span class="chip new">New bid</span>')+'</tr>'; })
     .concat(r.dropped.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(money(x.old),'num mono')+td('—','num mono muted')+td('<span class="chip drop">Dropped</span>')+'</tr>'; }));
   if (nd.length) parts.push('<h3>New and dropped bids <span class="cnt">'+nd.length+'</span></h3>' + table(['PLU','Item','Last','This week',''], nd));
   if (r.packEdits.length) parts.push('<h3>Pack size edits <span class="cnt">'+r.packEdits.length+'</span></h3>' + table(['PLU','Item','Was','Now',''],
     r.packEdits.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(esc(x.old),'num mono')+td(esc(x.new),'num mono strong')+td('Vendor changed the pack on the form; flows to Pack Size','muted')+'</tr>'; })));
   var oc = r.written ? [] : openCalls(r);
-  if (oc.length) {
+  if (oc.length && isAfi(r)) {
+    var pendingA = oc.filter(function(c){ return !STATE.calls[c.id]; }).length;
+    var sizes = oc.filter(function(c){ return c.field_id === 'AFISize'; }), packs = oc.filter(function(c){ return c.field_id !== 'AFISize'; });
+    if (packs.length) parts.push('<h3 class="warn-h sec">Pack differs from our book <span class="cnt warn">'+packs.filter(function(c){ return !STATE.calls[c.id]; }).length+' of '+packs.length+' open</span></h3>' +
+      '<p class="why">Every item here is going into the price change file this week. Pack drives unit cost, so it decides who wins the item.</p>' +
+      table(['Item','Description','AFI pack | size','Our book','Cost this week','Decision'], packs.map(function(c){ return afiCallRow(r,c); }), 'calls'));
+    if (sizes.length) parts.push('<h3 class="warn-h sec">Size differs from our book <span class="cnt warn">'+sizes.filter(function(c){ return !STATE.calls[c.id]; }).length+' of '+sizes.length+' open</span></h3>' +
+      '<p class="why">Every item here is going into the price change file this week, and the size that rides along with it is taken as the item’s size.</p>' +
+      table(['Item','Description','AFI pack | size','Our book','Cost this week','Decision'], sizes.map(function(c){ return afiCallRow(r,c); }), 'calls'));
+    void pendingA;
+  } else if (oc.length) {
     var pending = oc.filter(function(c){ return !STATE.calls[c.id]; }).length;
     parts.push('<h3 class="warn-h">Needs your call <span class="cnt warn">'+pending+' of '+oc.length+' open</span></h3>' +
       table(['PLU','Item','Field','Vendor wrote','Decision','Why'], oc.map(function(c){ return callRow(r,c); }), 'calls'));
   }
-  var remembered = r.needsCall.length - oc.length;
-  if (remembered) parts.push('<p class="empty">'+remembered+' pack size'+(remembered===1?'':'s')+' previously accepted for this vendor, not asked again.</p>');
+  if (isAfi(r)) {
+    if (r.score) parts.unshift(afiScoreboard(r.score));
+    parts.push(afiBlocks(r));
+    if (ch.length) parts.push('<details class="fold" data-fold="prices"' + (UI.fold.prices ? ' open' : '') + '><summary><b>'+ch.length+' price changes</b> <span class="muted">— AFI cost this week against the Produce Book; these are what go into the price change file.</span></summary>' + priceTable + '</details>');
+  } else {
+    var remembered = r.needsCall.length - oc.length;
+    if (remembered) parts.push('<p class="empty">'+remembered+' pack size'+(remembered===1?'':'s')+' previously accepted for this vendor, not asked again.</p>');
+  }
   if (r.tamper.length) parts.push('<h3 class="warn-h">Yellow columns altered <span class="cnt crit">'+r.tamper.length+'</span></h3>' + table(['PLU','Field','Our form says',"Vendor's file says"],
     r.tamper.map(function(t){ return '<tr>'+td(esc(t.plu),'mono')+td(esc(t.field))+td(esc(t.template))+td(esc(t.vendor))+'</tr>'; })));
   if (r.notes.length) parts.push('<details class="notes"><summary>Vendor notes <span class="cnt">'+r.notes.length+'</span> <span class="muted">— for information, no action</span></summary>' +
@@ -259,19 +420,28 @@ function vendorSection(r){
 
   var ctl = '', v = STATE.vendors[r.id];
   var pend = openCalls(r).filter(function(c){ return !STATE.calls[c.id]; }).length;
+  if (r.revision) parts.unshift('<p class="stale-note"><b>Revision ' + esc(r.revision) + '.</b> ' + esc(r.vendor) + ' sent more than one sheet this week; this is the newest (' + esc(r.file) + '). Earlier approvals of the older sheet do not carry over.</p>');
+  if (r.revisionAfterWrite) parts.unshift('<p class="stale-note"><b>Revision after write.</b> ' + esc(r.revisionAfterWrite.prior) + ' was already written by ' + esc(r.revisionAfterWrite.by) + ' (' + esc(r.revisionAfterWrite.at) + '). This newer sheet differs \u2014 approving it writes only the cells that changed.</p>');
+  if (v && v.approved && v.file && v.file !== r.file) parts.unshift('<p class="stale-note"><b>Approval voided by a revision.</b> ' + esc(v.by) + ' approved ' + esc(v.file) + ' at ' + esc(v.at) + '; the newest sheet is ' + esc(r.file) + '. Review and approve again.</p>');
   if (st==='written') ctl = '<span class="approved-line">Written <span class="by">'+esc(r.written.by)+' · '+esc(r.written.at)+'</span></span>';
   else if (st==='critical') ctl = '<span class="blocker">Blocked until the form is checked</span>';
   else if (st==='loaded') ctl = '';
-  else if (v && v.approved) ctl = '<span class="approved-line">Approved <span class="by">'+esc(v.by)+' · '+esc(v.at)+'</span><button data-unapprove="'+esc(r.id)+'">Undo</button></span>';
+  else if (approvalCurrent(r)) ctl = '<span class="approved-line">Approved <span class="by">'+esc(v.by)+' · '+esc(v.at)+'</span><button data-unapprove="'+esc(r.id)+'">Undo</button></span>';
   else if (pend) ctl = '<span class="blocker">Decide the '+pend+' open item'+(pend===1?'':'s')+' below, then approve</span>';
   else ctl = '<button class="primary big" data-approve="'+esc(r.id)+'">Approve '+esc(r.vendor)+'</button>';
 
-  return '<section class="vendor" id="'+esc(r.id)+'"><header class="vh"><h2>'+esc(r.vendor)+'</h2><span class="pill '+st+'">'+esc(label)+'</span><span class="grow"></span>'+ctl+'</header>' +
+  // B11 (Matthew, 9/15/26): the Approve control sits at the BOTTOM of each vendor's section,
+  // right after the pack/size work; the header keeps only a short note of what is holding it.
+  var headNote = (pend && st !== 'written' && st !== 'critical' && !approvalCurrent(r))
+    ? '<span class="blocker">Decide the '+pend+' open item'+(pend===1?'':'s')+' below, then approve at the bottom</span>' : '';
+  var foot = ctl ? '<div class="vfoot">' + ctl + '</div>' : '';
+  return '<section class="vendor" id="'+esc(r.id)+'"><header class="vh"><h2>'+esc(r.vendor)+'</h2><span class="pill '+st+'">'+esc(label)+'</span><span class="grow"></span>'+headNote+'</header>' +
     '<dl class="facts"><div><dt>File</dt><dd class="mono">'+esc(r.file)+'</dd></div><div><dt>Form</dt><dd>'+esc(r.form)+'</dd></div><div><dt>Writes to</dt><dd class="mono">'+esc(r.sheet)+'</dd></div>' +
     '<div><dt>Rows</dt><dd>'+r.rows+' on form · '+r.mainRows+' on sheet · PLUs '+(r.plusAligned?'aligned':'<b class="crit">misaligned</b>')+'</dd></div>' +
     '<div><dt>Bids</dt><dd>'+r.bids+' priced · '+r.unchanged+' unchanged · '+r.codes+' item codes</dd></div>' +
     (r.perennialPackDiffs ? '<div><dt>Packs</dt><dd>'+r.perennialPackDiffs+' packs differ from the Produce Book but match our form; not flagged</dd></div>' : '') +
-    freshFacts(r) + '</dl>' + freshWarn(r) + parts.join('') + '</section>';
+    (isAfi(r) && r.score ? '<div><dt>Price change file</dt><dd>'+r.score.inFile+' items · cost differs from the book by \u2265 $0.005</dd></div>' : '') +
+    freshFacts(r) + '</dl>' + freshWarn(r) + parts.join('') + foot + '</section>';
 }
 
 function isAfi(r){ return r.id === 'afi-data'; }
@@ -282,19 +452,28 @@ function inScope(r, scope){ return scope==='afi' ? isAfi(r) : scope==='dsd' ? !i
 // calls can move which DSD vendor wins an item. Same page, two envelopes. (Matthew, 9/7/26)
 function approvalsText(scope){
   var V = CFG.vendors.filter(function(r){ return inScope(r, scope); });
-  var approved = V.filter(function(r){ return !r.written && STATE.vendors[r.id] && STATE.vendors[r.id].approved; });
+  var approved = V.filter(function(r){ return !r.written && approvalCurrent(r); });
   var human = [], machine = ['=== APPROVALS ===', 'W|'+META.week];
   approved.forEach(function(r){
     var v = STATE.vendors[r.id];
     human.push(r.vendor + ' — approved by ' + v.by + ' (' + v.at + ')');
     machine.push('V|'+r.id+'|'+v.by+'|'+v.at);
+    if (r.file) machine.push('F|'+r.id+'|'+r.file);
     r.needsCall.forEach(function(c){
       var d = STATE.calls[c.id];
       if (d) { human.push('   ' + c.plu + ' ' + c.desc + ' — ' + c.field + ': ' + d.label); machine.push('C|'+c.id+'|'+d.choice+'|'+(d.value==null?'':d.value)); }
       else if (rememberedPack(r,c)) { machine.push('C|'+c.id+'|remembered|'+c.proposal); }
     });
+    // B8: adjusted remembered decisions and optional decisions on the not-asked block travel the
+    // same way; 'forget' carries no value and tells the merge to delete the memory.
+    (Array.isArray(r.remembered) ? r.remembered : []).concat(r.notAsked || []).forEach(function(e){
+      var d = STATE.calls[e.callId];
+      if (!d) return;
+      human.push('   ' + e.item + ' ' + e.desc + ' — ' + e.kind + (d.choice === 'forget' ? ': stop remembering, ask again next week' : ': ' + d.label + (e.keptValue ? ' (was ' + e.keptValue + ')' : '')));
+      machine.push('C|'+e.callId+'|'+d.choice+'|'+(d.choice === 'forget' ? '' : (d.value==null?'':d.value)));
+    });
   });
-  var notApproved = V.filter(function(r){ return !r.written && !(STATE.vendors[r.id] && STATE.vendors[r.id].approved); }).map(function(r){ return r.vendor; });
+  var notApproved = V.filter(function(r){ return !r.written && !approvalCurrent(r); }).map(function(r){ return r.vendor; });
   var done = V.filter(function(r){ return r.written; }).map(function(r){ return r.vendor; });
   if (done.length) human.push('', 'Already written: ' + done.join(', '));
   if (notApproved.length) human.push('', 'Not approved this week: ' + notApproved.join(', '));
@@ -370,6 +549,8 @@ function copyText(t, done){
 }
 
 document.addEventListener('input', function(e){ if (e.target.id==='who') setWho(e.target.value); });
+// A fold stays the way the reader left it across re-renders (every decision re-renders the page).
+document.addEventListener('toggle', function(e){ var d = e.target; if (d && d.matches && d.matches('details.fold') && d.dataset.fold) UI.fold[d.dataset.fold] = d.open; }, true);
 document.addEventListener('click', function(e){
   var b = e.target.closest('button'); if (!b) return;
   if (b.hasAttribute('data-copy-approvals')) { copyText(approvalsText(b.dataset.scope).text, function(){ toast('Copied — paste into an email to ' + META.email); }); return; }
@@ -380,12 +561,37 @@ document.addEventListener('click', function(e){
     var url = 'mailto:' + META.email + '?subject=' + encodeURIComponent(subj) + (META.cc ? '&cc=' + encodeURIComponent(META.cc) : '') + '&body=' + encodeURIComponent(a.text);
     location.href = url; return;
   }
+  if (b.dataset.reopen) { UI.open[b.dataset.reopen] = !UI.open[b.dataset.reopen]; render(); return; }
+  if (b.dataset.adj)    { UI.open[b.dataset.adj] = !UI.open[b.dataset.adj]; render(); return; }
   var name = needName(); if (!name) return;
   var at = when();
-  if (b.dataset.call) {
+  if (b.dataset.radj) {
+    STATE.calls[b.dataset.radj] = {choice:'option', value:b.dataset.value, label:'Use ' + b.dataset.value, by:name, at:at};
+    STATE.log.push(at+' — '+name+' adjusted '+b.dataset.radj+': '+b.dataset.value); UI.open[b.dataset.radj] = false;
+  } else if (b.dataset.rcustom) {
+    var rid = b.dataset.rcustom, rv;
+    var rz = document.querySelector('input[data-rz-for="'+rid+'"]');
+    if (rz) { rv = (rz.value||'').trim(); if (!rv) { toast('Type a size first'); rz.focus(); return; } }
+    else {
+      var rp = document.querySelector('input[data-rp-for="'+rid+'"]'), rs = document.querySelector('input[data-rs-for="'+rid+'"]');
+      var rpv = (rp.value||'').trim(), rsv = (rs.value||'').trim();
+      if (!rpv) { toast('Type a pack first'); rp.focus(); return; }
+      rv = (rpv + ' ' + rsv).trim();
+    }
+    STATE.calls[rid] = {choice:'custom', value:rv, label:'Use ' + rv, by:name, at:at};
+    STATE.log.push(at+' — '+name+' adjusted '+rid+': '+rv); UI.open[rid] = false;
+  } else if (b.dataset.forget) {
+    STATE.calls[b.dataset.forget] = {choice:'forget', value:'', label:'Stop remembering', by:name, at:at};
+    STATE.log.push(at+' — '+name+' will be asked again about '+b.dataset.forget); UI.open[b.dataset.forget] = false;
+  } else if (b.dataset.call) {
     var id = b.dataset.call, label, value;
     var fld = id.split(':').pop();   // CasePack | CaseCost | ItemCode — "the book" only means a pack
     if (b.dataset.choice==='option') { value = b.dataset.value; label = 'Use ' + value; }
+    else if (b.dataset.choice==='sizeonly') {
+      var zi = document.querySelector('input[data-custom-size-only-for="'+id+'"]');
+      value = (zi.value||'').trim(); if (!value) { toast('Type a size first'); zi.focus(); return; }
+      label = 'Use ' + value;
+    }
     else if (b.dataset.choice==='packsize') {
       var pi = document.querySelector('input[data-custom-pack-for="'+id+'"]');
       var si = document.querySelector('input[data-custom-size-for="'+id+'"]');
@@ -398,14 +604,14 @@ document.addEventListener('click', function(e){
     else if (b.dataset.choice==='skip') { value = null; label = 'Skipped'; }
     else { var inp = document.querySelector('input[data-custom-for="'+id+'"]'); value = (inp.value||'').trim(); if (!value) { toast('Type a value first'); inp.focus(); return; } label = 'Use ' + value; }
     // 'packsize' is only how the page collects it; downstream it is an ordinary write-in
-    var recChoice = (b.dataset.choice === 'packsize') ? 'custom' : b.dataset.choice;
+    var recChoice = (b.dataset.choice === 'packsize' || b.dataset.choice === 'sizeonly') ? 'custom' : b.dataset.choice;
     STATE.calls[id] = {choice:recChoice, value:value, label:label, by:name, at:at};
-    STATE.log.push(at+' — '+name+' decided '+id+': '+label);
+    STATE.log.push(at+' — '+name+' decided '+id+': '+label); UI.open[id] = false;
   } else if (b.dataset.undoCall) {
-    delete STATE.calls[b.dataset.undoCall]; STATE.log.push(at+' — '+name+' reopened '+b.dataset.undoCall);
+    delete STATE.calls[b.dataset.undoCall]; UI.open[b.dataset.undoCall] = false; STATE.log.push(at+' — '+name+' reopened '+b.dataset.undoCall);
   } else if (b.dataset.approve) {
     var r = CFG.vendors.filter(function(v){ return v.id===b.dataset.approve; })[0];
-    STATE.vendors[r.id] = {approved:true, by:name, at:at}; STATE.log.push(at+' — '+name+' approved '+r.vendor);
+    STATE.vendors[r.id] = {approved:true, by:name, at:at, file:r.file||null}; STATE.log.push(at+' — '+name+' approved '+r.vendor+(r.file?' ('+r.file+')':''));
   } else if (b.dataset.unapprove) {
     var r2 = CFG.vendors.filter(function(v){ return v.id===b.dataset.unapprove; })[0];
     delete STATE.vendors[r2.id]; STATE.log.push(at+' — '+name+' un-approved '+r2.vendor);
