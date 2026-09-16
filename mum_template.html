@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>10in Fall Mums Orders</title>
+<style>
+  :root { --accent:#b5551d; --accent-dark:#8a3f14; --bg:#fbf6ef; --card:#fff;
+          --ink:#2a1c14; --sub:#6b5a4c; --line:#e9ddcf; --gold:#a9781a; --ad:#fff3d6; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+         background:var(--bg); color:var(--ink); }
+  header { background:var(--accent); color:#fff; padding:14px 16px; position:sticky;
+           top:0; z-index:10; display:flex; align-items:center; justify-content:space-between; }
+  header .t { font-size:17px; font-weight:700; }
+  header .s { font-size:12px; opacity:.9; margin-top:2px; }
+  .chip { background:#fff; color:var(--accent); border:none; border-radius:8px;
+          font-size:13px; font-weight:600; padding:7px 11px; cursor:pointer; font-family:inherit; }
+  .who { padding:22px 16px; max-width:560px; margin:0 auto; }
+  .who h2 { font-size:20px; margin:6px 0 16px; }
+  .namegrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .namebtn { padding:18px 8px; font-size:17px; font-weight:600; background:var(--card);
+             border:1.5px solid var(--line); border-radius:12px; cursor:pointer; font-family:inherit; }
+  .namebtn:active { background:#fdeee2; border-color:var(--accent); }
+  .wrap { max-width:560px; margin:0 auto; padding:12px 12px 132px; }
+  .banner { background:#fdeee2; border:1px solid var(--accent); border-radius:10px;
+            padding:11px 13px; font-size:13.5px; margin-bottom:12px; }
+  .note { background:#fbf0d9; border:1px solid var(--gold); color:#6b4b06; border-radius:10px;
+          padding:11px 13px; font-size:13.5px; margin-bottom:12px; font-weight:600; }
+  .store { background:var(--card); border:1px solid var(--line); border-radius:12px;
+           margin-bottom:10px; overflow:hidden; }
+  .store-head { padding:13px 14px; display:flex; align-items:center; gap:9px;
+                justify-content:space-between; cursor:pointer; }
+  .store-head .n { font-size:16px; font-weight:700; }
+  .store-head .c { font-size:12.5px; color:var(--sub); margin-top:1px; }
+  .bn { font-size:10.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+        padding:3px 7px; border-radius:20px; background:#fae3d5; color:var(--accent-dark); }
+  .bn.fk { background:#fbf0d9; color:#7a5606; }
+  .prog { font-size:11.5px; color:var(--sub); white-space:nowrap; }
+  .prog.done { color:var(--accent); font-weight:700; }
+  .sec { border-top:1px solid var(--line); }
+  .sec > summary { padding:11px 14px; font-weight:700; font-size:13.5px; cursor:pointer;
+                   list-style:none; display:flex; justify-content:space-between; gap:8px; }
+  .sec > summary::-webkit-details-marker { display:none; }
+  .sec > summary::after { content:"▾"; color:var(--sub); }
+  .sec[open] > summary::after { content:"▴"; }
+  .sec-ship { font-weight:400; color:var(--sub); font-size:11.5px; }
+  .passrow { display:flex; align-items:center; gap:10px; padding:6px 14px 8px;
+             font-size:12.5px; color:var(--sub); }
+  .passbtn { margin-left:auto; font-size:12.5px; font-weight:600; padding:7px 12px;
+             background:var(--card); border:1px solid var(--line); border-radius:8px;
+             cursor:pointer; font-family:inherit; color:var(--accent); }
+  .irow { display:flex; align-items:center; gap:10px; padding:9px 14px;
+          border-top:1px solid var(--line); }
+  .irow.ad { background:var(--ad); }
+  .irow .thumb { width:52px; height:52px; border-radius:8px; object-fit:cover;
+                 border:1px solid var(--line); flex:none; background:#f2ebe4; }
+  .irow .info { flex:1; min-width:0; }
+  .irow .nm { font-size:13.5px; font-weight:600; }
+  .irow .dt { font-size:11.5px; color:var(--sub); margin-top:2px; }
+  .adtag { font-size:9.5px; font-weight:800; letter-spacing:.5px; background:var(--gold);
+           color:#fff; padding:2px 5px; border-radius:4px; margin-right:5px; vertical-align:1px; }
+  .qty { width:60px; padding:11px 4px; font-size:17px; text-align:center; font-family:inherit;
+         border:1.5px solid var(--line); border-radius:9px; background:#fff; flex:none; }
+  .qty.set { border-color:var(--accent); background:#fdf4ec; font-weight:700; }
+  .qty.zero { color:#8b7a76; font-weight:600; background:#f2ebe4; }
+  .foot { position:fixed; left:0; right:0; bottom:0; background:var(--card);
+          border-top:1px solid var(--line); padding:11px 12px calc(11px + env(safe-area-inset-bottom));
+          display:flex; gap:10px; align-items:center; justify-content:center; }
+  .send { flex:1; max-width:536px; padding:15px; font-size:16px; font-weight:700; color:#fff;
+          background:var(--accent); border:none; border-radius:11px; cursor:pointer; font-family:inherit; }
+  .send:disabled { background:#d7b49a; }
+  .modal { position:fixed; inset:0; background:rgba(30,20,20,.55); display:none;
+           align-items:flex-end; z-index:50; }
+  .modal.on { display:flex; }
+  .sheet { background:var(--card); width:100%; max-height:88vh; overflow:auto;
+           border-radius:16px 16px 0 0; padding:18px 16px calc(18px + env(safe-area-inset-bottom)); }
+  .sheet h3 { margin:0 0 8px; font-size:17px; }
+  .sheet p { font-size:13.5px; color:var(--sub); line-height:1.45; margin:0 0 12px; }
+  .warn { background:#fdeee0; border:1px solid var(--gold); color:#6b4b06;
+          border-radius:10px; padding:11px 13px; font-size:13px; margin-bottom:12px; }
+  .ta { width:100%; height:190px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px;
+        border:1px solid var(--line); border-radius:10px; padding:10px; resize:vertical; }
+  .row2 { display:flex; gap:9px; margin-top:11px; }
+  .row2 button { flex:1; padding:14px; font-size:14.5px; font-weight:700; border-radius:10px;
+                 font-family:inherit; cursor:pointer; }
+  .primary { background:var(--accent); color:#fff; border:none; }
+  .ghost { background:var(--card); color:var(--ink); border:1.5px solid var(--line); }
+  .kv { font-size:12.5px; color:var(--sub); margin:2px 0; word-break:break-all; }
+  .closed { max-width:560px; margin:60px auto; padding:0 20px; text-align:center; }
+  .closed h2 { font-size:22px; } .closed p { color:var(--sub); font-size:14.5px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<script>
+var CFG = __CFG__;
+var SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwFt2hW6uRMtnIo3JDeoOkjscGIGNosE2g6i-TE1Tj2QyFZoNNtDXV3lc7r4aRRKNtT/exec';
+var MAILTO_MAX = 1900;
+var SUP = null, QTY = {}, KEY = 'mum-' + (CFG.holiday || CFG.week || 'x');
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function money(v){ return (v==null||isNaN(v))?'-':'$'+Number(v).toFixed(2); }
+function allItems(){ var a=[]; (CFG.sections||[]).forEach(function(s){
+  s.items.forEach(function(it,i){ a.push({s:s,it:it,k:s.key+':'+i}); }); }); return a; }
+function totalItems(){ return allItems().length; }
+function retailFor(st,it){ return (st.banner==='Lowes'||!st.banner)? it.retailL : it.retailFK; }
+
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({sup:SUP,qty:QTY})); }catch(e){} }
+function load(){ try{ var d=JSON.parse(localStorage.getItem(KEY));
+  if(d && d.sup && CFG.supervisors[d.sup]){ return d; } }catch(e){} return null; }
+
+function seenCount(store){ return Object.keys(QTY[store]||{}).length; }
+
+/* An explicit 0 is DATA (reviewed and passing); an untouched item is a real gap
+   and is never silently reported as a zero. */
+function sectionBlock(st, sec){
+  var q=QTY[st.store]||{}, touched=[], nonzero=[], cases=0, plants=0;
+  sec.items.forEach(function(it,i){
+    var v=q[sec.key+':'+i];
+    if(v!==undefined){ touched.push(v);
+      if(Number(v)>0){
+        nonzero.push(v+' x '+it.desc+'  ['+it.pack+']'+
+                     (it.packN?'  = '+(Number(v)*Number(it.packN))+' plants':''));
+        cases+=Number(v); plants+=Number(v)*Number(it.packN||0);
+      } }
+  });
+  if(!touched.length) return null;
+  var full = touched.length===sec.items.length, L=[];
+  if(!nonzero.length){
+    L.push('  '+sec.label+': PASS - '+touched.length+' reviewed, none ordered');
+  } else {
+    L.push('  '+sec.label+':');
+    nonzero.forEach(function(t){ L.push('    '+t); });
+    var rest=touched.length-nonzero.length;
+    if(rest) L.push('    + '+rest+' more reviewed, 0');
+  }
+  if(!full) L.push('    ** '+(sec.items.length-touched.length)+' NOT LOOKED AT **');
+  return {lines:L, cases:cases, plants:plants, ordered:nonzero.length>0, full:full};
+}
+function storeHead(st){
+  return 'Store '+st.store+' ('+st.city+')'+(st.banner&&st.banner!=='Lowes'?' - FOOD KING':'');
+}
+function allUnits(stores){
+  var u=[];
+  stores.forEach(function(st){
+    (CFG.sections||[]).forEach(function(sec,xi){
+      if(sectionBlock(st,sec)) u.push({st:st, xi:xi});
+    });
+  });
+  return u;
+}
+function renderUnits(units, partLabel){
+  var L=['FALL MUMS ORDER', (CFG.holiday||CFG.week||''),
+         'Due: '+(CFG.due||''), 'Supervisor: '+SUP];
+  if(partLabel) L.push(partLabel);
+  L.push('');
+  var cases=0, plants=0, i=0;
+  while(i<units.length){
+    var st=units[i].st, blocks=[], any=false, allFull=true;
+    while(i<units.length && units[i].st.store===st.store){
+      var b=sectionBlock(st, CFG.sections[units[i].xi]);
+      if(b){ blocks.push(b); cases+=b.cases; plants+=b.plants; if(b.ordered) any=true; if(!b.full) allFull=false; }
+      i++;
+    }
+    if(!any && allFull && blocks.length===(CFG.sections||[]).length){
+      L.push(storeHead(st)+': CLEAR - all '+totalItems()+' reviewed, no order');
+    } else {
+      L.push(storeHead(st)+':');
+      blocks.forEach(function(b){ L=L.concat(b.lines); });
+    }
+  }
+  L.push('', 'TOTAL RACKS/CASES/PALLETS: '+cases, 'TOTAL PLANTS: '+plants);
+  return L.join('\n');
+}
+function orderText(stores){ return renderUnits(allUnits(stores), null); }
+function mailtoURL(sub, body){
+  return 'mailto:'+encodeURIComponent(CFG.email||'')+'?cc='+encodeURIComponent(CFG.cc||'')+
+         '&subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body);
+}
+function splitParts(stores){
+  var units=allUnits(stores), parts=[], cur=[];
+  units.forEach(function(u){
+    var trial=cur.concat([u]);
+    if(cur.length && mailtoURL('x', renderUnits(trial,'(part 9 of 9)')).length>MAILTO_MAX){
+      parts.push(cur); cur=[u];
+    } else cur=trial;
+  });
+  if(cur.length) parts.push(cur);
+  return parts;
+}
+/* ---------- render ---------- */
+function render(){
+  var app=document.getElementById('app');
+  if(CFG.closed){
+    app.innerHTML='<div class="closed"><h2>No mum order in progress</h2>'+
+      '<p>Nothing is open right now.</p></div>';
+    return;
+  }
+  if(!SUP){
+    var g=Object.keys(CFG.supervisors||{}).map(function(n){
+      return '<button class="namebtn" onclick="pick(\''+n.replace(/'/g,"\\'")+'\')">'+esc(n)+'</button>'; }).join('');
+    app.innerHTML='<header><div><div class="t">'+esc(CFG.holiday||CFG.week)+'</div>'+
+      '<div class="s">Orders due '+esc(CFG.due)+'</div></div></header>'+
+      '<div class="who"><h2>Who are you?</h2><div class="namegrid">'+g+'</div></div>';
+    return;
+  }
+  var stores=CFG.supervisors[SUP]||[], N=totalItems();
+  var h='<header><div><div class="t">'+esc(SUP)+'</div><div class="s">'+
+        stores.length+' stores &middot; '+N+' items &middot; due '+esc(CFG.due)+'</div></div>'+
+        '<button class="chip" onclick="switchSup()">Not you?</button></header><div class="wrap">';
+  if(CFG.note) h+='<div class="note">'+esc(CFG.note)+'</div>';
+  if(loadedFlag) h+='<div class="banner">&#10003; Your saved progress was restored. '+
+     'Come back as often as you like &mdash; nothing is sent until you tap Send.</div>';
+  stores.forEach(function(st,si){
+    var seen=seenCount(st.store), done=seen>=N;
+    h+='<div class="store"><div class="store-head" onclick="toggle('+si+')">'+
+       '<div><div class="n">Store '+st.store+'<span class="bn'+(st.banner!=='Lowes'?' fk':'')+'" style="margin-left:7px">'+
+       esc(st.banner==='Lowes'?'Lowes':'Food King')+'</span></div>'+
+       '<div class="c">'+esc(st.city)+', '+esc(st.state)+'</div></div>'+
+       '<div class="prog'+(done?' done':'')+'" id="p'+si+'">'+seen+' of '+N+'</div></div>'+
+       '<div id="b'+si+'" style="display:none">';
+    (CFG.sections||[]).forEach(function(sec,xi){
+      h+='<details class="sec"><summary><span>'+esc(sec.label)+
+         (sec.ship?' <span class="sec-ship">&middot; ships '+esc(sec.ship)+'</span>':'')+'</span>'+
+         '<span style="color:var(--sub);font-weight:600">'+sec.items.length+'</span></summary>'+
+         '<div class="passrow"><span>Not ordering any of these?</span>'+
+         '<button class="passbtn" onclick="passAll('+si+','+xi+')">Pass on all '+sec.items.length+'</button></div>';
+      sec.items.forEach(function(it,i){
+        var key=sec.key+':'+i, v=(QTY[st.store]||{})[key];
+        h+='<div class="irow'+(it.ad?' ad':'')+'">'+
+           (it.img?'<img class="thumb" src="'+it.img+'" alt="">':'')+
+           '<div class="info">'+
+           '<div class="nm">'+(it.ad?'<span class="adtag">HOT</span>':'')+esc(it.desc)+'</div>'+
+           '<div class="dt"><b>'+esc(it.pack)+'</b> '+esc(it.size)+' &middot; '+money(it.cost)+
+           (it.unit?' ('+money(it.unit)+'/plant)':'')+
+           ' &middot; retail '+money(retailFor(st,it))+'</div></div>'+
+           '<input class="qty'+(v===undefined?'':(Number(v)?' set':' zero'))+'" type="number" min="0" '+
+           'inputmode="numeric" pattern="[0-9]*" value="'+(v===undefined?'':v)+'" '+
+           'data-st="'+st.store+'" data-k="'+key+'" data-si="'+si+'" onchange="setQ(this)" oninput="setQ(this)"></div>';
+      });
+      h+='</details>';
+    });
+    h+='</div></div>';
+  });
+  h+='</div><div class="foot"><button class="send" id="sendbtn" onclick="review()">Review &amp; submit order</button></div>';
+  app.innerHTML=h;
+  loadedFlag=false;
+}
+var loadedFlag=false;
+function toggle(si){ var b=document.getElementById('b'+si); b.style.display = b.style.display==='none'?'block':'none'; }
+function pick(n){ SUP=n; QTY=QTY||{}; (CFG.supervisors[n]||[]).forEach(function(s){ QTY[s.store]=QTY[s.store]||{}; }); save(); render(); }
+function switchSup(){ if(confirm('Switch supervisor? Your entries stay saved on this phone.')){ SUP=null; render(); } }
+function setQ(el){
+  var st=el.getAttribute('data-st'), k=el.getAttribute('data-k'), si=el.getAttribute('data-si');
+  QTY[st]=QTY[st]||{};
+  if(el.value===''){ delete QTY[st][k]; el.className='qty'; }
+  else { var n=Math.max(0,parseInt(el.value,10)||0); QTY[st][k]=n; el.className='qty'+(n?' set':' zero'); }
+  var N=totalItems(), seen=Object.keys(QTY[st]).length, p=document.getElementById('p'+si);
+  if(p){ p.textContent=seen+' of '+N; p.className='prog'+(seen>=N?' done':''); }
+  save();
+}
+function passAll(si,xi){
+  var st=(CFG.supervisors[SUP]||[])[si], sec=CFG.sections[xi];
+  QTY[st.store]=QTY[st.store]||{};
+  sec.items.forEach(function(it,i){ QTY[st.store][sec.key+':'+i]=0; });
+  var inputs=document.querySelectorAll('#b'+si+' input.qty');
+  Array.prototype.forEach.call(inputs,function(el){
+    if(el.getAttribute('data-k').indexOf(sec.key+':')===0){ el.value=0; el.className='qty zero'; }
+  });
+  var N=totalItems(), seen=Object.keys(QTY[st.store]).length, p=document.getElementById('p'+si);
+  if(p){ p.textContent=seen+' of '+N; p.className='prog'+(seen>=N?' done':''); }
+  save();
+}
+
+/* ---------- structured payload for the Apps Script submit ---------- */
+function buildPayload(){
+  var stores=CFG.supervisors[SUP]||[], out=[], cases=0, touchedStores=0;
+  stores.forEach(function(st){
+    var q=QTY[st.store]||{}, secs={}, any=false;
+    (CFG.sections||[]).forEach(function(sec){
+      var m={};
+      sec.items.forEach(function(it,i){ var v=q[sec.key+':'+i];
+        if(v!==undefined){ m[String(it.upc||(it.desc+' '+it.pack))+'|'+it.desc+' ('+it.pack+')']=Number(v)||0;
+          any=true; cases+=Number(v)||0; } });
+      if(Object.keys(m).length) secs[sec.key]=m;
+    });
+    if(any){ touchedStores++; out.push({store:st.store, city:st.city, banner:st.banner, sections:secs}); }
+  });
+  return {program:'mum', holiday:CFG.holiday||CFG.week, due:CFG.due, supervisor:SUP,
+          submittedAt:new Date().toISOString(), totalCases:cases, storeCount:touchedStores,
+          stores:out, text:orderText(stores)};
+}
+function submitOrder(){
+  var btn=document.getElementById('submitbtn'); if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
+  var payload=buildPayload();
+  var ctl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+  var timer = ctl ? setTimeout(function(){ ctl.abort(); }, 25000) : null;
+  fetch(SUBMIT_URL, {method:'POST', mode:'cors', redirect:'follow', cache:'no-store',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload), signal: ctl?ctl.signal:undefined})
+   .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+   .then(function(j){
+      if(timer) clearTimeout(timer);
+      if(j && j.ok){ receipt(j, payload); }
+      else { throw new Error((j&&j.error)||'server said no'); }
+   })
+   .catch(function(err){ if(timer) clearTimeout(timer); submitFailed(err, payload); });
+}
+function receipt(j, payload){
+  var when=new Date().toLocaleString();
+  try{ localStorage.setItem(KEY+'-sent', when); localStorage.setItem(KEY+'-receipt', JSON.stringify({when:when,file:j.file,cases:payload.totalCases,stores:payload.storeCount})); }catch(e){}
+  document.getElementById('sheet').innerHTML=
+    '<h3>&#10003; Order received</h3>'+
+    '<p><b>'+payload.totalCases+' cases</b> across <b>'+payload.storeCount+' store'+(payload.storeCount===1?'':'s')+'</b> for '+esc(SUP)+
+    ' went to Matthew at '+esc(when)+'.</p>'+
+    '<p>Nothing else to do. If you change something later, just come back and submit again &mdash; '+
+    'the newest submission is the one that counts.</p>'+
+    (j.file?'<p class="kv">Receipt: '+esc(j.file)+'</p>':'')+
+    '<div class="row2"><button class="primary" onclick="closeModal()">Done</button></div>';
+}
+function submitFailed(err, payload){
+  var sub='Mums Order - '+SUP;
+  document.getElementById('sheet').innerHTML=
+    '<h3>Could not reach the order server</h3>'+
+    '<div class="warn"><b>Your order is NOT sent yet</b> &mdash; but nothing is lost, it is still saved on this phone. '+
+    'Try Submit again in a moment. If it keeps failing, copy the order below and paste it into a new email.</div>'+
+    '<p class="kv"><b>To:</b> '+esc(CFG.email)+'</p><p class="kv"><b>Cc:</b> '+esc(CFG.cc)+'</p>'+
+    '<p class="kv"><b>Subject:</b> '+esc(sub)+'</p>'+
+    '<textarea class="ta" id="ordertext" readonly>'+esc(payload.text)+'</textarea>'+
+    '<div class="row2"><button class="primary" onclick="submitOrder()">Try Submit again</button>'+
+    '<button class="ghost" onclick="copyText()">Copy order text</button></div>'+
+    '<div class="row2"><button class="ghost" onclick="closeModal()">Back</button></div>'+
+    '<p class="kv" style="margin-top:8px">'+esc(String(err&&err.message||err))+'</p>';
+}
+/* ---------- review, with the size guard ---------- */
+function review(){
+  var stores=CFG.supervisors[SUP]||[];
+  var body=orderText(stores);
+  var untouched=stores.filter(function(s){ return seenCount(s.store)===0; });
+  var h='<h3>Submit your order</h3>';
+  if(untouched.length) h+='<div class="warn"><b>'+untouched.length+' store'+(untouched.length>1?'s':'')+
+      ' not looked at yet:</b> '+untouched.map(function(s){return s.store;}).join(', ')+
+      '. Blank means nobody reviewed it. Use <b>Pass on all</b> if there is genuinely no order.</div>';
+  h+='<p>Check it over, then tap Submit. It goes straight to Matthew &mdash; you do not need to send an email.</p>'+
+     '<textarea class="ta" id="ordertext" readonly>'+esc(body)+'</textarea>'+
+     '<div class="row2"><button class="primary" id="submitbtn" onclick="submitOrder()">Submit order</button>'+
+     '<button class="ghost" onclick="closeModal()">Back</button></div>';
+  document.getElementById('sheet').innerHTML=h;
+  document.getElementById('modal').className='modal on';
+}
+function closeModal(){ document.getElementById('modal').className='modal'; }
+function copyText(){
+  var t=document.getElementById('ordertext'); t.select(); t.setSelectionRange(0,999999);
+  var ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+  if(navigator.clipboard){ navigator.clipboard.writeText(t.value).then(function(){},function(){}); ok=true; }
+  alert(ok?'Order text copied. Paste it into a new email to '+CFG.email
+          :'Select the text above and copy it manually.');
+}
+/* ---------- boot ---------- */
+(function(){
+  var d=load();
+  if(d){ SUP=d.sup; QTY=d.qty||{}; loadedFlag=true; }
+  render();
+})();
+</script>
+</body>
+</html>
