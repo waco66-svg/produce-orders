@@ -166,6 +166,13 @@ tr.editor-row td { background:var(--surface); }
 .note.ok { border-left-color:var(--good); background:var(--good-soft); }
 .vfoot { margin-top:18px; padding-top:14px; border-top:1px solid var(--line-2); display:flex; justify-content:flex-end; align-items:center; gap:10px; }
 @media (max-width:640px) { .sc { flex:1 1 100%; } .vfoot { justify-content:stretch; } .vfoot .primary.big { width:100%; } }
+
+/* B21 (9/22/26): "Remember this decision" -- an answer is this week only unless kept */
+button.remember { font-size:12px; padding:2px 9px; font-weight:600; border-style:dashed; color:var(--muted); }
+button.remember.on { background:var(--good-soft); color:var(--good); border-color:var(--good); border-style:solid; }
+.chip.kept { background:var(--good-soft); color:var(--good); }
+.chip.week { background:var(--line-2); color:var(--muted); }
+h3.sec { margin-top:14px; }
 </style>
 </head><body>
 <div id="root"></div>
@@ -189,16 +196,28 @@ var money = function(v){ return (v==null||v==='') ? '' : '$' + Number(v).toLocal
 var pct = function(o,n){ if(!o) return ''; var p=(n-o)/o*100; return (p>=0?'+':'') + p.toFixed(0) + '%'; };
 var when = function(){ return new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); };
 
-// Packs accepted in an EARLIER week (carried in the data file) are not asked again
-function rememberedPack(r,c){ var m=(CFG.acceptedPacks||{})[r.id]||{}; return c.field==='Case Pack' && c.alt!=null && String(m[c.plu])===String(c.proposal); }
-function openCalls(r){ return r.needsCall.filter(function(c){ return !rememberedPack(r,c); }); }
+// B21 (Matthew, 9/22/26): every pack/size difference is asked. A decision applies to this week
+// only, unless "Remember this decision" is pressed on it -- then it is kept (afi_packs.json /
+// accepted_packs.json) and not asked again while the vendor keeps writing the same pack.
+// Remembered items never reach needsCall (vc_compare / vc_afi leave them out), so nothing here
+// filters them; the old acceptedPacks lookup is gone.
+function rememberedPack(r,c){ return false; }
+function openCalls(r){ return r.needsCall; }
+// AFI: only the rows in the price change file hold the write, so only those block Approve.
+// The rest are asked (and asked again next week if left) but do not stop the morning.
+function mustAnswer(r,c){ return !isAfi(r) || c.inFile !== false; }
+function canRemember(c){ return c.field==='Case Pack' || c.field_id==='AFIPackSize' || c.field_id==='AFISize' || /:CasePack$|:AFIPackSize$|:AFISize$/.test(c.id||''); }
+function rememberBtn(id, d){
+  if (!d || d.choice==='skip' || d.choice==='forget') return '';
+  return '<button class="remember'+(d.remember?' on':'')+'" data-remember="'+esc(id)+'" title="'+(d.remember?'Kept for future weeks. Tap to make it this week only.':'This week only. Tap to keep this answer for future weeks.')+'">'+(d.remember?'\u2713 Remembered':'Remember this decision')+'</button>';
+}
 
 // B17 (9/15/26): an approval is of a FILE. If the vendor has since sent a revision, the page has a
 // different r.file and the old approval must not carry over -- the numbers changed.
 function approvalCurrent(r){ var v = STATE.vendors[r.id]; return !!(v && v.approved && (!v.file || v.file === r.file)); }
 function status(r){
   var v = STATE.vendors[r.id];
-  var pending = openCalls(r).filter(function(c){ return !STATE.calls[c.id]; });
+  var pending = openCalls(r).filter(function(c){ return !STATE.calls[c.id] && mustAnswer(r,c); });
   if (r.written) return ['written','Written to Vendor Compare'];
   if (r.revisionAfterWrite && !approvalCurrent(r) && !pending.length) return ['warn','Revision after write \u2014 approve again'];
   // vc_compare blocks a form dated outside the week. That has been detected since 9/1/26 but was
@@ -273,8 +292,8 @@ function optionGrid(c, cur){
 function decisionCell(c){
   var d = STATE.calls[c.id];
   if (!d) return optionGrid(c, null);
-  var head = '<span class="decided"><span class="val">'+esc(d.label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+'</span>' +
-             '<button data-reopen="'+esc(c.id)+'">'+(UI.open[c.id] ? 'Close' : 'Change')+'</button></span>';
+  var head = '<span class="decided"><span class="val">'+esc(d.label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+(d.remember ? ' · <span class="chip kept">kept</span>' : ' · <span class="chip week">this week</span>')+'</span>' +
+             '<button data-reopen="'+esc(c.id)+'">'+(UI.open[c.id] ? 'Close' : 'Change')+'</button>' + (canRemember(c) ? rememberBtn(c.id, d) : '') + '</span>';
   return head + (UI.open[c.id] ? '<div class="editor">' + optionGrid(c, d.value) + '</div>' : '');
 }
 
@@ -288,7 +307,7 @@ function afiCallRow(r, c){
   var d = STATE.calls[c.id];
   var cost = c.cost ? money(c.cost.old) + ' → <b>' + money(c.cost.new) + '</b> <span class="mv ' + (c.cost.new > c.cost.old ? 'up' : 'dn') + '">' + pct(c.cost.old, c.cost.new) + '</span>' : '—';
   var ours = (c.ourPack != null ? c.ourPack + ' | ' + c.ourSize : c.why.replace(/^.*our book says /, ''));
-  return '<tr class="call-row'+(d?' answered':'')+'">'+td(esc(c.plu),'mono')+td(esc(c.desc))+td('<code>'+esc(c.text)+'</code>','num')+td(esc(ours),'num mono muted')+td(cost,'num mono')+td(decisionCell(c))+'</tr>';
+  return '<tr class="call-row'+(d?' answered':'')+'">'+td(esc(c.plu)+(c.inFile ? ' <span class="chip hot">in file</span>' : ''),'mono')+td(esc(c.desc))+td('<code>'+esc(c.text)+'</code>','num')+td(esc(ours),'num mono muted')+td(cost,'num mono')+td(decisionCell(c))+'</tr>';
 }
 
 // B8: a remembered (or shown-but-not-asked) AFI row. Adjust opens the same grid; an edit lands
@@ -302,7 +321,7 @@ function afiMemoRow(e, remembered){
     ? '<span class="decided"><span class="val">'+esc(label)+'</span><span class="by">'+esc(d.by)+' · '+esc(d.at)+' · '+(d.choice==='forget' ? '<span class="chip forgot">stop remembering</span>' : '<span class="chip changed">changed</span>')+'</span></span>'
     : (remembered ? '<b>'+esc(label)+'</b>' : '<span class="muted">not asked — cost unchanged</span>');
   var prov = remembered
-    ? '<span class="by">'+esc(e.by)+(e.at ? ' · '+esc(e.at) : ' · <i>date not recorded</i>')+' · '+esc(e.src)+(e.choice ? ' · '+esc(e.choice==='custom' ? 'typed in' : e.choice) : '')+'</span>'
+    ? '<span class="by">'+esc(e.by)+(e.at ? ' · '+esc(e.at) : ' · <i>date not recorded</i>')+' · '+esc(e.src)+(e.choice ? ' · '+esc(e.choice==='custom' ? 'typed in' : e.choice) : '')+(e.thisWeek ? ' · <span class="chip week">this week only — asked again next week</span>' : ' · <span class="chip kept">kept</span>')+'</span>'
     : '<span class="by muted">a real difference; nothing about it is written this week</span>';
   var main = '<tr class="'+(d?'edited':'')+'">' +
     td(esc(e.item)+(e.inFile ? ' <span class="chip hot">in file</span>' : ''),'mono') + td(esc(e.desc)) +
@@ -320,16 +339,16 @@ function afiMemoRow(e, remembered){
   var writein = e.kind === 'size'
     ? '<span class="writein"><input class="custom size" placeholder="Type a size" data-rz-for="'+esc(id)+'" aria-label="Size"><button data-rcustom="'+esc(id)+'">Use this</button></span>'
     : '<span class="writein"><input class="custom pack" placeholder="Pack" data-rp-for="'+esc(id)+'" inputmode="decimal" aria-label="Pack"><input class="custom size" placeholder="Size" data-rs-for="'+esc(id)+'" aria-label="Size"><button data-rcustom="'+esc(id)+'">Use this</button></span>';
-  var tail = (remembered && !(d && d.choice === 'forget') ? '<button class="forget" data-forget="'+esc(id)+'">Stop remembering — ask me again next week</button>' : '') +
-             (d ? '<button class="forget" data-undo-call="'+esc(id)+'">'+(remembered ? 'Undo my change' : 'Clear this decision')+'</button>' : '');
+  var tail = (remembered && !e.thisWeek && !(d && d.choice === 'forget') ? '<button class="forget" data-forget="'+esc(id)+'">Stop remembering — ask me again next week</button>' : '') +
+             (d ? rememberBtn(id, d) + '<button class="forget" data-undo-call="'+esc(id)+'">'+(remembered ? 'Undo my change' : 'Clear this decision')+'</button>' : '');
   return main + '<tr class="editor-row"><td colspan="8"><div class="editor"><span class="opts opts-grid">'+opts+writein+tail+'</span></div></td></tr>';
 }
 
 function afiScoreboard(sc){
   return '<div class="scoreboard">' +
     '<div class="sc quiet"><div class="n">'+sc.total+'</div><div class="l">pack and size differences between AFI and the Produce Book this week — '+sc.pack+' pack, '+sc.size+' size</div></div>' +
-    '<div class="sc ask"><div class="n">'+sc.asked+'</div><div class="l"><b>asked</b>, because these items land in the price change file — '+sc.askedPack+' pack, '+sc.askedSize+' size</div></div>' +
-    '<div class="sc quiet"><div class="n">'+sc.notAsked+'</div><div class="l">not asked — real differences on items whose cost did not change, so nothing is written</div></div>' +
+    '<div class="sc ask"><div class="n">'+sc.asked+'</div><div class="l"><b>asked</b> — every difference is asked; '+(sc.askedInFile||0)+' of them are in this week’s price change file and must be answered before the AFI tab is written</div></div>' +
+    '<div class="sc quiet"><div class="n">'+(sc.thisWeek||0)+'</div><div class="l">answered for this week only — asked again next week unless you press Remember</div></div>' +
     '<div class="sc quiet"><div class="n">'+sc.remembered+'</div><div class="l">remembered from earlier weeks — '+sc.rememberedInFile+' of them in this week’s price change file</div></div></div>';
 }
 
@@ -340,10 +359,11 @@ function afiBlocks(r){
   if (rem.length) {
     var inFile = rem.filter(function(e){ return e.inFile; }).length;
     var edited = rem.filter(function(e){ return STATE.calls[e.callId]; }).length;
-    parts.push('<details class="fold" data-fold="rem"' + ((edited || UI.fold.rem) ? ' open' : '') + '><summary><b>'+rem.length+' pack and size decisions previously accepted</b> — not asked again. <span class="muted">'+inFile+' of them are in this week’s price change file. Open to review or change any of them.</span>' + (edited ? ' <span class="chip changed">'+edited+' changed on this phone</span>' : '') + '</summary>' +
+    var kept = rem.filter(function(e){ return !e.thisWeek; }).length, wk = rem.length - kept;
+    parts.push('<details class="fold" data-fold="rem"' + ((edited || UI.fold.rem) ? ' open' : '') + '><summary><b>'+rem.length+' pack and size decisions already made</b> — '+kept+' remembered, '+wk+' for this week only. <span class="muted">'+inFile+' of them are in this week’s price change file. Open to review or change any of them.</span>' + (edited ? ' <span class="chip changed">'+edited+' changed on this phone</span>' : '') + '</summary>' +
       '<div class="tw"><table><thead><tr><th>Item</th><th>Description</th><th></th><th class="num">AFI</th><th class="num">Our book</th><th class="num">In use</th><th>Decided</th><th></th></tr></thead><tbody>' +
       rem.map(function(e){ return afiMemoRow(e, true); }).join('') + '</tbody></table></div>' +
-      '<div class="pad">A remembered decision is re-asked automatically if AFI changes its pack or size, or if the Produce Book changes. Until then the item pastes with the value in use — which is why it can still show pink in column I or blue in column J of the AFI Data tab. ' +
+      '<div class="pad">A remembered decision is re-asked automatically if AFI changes its pack or size, or if the Produce Book changes. A this-week-only answer is used for this feed and asked again next Tuesday — press Remember on it if it should stick. Until then the item pastes with the value in use — which is why it can still show pink in column I or blue in column J of the AFI Data tab. ' +
       (r.written ? '<b>This week’s tab is already written; a change here applies from next Tuesday.</b>' : 'A change made before you approve lands in this week’s file.') + '</div></details>');
   }
   if (quiet.length) {
@@ -389,15 +409,20 @@ function vendorSection(r){
     r.packEdits.map(function(x){ return '<tr>'+td(esc(x.plu),'mono')+td(esc(x.desc))+td(esc(x.old),'num mono')+td(esc(x.new),'num mono strong')+td('Vendor changed the pack on the form; flows to Pack Size','muted')+'</tr>'; })));
   var oc = r.written ? [] : openCalls(r);
   if (oc.length && isAfi(r)) {
-    var pendingA = oc.filter(function(c){ return !STATE.calls[c.id]; }).length;
-    var sizes = oc.filter(function(c){ return c.field_id === 'AFISize'; }), packs = oc.filter(function(c){ return c.field_id !== 'AFISize'; });
-    if (packs.length) parts.push('<h3 class="warn-h sec">Pack differs from our book <span class="cnt warn">'+packs.filter(function(c){ return !STATE.calls[c.id]; }).length+' of '+packs.length+' open</span></h3>' +
-      '<p class="why">Every item here is going into the price change file this week. Pack drives unit cost, so it decides who wins the item.</p>' +
-      table(['Item','Description','AFI pack | size','Our book','Cost this week','Decision'], packs.map(function(c){ return afiCallRow(r,c); }), 'calls'));
-    if (sizes.length) parts.push('<h3 class="warn-h sec">Size differs from our book <span class="cnt warn">'+sizes.filter(function(c){ return !STATE.calls[c.id]; }).length+' of '+sizes.length+' open</span></h3>' +
-      '<p class="why">Every item here is going into the price change file this week, and the size that rides along with it is taken as the item’s size.</p>' +
-      table(['Item','Description','AFI pack | size','Our book','Cost this week','Decision'], sizes.map(function(c){ return afiCallRow(r,c); }), 'calls'));
-    void pendingA;
+    var openN = function(list){ return list.filter(function(c){ return !STATE.calls[c.id]; }).length; };
+    var inF = oc.filter(function(c){ return c.inFile !== false; }), rest = oc.filter(function(c){ return c.inFile === false; });
+    var packsF = inF.filter(function(c){ return c.field_id !== 'AFISize'; }), sizesF = inF.filter(function(c){ return c.field_id === 'AFISize'; });
+    var packsR = rest.filter(function(c){ return c.field_id !== 'AFISize'; }), sizesR = rest.filter(function(c){ return c.field_id === 'AFISize'; });
+    if (packsF.length) parts.push('<h3 class="warn-h sec">Pack differs from our book — in the price change file <span class="cnt warn">'+openN(packsF)+' of '+packsF.length+' open</span></h3>' +
+      '<p class="why">Every item here is going into the price change file this week. Pack drives unit cost, so it decides who wins the item. These must be answered before AFI can be approved.</p>' +
+      table(['Item','Description','AFI pack | size','Our book','Cost this week','Decision'], packsF.map(function(c){ return afiCallRow(r,c); }), 'calls'));
+    if (sizesF.length) parts.push('<h3 class="warn-h sec">Size differs from our book — in the price change file <span class="cnt warn">'+openN(sizesF)+' of '+sizesF.length+' open</span></h3>' +
+      '<p class="why">Every item here is going into the price change file this week, and the size that rides along with it is taken as the item’s size. These must be answered before AFI can be approved.</p>' +
+      table(['Item','Description','AFI pack | size','Our book','Cost this week','Decision'], sizesF.map(function(c){ return afiCallRow(r,c); }), 'calls'));
+    if (rest.length) parts.push('<details class="fold" data-fold="rest"' + (UI.fold.rest ? ' open' : '') + '><summary><b>'+rest.length+' more differences, not in this week’s price change file</b> <span class="muted">— '+packsR.length+' pack, '+sizesR.length+' size; '+openN(rest)+' open. Answer what you can; anything left is asked again next week. Press Remember on an answer to keep it.</span></summary>' +
+      (packsR.length ? '<h3 class="sec">Pack differs from our book</h3>' + table(['Item','Description','AFI pack | size','Our book','Cost this week','Decision'], packsR.map(function(c){ return afiCallRow(r,c); }), 'calls') : '') +
+      (sizesR.length ? '<h3 class="sec">Size differs from our book</h3>' + table(['Item','Description','AFI pack | size','Our book','Cost this week','Decision'], sizesR.map(function(c){ return afiCallRow(r,c); }), 'calls') : '') +
+      '</details>');
   } else if (oc.length) {
     var pending = oc.filter(function(c){ return !STATE.calls[c.id]; }).length;
     parts.push('<h3 class="warn-h">Needs your call <span class="cnt warn">'+pending+' of '+oc.length+' open</span></h3>' +
@@ -407,9 +432,15 @@ function vendorSection(r){
     if (r.score) parts.unshift(afiScoreboard(r.score));
     parts.push(afiBlocks(r));
     if (ch.length) parts.push('<details class="fold" data-fold="prices"' + (UI.fold.prices ? ' open' : '') + '><summary><b>'+ch.length+' price changes</b> <span class="muted">— AFI cost this week against the Produce Book; these are what go into the price change file.</span></summary>' + priceTable + '</details>');
-  } else {
-    var remembered = r.needsCall.length - oc.length;
-    if (remembered) parts.push('<p class="empty">'+remembered+' pack size'+(remembered===1?'':'s')+' previously accepted for this vendor, not asked again.</p>');
+  } else if (Array.isArray(r.remembered) && r.remembered.length) {
+    var remD = r.remembered, editedD = remD.filter(function(e){ return STATE.calls[e.callId]; }).length;
+    parts.push('<details class="fold" data-fold="rem-'+esc(r.id)+'"' + ((editedD || UI.fold['rem-'+r.id]) ? ' open' : '') + '><summary><b>'+remD.length+' pack decision'+(remD.length===1?'':'s')+' remembered for '+esc(r.vendor)+'</b> <span class="muted">— not asked while the vendor keeps writing the same pack. Open to review or stop remembering.</span>' + (editedD ? ' <span class="chip changed">'+editedD+' changed on this phone</span>' : '') + '</summary>' +
+      '<div class="tw"><table><thead><tr><th>PLU</th><th>Item</th><th class="num">Vendor writes</th><th class="num">We use</th><th class="num">Book</th><th>Decided</th><th></th></tr></thead><tbody>' +
+      remD.map(function(e){ var d = STATE.calls[e.callId];
+        return '<tr class="'+(d?'edited':'')+'">'+td(esc(e.plu),'mono')+td(esc(e.desc))+td(esc(e.vendorPack),'num mono')+td('<b>'+esc(e.pack)+'</b>','num mono')+td(esc(e.book),'num mono muted')+
+          td('<span class="by">'+esc(e.by)+(e.at ? ' · '+esc(e.at) : '')+(e.choice ? ' · '+esc(e.choice) : '')+'</span>') +
+          td(d ? '<span class="chip forgot">will ask again next week</span> <button class="forget" data-undo-call="'+esc(e.callId)+'">Undo</button>' : '<button class="forget" data-forget="'+esc(e.callId)+'">Stop remembering — ask me again next week</button>')+'</tr>'; }).join('') +
+      '</tbody></table></div></details>');
   }
   if (r.tamper.length) parts.push('<h3 class="warn-h">Yellow columns altered <span class="cnt crit">'+r.tamper.length+'</span></h3>' + table(['PLU','Field','Our form says',"Vendor's file says"],
     r.tamper.map(function(t){ return '<tr>'+td(esc(t.plu),'mono')+td(esc(t.field))+td(esc(t.template))+td(esc(t.vendor))+'</tr>'; })));
@@ -419,7 +450,7 @@ function vendorSection(r){
   else if (!(r.changes.length||r.new.length||r.dropped.length||r.packEdits.length) && oc.length) parts.unshift('<p class="empty">Prices already match Vendor Compare; only the items below need a decision.</p>');
 
   var ctl = '', v = STATE.vendors[r.id];
-  var pend = openCalls(r).filter(function(c){ return !STATE.calls[c.id]; }).length;
+  var pend = openCalls(r).filter(function(c){ return !STATE.calls[c.id] && mustAnswer(r,c); }).length;
   if (r.revision) parts.unshift('<p class="stale-note"><b>Revision ' + esc(r.revision) + '.</b> ' + esc(r.vendor) + ' sent more than one sheet this week; this is the newest (' + esc(r.file) + '). Earlier approvals of the older sheet do not carry over.</p>');
   if (r.revisionAfterWrite) parts.unshift('<p class="stale-note"><b>Revision after write.</b> ' + esc(r.revisionAfterWrite.prior) + ' was already written by ' + esc(r.revisionAfterWrite.by) + ' (' + esc(r.revisionAfterWrite.at) + '). This newer sheet differs \u2014 approving it writes only the cells that changed.</p>');
   if (v && v.approved && v.file && v.file !== r.file) parts.unshift('<p class="stale-note"><b>Approval voided by a revision.</b> ' + esc(v.by) + ' approved ' + esc(v.file) + ' at ' + esc(v.at) + '; the newest sheet is ' + esc(r.file) + '. Review and approve again.</p>');
@@ -439,7 +470,7 @@ function vendorSection(r){
     '<dl class="facts"><div><dt>File</dt><dd class="mono">'+esc(r.file)+'</dd></div><div><dt>Form</dt><dd>'+esc(r.form)+'</dd></div><div><dt>Writes to</dt><dd class="mono">'+esc(r.sheet)+'</dd></div>' +
     '<div><dt>Rows</dt><dd>'+r.rows+' on form · '+r.mainRows+' on sheet · PLUs '+(r.plusAligned?'aligned':'<b class="crit">misaligned</b>')+'</dd></div>' +
     '<div><dt>Bids</dt><dd>'+r.bids+' priced · '+r.unchanged+' unchanged · '+r.codes+' item codes</dd></div>' +
-    (r.perennialPackDiffs ? '<div><dt>Packs</dt><dd>'+r.perennialPackDiffs+' packs differ from the Produce Book but match our form; not flagged</dd></div>' : '') +
+    (r.perennialPackDiffs ? '<div><dt>Packs</dt><dd>'+r.perennialPackDiffs+' packs differ from the Produce Book but match our bid form \u2014 asked below like the rest (since 9/22/26)</dd></div>' : '') +
     (isAfi(r) && r.score ? '<div><dt>Price change file</dt><dd>'+r.score.inFile+' items · cost differs from the book by \u2265 $0.005</dd></div>' : '') +
     freshFacts(r) + '</dl>' + freshWarn(r) + parts.join('') + foot + '</section>';
 }
@@ -461,16 +492,15 @@ function approvalsText(scope){
     if (r.file) machine.push('F|'+r.id+'|'+r.file);
     r.needsCall.forEach(function(c){
       var d = STATE.calls[c.id];
-      if (d) { human.push('   ' + c.plu + ' ' + c.desc + ' — ' + c.field + ': ' + d.label); machine.push('C|'+c.id+'|'+d.choice+'|'+(d.value==null?'':d.value)); }
-      else if (rememberedPack(r,c)) { machine.push('C|'+c.id+'|remembered|'+c.proposal); }
+      if (d) { human.push('   ' + c.plu + ' ' + c.desc + ' — ' + c.field + ': ' + d.label + (d.remember ? ' (remember)' : '')); machine.push('C|'+c.id+'|'+d.choice+'|'+(d.value==null?'':d.value)+(d.remember ? '|remember' : '')); }
     });
     // B8: adjusted remembered decisions and optional decisions on the not-asked block travel the
     // same way; 'forget' carries no value and tells the merge to delete the memory.
     (Array.isArray(r.remembered) ? r.remembered : []).concat(r.notAsked || []).forEach(function(e){
       var d = STATE.calls[e.callId];
       if (!d) return;
-      human.push('   ' + e.item + ' ' + e.desc + ' — ' + e.kind + (d.choice === 'forget' ? ': stop remembering, ask again next week' : ': ' + d.label + (e.keptValue ? ' (was ' + e.keptValue + ')' : '')));
-      machine.push('C|'+e.callId+'|'+d.choice+'|'+(d.choice === 'forget' ? '' : (d.value==null?'':d.value)));
+      human.push('   ' + (e.item || e.plu) + ' ' + e.desc + ' — ' + (e.kind || 'pack') + (d.choice === 'forget' ? ': stop remembering, ask again next week' : ': ' + d.label + (e.keptValue ? ' (was ' + e.keptValue + ')' : '') + (d.remember ? ' (remember)' : '')));
+      machine.push('C|'+e.callId+'|'+d.choice+'|'+(d.choice === 'forget' ? '' : (d.value==null?'':d.value))+(d.remember && d.choice !== 'forget' ? '|remember' : ''));
     });
   });
   var notApproved = V.filter(function(r){ return !r.written && !approvalCurrent(r); }).map(function(r){ return r.vendor; });
@@ -519,7 +549,7 @@ function render(){
   var sts = V.map(status);
   var nWritten = sts.filter(function(s){ return s[0]==='written'; }).length;
   var nReady = sts.filter(function(s){ return s[0]==='ready'; }).length, nApproved = sts.filter(function(s){ return s[0]==='approved'; }).length,
-      nCall = V.reduce(function(a,r){ return a + openCalls(r).filter(function(c){ return !STATE.calls[c.id]; }).length; }, 0),
+      nCall = V.reduce(function(a,r){ return a + openCalls(r).filter(function(c){ return !STATE.calls[c.id] && mustAnswer(r,c); }).length; }, 0),
       nLoaded = sts.filter(function(s){ return s[0]==='loaded'; }).length;
   var tiles = V.map(function(r,i){ var st=sts[i][0], label=sts[i][1]; var n=r.changes.length+r.new.length+r.dropped.length;
     return '<a class="tile '+st+'" href="#'+esc(r.id)+'"><div class="tile-name">'+esc(r.vendor)+'</div><div class="tile-status">'+esc(label)+'</div>' +
@@ -537,7 +567,7 @@ function render(){
     '<div class="legend"><span><i style="background:var(--ink)"></i>Written — already in Vendor Compare</span><span><i style="background:var(--good)"></i>Approved — will be written</span><span><i style="background:var(--accent)"></i>Ready — approve to write</span><span><i style="background:var(--warn)"></i>Needs your call — a proposal is waiting</span><span><i style="background:var(--crit)"></i>Form altered — vendor changed a yellow column or the row order</span><span><i style="background:var(--crit)"></i>Stale — file is not from this week, not written</span><span><i style="background:var(--line)"></i>Already loaded — file matches the sheet</span></div>' +
     V.map(function(r){ return vendorSection(r) + (isAfi(r) ? sendBar('afi') : ''); }).join('') +
     '<section class="how"><h2>How to read this</h2><p>Each vendor\'s bid form is checked against our v12 template (row order, descriptions, grades, units) and then against that vendor\'s MAIN sheet in Vendor Compare. Only case cost, pack size, item code and notes are ever written; PLU and the yellow columns are never touched.</p>' +
-    '<p>"N/A", "NA" and "Xx" are read as no bid. A note that implies a pack size, or text in the pack column, becomes a proposal: the leading number is offered and the vendor\'s original text is shown beside it. A priced item whose pack differs from both the Produce Book and our bid form must be accepted or set back to the book pack; once accepted for a vendor, that pack is remembered for later weeks.</p>' +
+    '<p>"N/A", "NA" and "Xx" are read as no bid. A note that implies a pack size, or text in the pack column, becomes a proposal: the leading number is offered and the vendor\'s original text is shown beside it. Every priced item whose pack differs from the Produce Book is asked, every week. An answer is used for this week only — press <b>Remember this decision</b> on it to keep it for future weeks; a remembered pack stays quiet while the vendor keeps writing the same number and is asked again the moment it changes. Anything left unanswered comes back next week.</p>' +
     (log ? '<h2>Decisions on this phone</h2><ul class="log">'+log+'</ul>' : '') + '</section></div><div class="toast" id="toast"></div>';
 }
 
@@ -562,6 +592,11 @@ document.addEventListener('click', function(e){
     location.href = url; return;
   }
   if (b.dataset.reopen) { UI.open[b.dataset.reopen] = !UI.open[b.dataset.reopen]; render(); return; }
+  if (b.dataset.remember) {
+    var rd = STATE.calls[b.dataset.remember]; if (!rd) return;
+    rd.remember = !rd.remember; STATE.log.push(when()+' — '+(who()||'someone')+(rd.remember ? ' will remember ' : ' un-remembered ')+b.dataset.remember);
+    persist(); render(); return;
+  }
   if (b.dataset.adj)    { UI.open[b.dataset.adj] = !UI.open[b.dataset.adj]; render(); return; }
   var name = needName(); if (!name) return;
   var at = when();
