@@ -21,6 +21,7 @@ PAGES = [
     ("fl", "fl_template.html", "fl.html"),    # Floral holidays (Valentine's, Easter, Mothers Day, Poinsettias)
     ("ol", "ol_template.html", "ol.html"),    # Our Lady of Guadalupe prebook (one-off, added 9/14/26)
     ("mum", "mum_template.html", "mum.html"),  # 10in Fall Mums, AFI seasonal buy (one-off, added 9/16/26)
+    ("fb", "fb_template.html", "fb.html"),    # Fresh Bites new items, AFI first order wk of 10/03/26 (one-off, added 9/24/26)
 ]
 
 for param, tpl_name, out in PAGES:
