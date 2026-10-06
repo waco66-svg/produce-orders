@@ -1,0 +1,342 @@
+<title>Cut Fruit Approvals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one working column (max 880px), sticky masthead, four decision sections in the order they must be answered, send bar at the bottom. */
+:root{
+  --bg:#f5f7f3; --panel:#ffffff; --ink:#1d2a20; --muted:#5d6b60; --line:#d9e1d8;
+  --accent:#2f6b3a; --accent-ink:#ffffff; --accent-soft:#e3efe2;
+  --warn:#9a5b00; --warn-soft:#fbefd9; --bad:#b3261e; --bad-soft:#fbe4e2; --ok:#2f6b3a; --ok-soft:#e3efe2;
+  --chip:#eef2ec;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121814; --panel:#1a221c; --ink:#e4ece5; --muted:#9aa89d; --line:#2c3a2f;
+  --accent:#7cc48a; --accent-ink:#0f1a12; --accent-soft:#213528;
+  --warn:#f0b357; --warn-soft:#3a2d16; --bad:#f2948c; --bad-soft:#3d1f1c; --ok:#7cc48a; --ok-soft:#213528; --chip:#243026;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121814; --panel:#1a221c; --ink:#e4ece5; --muted:#9aa89d; --line:#2c3a2f;
+  --accent:#7cc48a; --accent-ink:#0f1a12; --accent-soft:#213528;
+  --warn:#f0b357; --warn-soft:#3a2d16; --bad:#f2948c; --bad-soft:#3d1f1c; --ok:#7cc48a; --ok-soft:#213528; --chip:#243026;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);padding-inline:16px;padding-block:0 120px}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.mock{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:8px;padding:10px 14px;font-size:13px;margin-top:14px}
+header.mast{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 10px;border-bottom:1px solid var(--line)}
+.mast h1{font:700 30px/1.05 var(--display);letter-spacing:.01em;margin:0;text-wrap:balance}
+.mast .sub{color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px}
+.score{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.score a{display:flex;gap:6px;align-items:baseline;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.score a b{font:600 13px var(--mono)}
+.score a.done{border-color:var(--ok);background:var(--ok-soft)}
+section.gate{display:flex;flex-direction:column;gap:12px}
+.gh{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:6px}
+.gh h2{font:700 22px/1.1 var(--display);margin:0;text-transform:uppercase;letter-spacing:.04em}
+.gh p{margin:2px 0 0;color:var(--muted);font-size:13px;max-width:60ch}
+.gh .tally{font:600 13px var(--mono);color:var(--muted);white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.decided{border-color:var(--ok)}
+.row1{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.item{font:600 16px/1.3 var(--body);min-width:0}
+.item .no{font:600 13px var(--mono);color:var(--muted);margin-right:6px}
+.tag{font:600 11px/1 var(--body);text-transform:uppercase;letter-spacing:.06em;padding:4px 7px;border-radius:4px;white-space:nowrap}
+.tag.bad{background:var(--bad-soft);color:var(--bad)} .tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.ok{background:var(--ok-soft);color:var(--ok)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 16px;font-size:13px}
+.facts div span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.used{font-size:12.5px;color:var(--muted)}
+.used summary{cursor:pointer;width:max-content;max-width:100%}
+.used ul{margin:6px 0 0;padding-left:18px;columns:2;column-gap:20px}
+@media (max-width:560px){.used ul{columns:1}}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{font:500 13.5px/1.25 var(--body);text-align:left;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 11px;cursor:pointer;display:flex;flex-direction:column;gap:2px;max-width:100%}
+.opt small{color:var(--muted);font-size:12px}
+.opt:hover{border-color:var(--accent)}
+.opt:focus-visible,.btn:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.opt[aria-pressed="true"] small{color:var(--accent-ink);opacity:.85}
+.opt.quiet{background:transparent;border-style:dashed}
+.write{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+.write input{font:500 14px var(--mono);width:9em;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.remember{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
+.cmp .side{background:var(--bg);border-radius:6px;padding:8px 10px;font-size:13px;min-width:0}
+.cmp .side b{display:block;font-size:13.5px}
+.cmp .arrow{font:700 18px var(--display);color:var(--accent)}
+.save{font:700 20px/1 var(--display);color:var(--ok)}
+.note{font-size:12.5px;color:var(--warn)}
+table.ret{width:100%;border-collapse:collapse;font-size:13.5px}
+.tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+table.ret th{font:600 11px var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ret td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.ret tr:last-child td{border-bottom:0}
+table.ret td.r,table.ret th.r{text-align:right}
+table.ret tr.grp td{background:var(--chip);font:700 14px var(--display);letter-spacing:.05em;text-transform:uppercase}
+.mini{display:flex;gap:6px;flex-wrap:wrap}
+.mini .opt{padding:5px 8px;font-size:12.5px}
+.mini input{font:500 13px var(--mono);width:5.5em;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.otherbox{display:inline-flex;align-items:center;gap:4px}
+.mini input.set{border-color:var(--accent);background:var(--accent-soft)}
+.tm{font:600 12px var(--mono);min-width:2.6em}
+.tm.in{color:var(--ok)} .tm.off{color:var(--bad)}
+.undr{color:var(--bad)} .opt[aria-pressed="true"] .undr{color:var(--accent-ink)}
+table.ret tr.set td:first-child{box-shadow:inset 3px 0 0 var(--ok)}
+.bulk{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:600 14px var(--body);border-radius:6px;padding:9px 14px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.sendbar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.sendbar .in{max-width:880px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.sendbar .left{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px}
+.sendbar input{font:500 14px var(--body);padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:10em}
+pre.out{white-space:pre-wrap;word-break:break-word;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;font:12.5px/1.5 var(--mono);margin:0}
+@media (prefers-reduced-motion:no-preference){.opt,.card{transition:border-color .15s,background .15s}}
+</style>
+
+<div class="wrap">
+  <div class="mock" id="demo" hidden><b>Test build.</b> This page was built from test data. Decisions sent from it are not written anywhere.</div>
+  <header class="mast">
+    <h1>Cut Fruit &amp; Mealtime Approvals</h1>
+    <div class="sub"><span id="m-week"></span><span id="m-scales"></span><span id="m-afi"></span><span id="m-built"></span></div>
+    <nav class="score" id="score"></nav>
+  </header>
+
+  <section class="gate" id="g-packs">
+    <div class="gh"><div><h2>1 · Pack &amp; size changes</h2><p>AFI changed the pack or size on an ingredient we use. Pick the one that's right for the recipe math. Press Remember so it isn't asked again while AFI keeps sending the same thing.</p></div><span class="tally" id="t-packs"></span></div>
+    <div id="packs"></div>
+  </section>
+
+  <section class="gate" id="g-missing">
+    <div class="gh"><div><h2>2 · Items gone from AFI</h2><p>These ingredient numbers aren't in this week's AFI files. Suggestions come from every AFI feed (produce, meat, dairy, supplies…), including items numbered next to it in the same product line. Pick one, type a number, or skip: this week only, or until AFI carries it again. Items on a skipped ingredient keep last week's cost.</p></div><span class="tally" id="t-missing"></span></div>
+    <div id="missing"></div>
+  </section>
+
+  <section class="gate" id="g-cheaper">
+    <div class="gh"><div><h2>3 · Cheaper produce options</h2><p>Same product, 5% or more cheaper per pound (or per bin for count-sized fruit). A swap to a different size rescales the recipe yield and flags the item for a test cut.</p></div><span class="tally" id="t-cheaper"></span></div>
+    <div id="cheaper"></div>
+  </section>
+
+  <section class="gate" id="g-retails">
+    <div class="gh"><div><h2>4 · Retails outside the margin band</h2><p>Only items outside the band are listed: cut fruit 45–60%, Mealtime 40–50%. Each item gets up to two prices just under the band (marked in red) and up to four inside it, all ending in 9; the small figure is the margin each one gives. Type any other price and its margin shows next to the box. Food King retail is Lowe's ÷ 1.1 and isn't asked.</p></div><span class="tally" id="t-retails"></span></div>
+    <div class="bulk"><button class="btn ghost" id="keepHigh" type="button">Keep current on every item above the band</button></div>
+    <div class="tw"><table class="ret"><thead><tr><th>PLU</th><th>Item</th><th class="r">Cost</th><th class="r">Retail</th><th class="r">Margin</th><th>Decision</th></tr></thead><tbody id="retails"></tbody></table></div>
+  </section>
+
+  <section class="gate" id="g-remembered">
+    <div class="gh"><div><h2>Remembered answers</h2><p>These are being answered for you from earlier weeks. Press Stop remembering and the question comes back next week (or on this page's next build).</p></div><span class="tally" id="t-remembered"></span></div>
+    <div id="remembered"></div>
+  </section>
+
+  <section class="gate" id="g-email" hidden>
+    <div class="gh"><div><h2>Approval email</h2><p>This is what Send puts in the email. Claude reads it, writes the workbook, and builds the PDFs and store emails.</p></div></div>
+    <pre class="out" id="out"></pre>
+  </section>
+</div>
+
+<div class="sendbar"><div class="in">
+  <div class="left"><label for="who">Approved by</label><input id="who" placeholder="Your name" autocomplete="name"><span id="left" class="num"></span></div>
+  <div class="left"><button class="btn ghost" id="copy" type="button">Copy</button><button class="btn" id="send" type="button" disabled>Approve &amp; Send</button></div>
+</div></div>
+
+<script>
+const DATA = __CFG__;
+const META = DATA.meta, g = DATA.gates, M = DATA.margins;
+const KEY = 'cf-' + META.tuesday + '-' + META.builtStamp;
+let S = {packs:{}, missing:{}, cheaper:{}, retails:{}, forget:{}};
+try { const saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved) S = Object.assign(S, saved); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const $ = s => document.querySelector(s);
+const money = v => '$' + Number(v).toFixed(2);
+const pct = v => Math.round(v*100) + '%';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const title = s => esc(String(s||'').trim().toLowerCase().replace(/\b\w/g, c => c.toUpperCase()));
+const usedOn = sheets => {
+  const u = [...new Map(sheets.map(s => [s[0], s])).values()];
+  return `<details class="used"><summary>Used on ${u.length} item${u.length>1?'s':''}</summary><ul>${u.map(s=>`<li><span class="num">${esc(s[0])}</span> ${esc(s[1])}</li>`).join('')}</ul></details>`;
+};
+function opt(group, key, val, label, small, quiet){
+  const on = S[group][key] && S[group][key].v === val;
+  return `<button type="button" class="opt${quiet?' quiet':''}" aria-pressed="${on}" data-g="${group}" data-k="${esc(key)}" data-v="${esc(val)}">${label}${small?`<small>${small}</small>`:''}</button>`;
+}
+
+function renderPacks(){
+  $('#packs').innerHTML = g.packs.map(p => {
+    const d = S.packs[p.item];
+    return `<div class="card${d?' decided':''}">
+      <div class="row1"><div class="item"><span class="no">${p.item}</span>${title(p.desc)}</div><span class="tag warn">Pack/size changed</span></div>
+      <div class="facts"><div><span>AFI this week</span><b class="num">${esc(p.afi.pack)} / ${esc(p.afi.size)}</b></div><div><span>Last week (corrected)</span><b class="num">${esc(p.last.pack)} / ${esc(p.last.size)}</b></div><div><span>Why it matters</span>Pack and size set the cost per unit on every recipe below</div></div>
+      <div class="opts">${opt('packs',p.item,'last',`Keep ${esc(p.last.pack)} / ${esc(p.last.size)}`,"Last week's corrected value")}${opt('packs',p.item,'afi',`Use ${esc(p.afi.pack)} / ${esc(p.afi.size)}`,"AFI's value")}</div>
+      <div class="write"><label for="pk-${p.item}">Or type pack / size</label><input id="pk-${p.item}" data-wg="packs" data-wk="${p.item}" placeholder="113 / CT"></div>
+      <label class="remember"><input type="checkbox" id="rem-${p.item}" data-rem="${p.item}" ${d&&d.rem?'checked':''}> Remember this answer while AFI sends ${esc(p.afi.pack)} / ${esc(p.afi.size)}</label>
+      ${usedOn(p.sheets)}</div>`;
+  }).join('') || '<p class="used">No pack or size changes this week.</p>';
+}
+
+function renderMissing(){
+  $('#missing').innerHTML = g.missing.map(m => {
+    const d = S.missing[m.item];
+    const last = m.lastSeen ? `${title(m.lastSeen.desc)} · <span class="num">${esc(m.lastSeen.pack)}/${esc(m.lastSeen.size)}</span> · <span class="num">${money(m.lastSeen.cost)}</span>` : 'Not in the history we have';
+    const sug = m.suggest.slice(0,4).map(s => opt('missing', m.item, s.item, `<span class="num">${esc(s.item)}</span> ${title(s.desc)}`, `${FEED[s.feed]||s.feed} · ${esc(s.pack)}/${esc(s.size)} · ${money(s.cost)}${s.why&&s.why.includes('line')?' · same product line':''}`)).join('');
+    const none = m.suggest.length ? '' : `<p class="used">Nothing close in any AFI feed. Type the new item number if you know it.</p>`;
+    return `<div class="card${d?' decided':''}">
+      <div class="row1"><div class="item"><span class="no">${m.item}</span>${esc(m.name)}</div><span class="tag bad">Not in AFI</span></div>
+      <div class="facts"><div><span>Last seen in AFI</span>${last}</div></div>
+      ${none}
+      <div class="opts">${sug}</div>
+      <div class="opts">${opt('missing',m.item,'skipweek','Skip this week','Asked again next week',true)}${opt('missing',m.item,'skipuntil','Skip until it\'s back in AFI','Not asked again; picked up the week it returns',true)}</div>
+      <div class="write"><label for="mi-${m.item}">Or type a new item #</label><input id="mi-${m.item}" data-wg="missing" data-wk="${m.item}" placeholder="17904"></div>
+      ${usedOn(m.sheets)}</div>`;
+  }).join('');
+}
+
+function renderCheaper(){
+  const byItem = {};
+  g.cheaper.forEach(c => (byItem[c.item] = byItem[c.item] || []).push(c));
+  $('#cheaper').innerHTML = Object.values(byItem).map(list => {
+    const c0 = list[0], d = S.cheaper[c0.item];
+    const alts = list.map(c => `<div class="cmp">
+        <div class="side"><b>${title(c0.desc)}</b><span class="num">${c0.item} · ${esc(c0.pack)}/${esc(c0.size)} · ${money(c0.cost)}</span></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="side"><b>${title(c.altDesc)}</b><span class="num">${c.alt} · ${esc(c.altPack)}/${esc(c.altSize)} · ${money(c.altCost)}</span></div>
+      </div>
+      <div class="row1"><span><span class="save">${pct(c.saving)} cheaper</span> <span class="used">${esc(c.basis)}</span></span>${c.rescale?'<span class="note">Different size: yield rescaled, test cut flagged</span>':''}</div>
+      <div class="opts">${opt('cheaper',c0.item,'use:'+c.alt,`Switch to ${c.alt}`)}${opt('cheaper',c0.item,'notsub:'+c.alt,'Not a substitute','Never suggest again',true)}</div>`).join('<hr style="border:0;border-top:1px solid var(--line);margin:4px 0">');
+    return `<div class="card${d?' decided':''}">
+      ${alts}
+      <div class="opts">${opt('cheaper',c0.item,'keep',`Keep ${c0.item} this week`)}</div>
+      ${usedOn(c0.sheets)}</div>`;
+  }).join('');
+}
+
+const FEED = {AFITMPRD:'Produce',AFITMMET:'Meat',AFITMGRC:'Grocery',AFITMMIL:'Dairy',AFITMFRZ:'Frozen',AFITMFDS:'Foodservice',AFITMDEL:'Deli',AFITMDSP:'Deli supplies',AFITMSUP:'Store supplies',AFITMBSP:'Bakery supplies',AFITMBAK:'Bakery',AFITMEGG:'Eggs'};
+const BAND = {cutfruit:[.45,.60], mealtime:[.40,.50]};
+const near9 = x => { // nearest retail ending in 9 cents
+  const c = Math.round(x*100); let r = Math.floor(c/10)*10 + 9; if (r - c > 5) r -= 10; return Math.max(r,9)/100; };
+let RET = [];
+function buildRetails(){
+  ['cutfruit','mealtime'].forEach(k => {
+    const [lo,hi] = BAND[k];
+    M[k].filter(i => !i.err && (i.margin < lo || i.margin > hi)).forEach(i => {
+      // prices ending in 9: up to 4 spread across the band, plus up to 2 under it (down to 10 points below the floor)
+      const nines = (fromM, toM) => { const a = Math.ceil(i.cost/(1-fromM)*100), b = Math.floor(i.cost/(1-toM)*100), o = [];
+        for (let c = Math.floor(a/10)*10 + 9; c <= b; c += 10) if (c >= a) o.push(c/100); return o; };
+      const spread = (arr, n) => arr.length <= n ? arr : Array.from({length:n}, (_, j) => arr[Math.round(j*(arr.length-1)/(n-1))]);
+      let inb = nines(lo, hi); if (!inb.length) inb = [Math.ceil((Math.ceil(i.cost/(1-lo)*100)-9)/10)*10/100 + .09];
+      const under = nines(lo - .10, lo - .0001).filter(p => !inb.includes(p));
+      const near = (arr, m) => arr.length ? arr.reduce((b, p) => Math.abs((p-i.cost)/p - m) < Math.abs((b-i.cost)/b - m) ? p : b) : null;
+      const pick = [near(under, lo - .08), near(under, lo - .03), ...spread(inb, 4)].filter(p => p !== null);
+      const pts = [...new Set(pick)].filter(p => Math.abs(p - i.retail) > .004).map(p => ({p, m:(p-i.cost)/p, under:(p-i.cost)/p < lo - 1e-9}));
+      RET.push({...i, kind:k, low:i.margin < lo, pts});
+    });
+  });
+  RET.sort((a,b) => (a.kind>b.kind?1:-1) || (b.low-a.low) || (a.margin-b.margin));
+}
+function retailCell(r){
+  const d = S.retails[r.plu];
+  const typed = d && d.v === 'custom' ? d.x : '';
+  const tm = typed && !isNaN(parseFloat(typed)) ? (parseFloat(typed)-r.cost)/parseFloat(typed) : null;
+  const [lo,hi] = BAND[r.kind];
+  return `<div class="mini">${r.pts.map(x => opt('retails',r.plu,x.p.toFixed(2),money(x.p),x.under?`<span class="undr">${Math.floor(x.m*100)}% · under band</span>`:`${pct(x.m)}`)).join('')}${opt('retails',r.plu,'keep','Keep',money(r.retail),true)}
+    <span class="otherbox"><input aria-label="Other retail for ${esc(r.plu)}" data-wg="retails" data-wk="${esc(r.plu)}" placeholder="other" inputmode="decimal" value="${esc(typed)}" class="${typed?'set':''}"><small class="tm ${tm===null?'':(tm<lo||tm>hi?'off':'in')}" id="tm-${esc(r.plu)}">${tm===null?'':pct(tm)}</small></span></div>`;
+}
+function renderRetails(){
+  let html = '', last = '';
+  RET.forEach(r => {
+    const grp = (r.kind==='cutfruit'?'Cut fruit · band 45–60%':'Mealtime · band 40–50%') + ' · ' + (r.low?'below':'above');
+    if (grp !== last){ html += `<tr class="grp"><td colspan="6">${grp}</td></tr>`; last = grp; }
+    html += `<tr class="${S.retails[r.plu]?'set':''}"><td class="num">${esc(r.plu)}</td><td>${esc(r.desc)}</td><td class="r num">${money(r.cost)}</td><td class="r num">${money(r.retail)}</td>
+      <td class="r"><span class="tag ${r.low?'bad':'warn'} num">${pct(r.margin)}</span></td>
+      <td id="rc-${esc(r.plu)}">${retailCell(r)}</td></tr>`;
+  });
+  $('#retails').innerHTML = html;
+}
+
+function renderRemembered(){
+  const R = g.remembered || [];
+  const kinds = {pack:'Pack/size', skip:'Out of AFI', notsub:'Not a substitute'};
+  $('#remembered').innerHTML = R.length ? R.map(r => {
+    const k = r.kind + '|' + r.key, off = !!S.forget[k];
+    return `<div class="card${off?' decided':''}"><div class="row1"><div class="item"><span class="no">${esc(r.item)}</span>${title(r.desc)}</div><span class="tag ok">${kinds[r.kind]||r.kind}</span></div>
+      <div class="facts"><div><span>Answer</span>${esc(r.text)}</div><div><span>Decided</span>${esc(r.by||'')} ${esc(r.at||'')}</div></div>
+      <div class="opts"><button type="button" class="opt quiet" aria-pressed="${off}" data-forget="${esc(k)}">${off?'Will be asked again':'Stop remembering'}</button></div></div>`;
+  }).join('') : '<p class="used">Nothing remembered yet.</p>';
+  $('#t-remembered').textContent = R.length + ' remembered';
+}
+function counts(){
+  const groups = {packs:g.packs.map(p=>p.item), missing:g.missing.map(m=>m.item), cheaper:[...new Set(g.cheaper.map(c=>c.item))], retails:RET.map(r=>r.plu)};
+  let open = 0;
+  const names = {packs:'Pack & size', missing:'Gone from AFI', cheaper:'Cheaper options', retails:'Retails'};
+  $('#score').innerHTML = Object.entries(groups).map(([k,ids]) => {
+    const done = ids.filter(id => S[k][id]).length; open += ids.length - done;
+    $('#t-'+k).textContent = `${done} of ${ids.length} decided`;
+    return `<a href="#g-${k}" class="${done===ids.length?'done':''}">${names[k]} <b>${done}/${ids.length}</b></a>`;
+  }).join('');
+  $('#left').textContent = open ? `${open} still to decide` : 'Everything decided';
+  $('#send').disabled = open > 0;
+  return open;
+}
+function text(){
+  const who = $('#who').value.trim() || '(name)';
+  const L = [`W|${META.tuesday}|${who}|${new Date().toLocaleString()}|${META.builtStamp}`];
+  for (const [k,v] of Object.entries(S.packs)) L.push(`P|${k}|${v.v}${v.v==='custom'?'|'+v.x:''}${v.rem?'|remember':''}`);
+  for (const [k,v] of Object.entries(S.missing)) L.push(`M|${k}|${v.v==='custom'?'item|'+v.x:v.v.startsWith('skip')?v.v:'item|'+v.v}`);
+  for (const [k,v] of Object.entries(S.cheaper)) L.push(`S|${k}|${v.v.replace(':','|')}`);
+  for (const k of Object.keys(S.forget)) L.push(`F|${k}`);
+  for (const [k,v] of Object.entries(S.retails)){ const r = RET.find(x=>x.plu===k); L.push(`R|${k}|${v.v==='keep'?r.retail.toFixed(2):v.v==='custom'?Number(v.x).toFixed(2):v.v}`); }
+  return L.join('\n');
+}
+function refresh(){ save(); renderPacks(); renderMissing(); renderCheaper(); renderRetails(); renderRemembered(); counts(); const any = Object.values(S).some(o=>Object.keys(o).length); $('#g-email').hidden = !any; $('#out').textContent = text(); }
+
+document.addEventListener('click', e => {
+  const fb = e.target.closest('[data-forget]');
+  if (fb){ const k = fb.dataset.forget; if (S.forget[k]) delete S.forget[k]; else S.forget[k] = 1; refresh(); return; }
+  const b = e.target.closest('.opt'); if (!b || !b.dataset.g) return;
+  const gname = b.dataset.g, k = b.dataset.k, v = b.dataset.v;
+  if (S[gname][k] && S[gname][k].v === v) delete S[gname][k];
+  else S[gname][k] = {v, rem: gname==='packs' && S.packs[k] ? S.packs[k].rem : false};
+  refresh();
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.rem){ if (S.packs[t.dataset.rem]) S.packs[t.dataset.rem].rem = t.checked; refresh(); }
+  else if (t.dataset.wg && t.dataset.wg !== 'retails' && t.value.trim()){ S[t.dataset.wg][t.dataset.wk] = {v:'custom', x:t.value.trim()}; refresh(); }
+});
+// Retail "other": take it as you type, show the margin live, keep focus (no re-render of the input).
+document.addEventListener('input', e => {
+  const t = e.target; if (t.dataset.wg !== 'retails') return;
+  const k = t.dataset.wk, r = RET.find(x => x.plu === k), v = parseFloat(t.value.replace('$',''));
+  const tm = document.getElementById('tm-'+k), [lo,hi] = BAND[r.kind];
+  if (!isNaN(v) && v > 0){
+    S.retails[k] = {v:'custom', x:v.toFixed(2)};
+    const m = (v - r.cost)/v; tm.textContent = pct(m); tm.className = 'tm ' + (m<lo||m>hi?'off':'in');
+    t.classList.add('set');
+  } else { if (S.retails[k] && S.retails[k].v==='custom') delete S.retails[k]; tm.textContent=''; t.classList.remove('set'); }
+  t.closest('td').querySelectorAll('.opt').forEach(b => b.setAttribute('aria-pressed','false'));
+  t.closest('tr').classList.toggle('set', !!S.retails[k]);
+  save(); counts(); const any = Object.values(S).some(o=>Object.keys(o).length); $('#g-email').hidden = !any; $('#out').textContent = text();
+});
+$('#keepHigh').addEventListener('click', () => { RET.filter(r=>!r.low).forEach(r => S.retails[r.plu] = {v:'keep'}); refresh(); });
+try { $('#who').value = localStorage.getItem('cf-who') || ''; } catch(e) {}
+$('#who').addEventListener('input', () => { try { localStorage.setItem('cf-who', $('#who').value); } catch(e) {} $('#out').textContent = text(); });
+$('#copy').addEventListener('click', () => {
+  $('#g-email').hidden = false; const t = text(); $('#out').textContent = t;
+  navigator.clipboard?.writeText(t).then(()=>{ $('#copy').textContent='Copied'; }).catch(()=>{ const r=document.createRange(); r.selectNodeContents($('#out')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); });
+});
+$('#send').addEventListener('click', () => {
+  if (!$('#who').value.trim()){ $('#who').focus(); $('#who').placeholder = 'Name first'; return; }
+  const t = text(); $('#g-email').hidden = false; $('#out').textContent = t;
+  if (META.demo){ $('#send').textContent = 'Test build: not sent'; return; }
+  location.href = 'mailto:' + META.email + '?subject=' + encodeURIComponent(META.subject) + '&body=' + encodeURIComponent(t);
+  $('#send').textContent = 'Email opened. Press Send in your mail app';
+  try { localStorage.setItem(KEY + '-sent', new Date().toLocaleString()); } catch(e) {}
+});
+$('#m-week').textContent = META.week; $('#m-scales').textContent = 'Scales load ' + META.scales;
+$('#m-afi').textContent = META.afiDate ? 'AFI files dated ' + META.afiDate : ''; $('#m-built').textContent = 'Page built ' + META.built;
+$('#demo').hidden = !META.demo;
+buildRetails(); refresh();
+</script>

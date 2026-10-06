@@ -3,7 +3,7 @@
 
 Runs on GitHub's servers (see .github/workflows/refresh.yml), triggered by
 Matthew's Apps Script when a new data file lands in "Order Page Data".
-For each program (dc, fpb, pom, vc, bep, ds, go, fl, ol, mum) it fetches the latest data JSON
+For each program (dc, fpb, pom, vc, bep, ds, go, fl, ol, mum, fb, cf) it fetches the latest data JSON
 from the Apps Script endpoint and injects it into the matching template. If the
 fetch fails or there is no data yet, the existing page is left untouched.
 """
@@ -22,6 +22,7 @@ PAGES = [
     ("ol", "ol_template.html", "ol.html"),    # Our Lady of Guadalupe prebook (one-off, added 9/14/26)
     ("mum", "mum_template.html", "mum.html"),  # 10in Fall Mums, AFI seasonal buy (one-off, added 9/16/26)
     ("fb", "fb_template.html", "fb.html"),    # Fresh Bites new items, AFI first order wk of 10/03/26 (one-off, added 9/24/26)
+    ("cf", "cf_template.html", "cf.html"),    # Cut Fruit & Mealtime weekly pricing approvals (added 10/6/26)
 ]
 
 for param, tpl_name, out in PAGES:
