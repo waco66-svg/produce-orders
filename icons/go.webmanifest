@@ -1,0 +1,19 @@
+{
+  "name": "Grand Opening",
+  "short_name": "Grand Opening",
+  "start_url": "../go.html",
+  "scope": "../",
+  "display": "browser",
+  "icons": [
+    {
+      "src": "go-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "go-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

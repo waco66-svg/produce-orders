@@ -1,0 +1,19 @@
+{
+  "name": "Black Eyed Peas",
+  "short_name": "Black Eyed Peas",
+  "start_url": "../bep.html",
+  "scope": "../",
+  "display": "browser",
+  "icons": [
+    {
+      "src": "bep-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "bep-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

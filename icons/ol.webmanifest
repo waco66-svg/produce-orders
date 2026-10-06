@@ -1,0 +1,19 @@
+{
+  "name": "Guadalupe Orders",
+  "short_name": "Guadalupe Orders",
+  "start_url": "../ol.html",
+  "scope": "../",
+  "display": "browser",
+  "icons": [
+    {
+      "src": "ol-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "ol-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
