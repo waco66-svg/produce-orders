@@ -28,6 +28,9 @@ header .sub{font-size:13px;opacity:.94;margin-top:2px}
 .nm{font-size:15px;font-weight:600;line-height:1.25}
 .dt{font-size:12px;color:var(--mut);margin-top:3px}
 .dt .cst{color:var(--gd);font-weight:700}
+.deal{margin-top:5px;font-size:13px;color:var(--mut)}
+.deal .ret{display:inline-block;background:#e8f5e9;color:#1b5e20;font-weight:700;font-size:14px;padding:2px 9px;border-radius:999px}
+.deal .ret.na{background:#fff3e0;color:#8a4b00}
 .rows{display:flex;flex-wrap:wrap;gap:14px;margin-top:9px;align-items:flex-end}
 .fld{display:flex;flex-direction:column;gap:4px}
 .lbl{font-size:11px;font-weight:700;color:var(--mut);letter-spacing:.3px;text-transform:uppercase}
@@ -83,6 +86,8 @@ if(CFG.closed||!CFG.weeks||!CFG.weeks.length){
 
  function bump(i,d){var s=Q[cur][i];var v=s.init;v=(v===undefined?0:v)+d;if(v<0)v=0;s.init=v;dirty=true;render()}
 
+ function retail(it){if(it.retail==null||it.retail==='')return '<span class="ret na">Ad retail: see ad</span>';
+   var r=typeof it.retail==='number'?'$'+it.retail.toFixed(2):String(it.retail);return '<span class="ret">Ad retail '+r+'</span>'}
  function who(w){return (w.storeName||'Food King Odessa #37')+' · '+(w.afi||'AFI #134')+' · '+(w.supervisor||'Mike M')}
  function render(){tabs();
   var w=CFG.weeks[cur],p=document.getElementById('panel');
@@ -98,6 +103,7 @@ if(CFG.closed||!CFG.weeks||!CFG.weeks.length){
    h+='<div class="item"><div class="nm">'+it.desc+'</div>'+
       '<div class="dt">#'+it.order+' &middot; '+it.pack+(it.size?' '+it.size:'')+
       ' &middot; <span class="cst">$'+it.cost.toFixed(2)+'/cs</span></div>'+
+      '<div class="deal">'+retail(it)+(it.unit!=null?' &middot; unit cost $'+(+it.unit).toFixed(2):'')+'</div>'+
       '<div class="rows">'+
         '<div class="fld"><div class="lbl">Initial shipment</div>'+
         '<div class="qty"><button data-m="'+i+'">&minus;</button><div class="val '+cls+'">'+txt+
