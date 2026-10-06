@@ -37,6 +37,14 @@ a.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .chip{background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:2px 6px;font-weight:600}
 .age{color:var(--muted)}
 .age.old{color:var(--warn)}
+.chip.due{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.chip.off{background:transparent;border:1px solid var(--line);color:var(--muted)}
+section{display:flex;flex-direction:column;gap:10px}
+details.inactive>summary{cursor:pointer;color:var(--muted);font:600 13px/1.2 var(--body);padding:4px 0;list-style-position:inside}
+details.inactive .grid{margin-top:8px}
+details.inactive a.card{opacity:.6}
+details.inactive a.card:hover{opacity:1}
+.empty{color:var(--muted);font-size:13px}
 .file{font:12px ui-monospace,Consolas,monospace;color:var(--muted)}
 footer{color:var(--muted);font-size:12px}
 @media (prefers-reduced-motion:no-preference){a.card{transition:border-color .15s}}
@@ -49,20 +57,22 @@ footer{color:var(--muted);font-size:12px}
     <div class="sub">Lowe's Market produce. Bookmark this page; each card opens the current version.</div>
   </header>
   <div id="groups"></div>
-  <footer>Week and "updated" are read live from each page when this page opens.</footer>
+  <footer>Week, due date and status are read live from each page when this page opens. A page moves to "Not active" when it is closed or its due date has passed.</footer>
 </div>
 <script>
+// Each card: [file, title, description]. A card moves to "Not active" when its page says closed,
+// or its due date has passed and the page doesn't say it's still open.
 const PAGES = [
-  ['Weekly', [
+  ['DSD & Pricing', [
     ['vc.html',  'DSD Vendor Compare', 'Vendor and AFI pricing approvals'],
     ['cf.html',  'Cut Fruit & Mealtime', 'Weekly pricing approvals'],
+  ]],
+  ['Order Collection', [
     ['dc.html',  'Digital Coupon', 'Initial orders'],
     ['fpb.html', 'Fresh Picked Buys', 'Order entry'],
     ['ds.html',  '3 Day Sale', 'Order entry'],
     ['pom.html', 'Pick of the Month', 'Orders'],
     ['go.html',  'Grand Opening', 'Store order'],
-  ]],
-  ['Seasonal & one-offs', [
     ['fl.html',  'Floral Holidays', "Valentine's, Easter, Mother's Day, poinsettias"],
     ['ol.html',  'Our Lady of Guadalupe', 'Pre-book orders'],
     ['mum.html', '10in Fall Mums', 'AFI seasonal buy'],
@@ -74,25 +84,48 @@ const PAGES = [
   ]],
 ];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-document.getElementById('groups').innerHTML = PAGES.map(([g, list]) => `
-  <section><h2>${esc(g)}</h2><div class="grid">${list.map(([f, n, w]) => `
-    <a class="card" href="${f}"><span class="name">${esc(n)}</span><span class="what">${esc(w)}</span>
-      <span class="live" id="live-${f.replace('.html','')}"><span class="file">${f}</span></span></a>`).join('')}
-  </div></section>`).join('');
+const id = f => f.replace('.html','');
+document.getElementById('groups').innerHTML = PAGES.map(([g, list], gi) => `
+  <section><h2>${esc(g)}</h2>
+    <div class="grid" id="act-${gi}">${list.map(([f, n, w]) => `
+      <a class="card" href="${f}" id="card-${id(f)}"><span class="name">${esc(n)}</span><span class="what">${esc(w)}</span>
+        <span class="live" id="live-${id(f)}"><span class="file">${f}</span></span></a>`).join('')}</div>
+    <details class="inactive" id="inw-${gi}" hidden><summary>Not active (<span id="inn-${gi}">0</span>)</summary>
+      <div class="grid" id="ina-${gi}"></div></details>
+  </section>`).join('');
 const ago = d => { const h = (Date.now() - d) / 36e5; return h < 1 ? 'updated just now' : h < 48 ? `updated ${Math.round(h)} h ago` : `updated ${Math.round(h/24)} days ago`; };
+const field = (t, k) => { const m = t.match(new RegExp('"' + k + '":\\s*("(?:[^"\\\\]|\\\\.)*"|true|false)')); return m ? JSON.parse(m[1]) : undefined; };
+// "Fri 10/9" -> the date nearest today with that month/day
+const dueDate = s => { const m = String(s||'').match(/(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/); if (!m) return null;
+  const now = new Date(); const mk = y => new Date(y, m[1]-1, +m[2]);
+  if (m[3]) return mk(m[3].length === 2 ? 2000 + +m[3] : +m[3]);
+  return [now.getFullYear()-1, now.getFullYear(), now.getFullYear()+1].map(mk).sort((a,b) => Math.abs(a-now) - Math.abs(b-now))[0]; };
+const today = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+const moveInactive = (f) => { const gi = PAGES.findIndex(([, l]) => l.some(([x]) => x === f));
+  document.getElementById('ina-' + gi).appendChild(document.getElementById('card-' + id(f)));
+  const n = document.getElementById('ina-' + gi).children.length;
+  document.getElementById('inn-' + gi).textContent = n; document.getElementById('inw-' + gi).hidden = false;
+  if (!document.getElementById('act-' + gi).children.length) document.getElementById('act-' + gi).outerHTML = '<div class="empty">Nothing open right now.</div>'; };
 PAGES.flatMap(([, l]) => l).forEach(async ([f]) => {
-  const el = document.getElementById('live-' + f.replace('.html',''));
+  const el = document.getElementById('live-' + id(f));
   try {
     const r = await fetch(f + '?cb=' + Date.now(), {cache:'no-store'});
     if (!r.ok) return;
     const t = await r.text();
-    const wk = (t.match(/"week":\s*"((?:[^"\\]|\\.)*)"/) || [])[1];
+    const wk = field(t, 'week'), due = field(t, 'due'), closed = field(t, 'closed');
+    const dd = dueDate(due);
+    const inactive = closed === true || (closed !== false && dd && dd < today);
     const lm = r.headers.get('last-modified'); const d = lm ? new Date(lm) : null;
     let html = '';
-    if (wk && wk.replace(/\\./g,'').trim()) html += `<span class="chip">${esc(JSON.parse('"' + wk + '"'))}</span>`;
-    if (d && !isNaN(d)) html += `<span class="age${(Date.now()-d) > 9*864e5 ? ' old' : ''}" title="${esc(d.toLocaleString())}">${ago(d)}</span>`;
+    if (wk && String(wk).trim()) html += `<span class="chip">${esc(wk)}</span>`;
+    if (closed === true) html += `<span class="chip off">Closed</span>`;
+    else if (due) html += inactive ? `<span class="chip off">Was due ${esc(due)}</span>`
+      : (dd && dd < today) ? `<span class="chip due">Still open, was due ${esc(due)}</span>`
+      : `<span class="chip due">Due ${esc(due)}</span>`;
+    if (d && !isNaN(d)) html += `<span class="age${!inactive && (Date.now()-d) > 9*864e5 ? ' old' : ''}" title="${esc(d.toLocaleString())}">${ago(d)}</span>`;
     if (html) el.innerHTML = html;
-  } catch (e) { /* offline or blocked: keep the file name */ }
+    if (inactive) moveInactive(f);
+  } catch (e) { /* offline or blocked: keep the card where it is */ }
 });
 </script>
 </body>
