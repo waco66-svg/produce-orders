@@ -1,0 +1,19 @@
+{
+  "name": "3 Day Sales",
+  "short_name": "3 Day Sales",
+  "start_url": "../ds.html",
+  "scope": "../",
+  "display": "browser",
+  "icons": [
+    {
+      "src": "ds-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "ds-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
