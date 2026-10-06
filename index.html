@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Produce Order Pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column of grouped link cards, max 760px; each card shows the page's live week and last update. */
+:root{
+  --bg:#f5f7f3; --panel:#ffffff; --ink:#1d2a20; --muted:#5d6b60; --line:#d9e1d8;
+  --accent:#2f6b3a; --accent-soft:#e3efe2; --warn:#9a5b00;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#121814; --panel:#1a221c; --ink:#e4ece5; --muted:#9aa89d; --line:#2c3a2f;
+  --accent:#7cc48a; --accent-soft:#213528; --warn:#f0b357; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--body);padding-inline:16px;
+  padding-block:calc(18px + env(safe-area-inset-top,0px)) calc(32px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font:700 32px/1.05 var(--display);margin:0;letter-spacing:.01em}
+.sub{color:var(--muted);font-size:13px;margin-top:4px}
+h2{font:700 15px/1 var(--display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 8px;border-bottom:2px solid var(--ink);padding-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+a.card{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+a.card:hover{border-color:var(--accent)}
+a.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.name{font:700 19px/1.15 var(--display);letter-spacing:.01em}
+.what{font-size:13px;color:var(--muted)}
+.live{font-size:12px;display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:4px}
+.chip{background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:2px 6px;font-weight:600}
+.age{color:var(--muted)}
+.age.old{color:var(--warn)}
+.file{font:12px ui-monospace,Consolas,monospace;color:var(--muted)}
+footer{color:var(--muted);font-size:12px}
+@media (prefers-reduced-motion:no-preference){a.card{transition:border-color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Produce Order Pages</h1>
+    <div class="sub">Lowe's Market produce. Bookmark this page; each card opens the current version.</div>
+  </header>
+  <div id="groups"></div>
+  <footer>Week and "updated" are read live from each page when this page opens.</footer>
+</div>
+<script>
+const PAGES = [
+  ['Weekly', [
+    ['vc.html',  'DSD Vendor Compare', 'Vendor and AFI pricing approvals'],
+    ['cf.html',  'Cut Fruit & Mealtime', 'Weekly pricing approvals'],
+    ['dc.html',  'Digital Coupon', 'Initial orders'],
+    ['fpb.html', 'Fresh Picked Buys', 'Order entry'],
+    ['ds.html',  '3 Day Sale', 'Order entry'],
+    ['pom.html', 'Pick of the Month', 'Orders'],
+    ['go.html',  'Grand Opening', 'Store order'],
+  ]],
+  ['Seasonal & one-offs', [
+    ['fl.html',  'Floral Holidays', "Valentine's, Easter, Mother's Day, poinsettias"],
+    ['ol.html',  'Our Lady of Guadalupe', 'Pre-book orders'],
+    ['mum.html', '10in Fall Mums', 'AFI seasonal buy'],
+    ['fb.html',  'Fresh Bites', 'New items'],
+    ['bep.html', 'Black Eyed Peas', 'Pre-book orders'],
+  ]],
+  ['Tools', [
+    ['trip.html', 'Store Trip Calculator', 'Mileage between stores'],
+  ]],
+];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.getElementById('groups').innerHTML = PAGES.map(([g, list]) => `
+  <section><h2>${esc(g)}</h2><div class="grid">${list.map(([f, n, w]) => `
+    <a class="card" href="${f}"><span class="name">${esc(n)}</span><span class="what">${esc(w)}</span>
+      <span class="live" id="live-${f.replace('.html','')}"><span class="file">${f}</span></span></a>`).join('')}
+  </div></section>`).join('');
+const ago = d => { const h = (Date.now() - d) / 36e5; return h < 1 ? 'updated just now' : h < 48 ? `updated ${Math.round(h)} h ago` : `updated ${Math.round(h/24)} days ago`; };
+PAGES.flatMap(([, l]) => l).forEach(async ([f]) => {
+  const el = document.getElementById('live-' + f.replace('.html',''));
+  try {
+    const r = await fetch(f + '?cb=' + Date.now(), {cache:'no-store'});
+    if (!r.ok) return;
+    const t = await r.text();
+    const wk = (t.match(/"week":\s*"((?:[^"\\]|\\.)*)"/) || [])[1];
+    const lm = r.headers.get('last-modified'); const d = lm ? new Date(lm) : null;
+    let html = '';
+    if (wk && wk.replace(/\\./g,'').trim()) html += `<span class="chip">${esc(JSON.parse('"' + wk + '"'))}</span>`;
+    if (d && !isNaN(d)) html += `<span class="age${(Date.now()-d) > 9*864e5 ? ' old' : ''}" title="${esc(d.toLocaleString())}">${ago(d)}</span>`;
+    if (html) el.innerHTML = html;
+  } catch (e) { /* offline or blocked: keep the file name */ }
+});
+</script>
+</body>
+</html>
