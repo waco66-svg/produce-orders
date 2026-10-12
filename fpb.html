@@ -94,6 +94,11 @@
   .note { font-size:12px; color:var(--sub); text-align:center; margin:14px 8px; line-height:1.5; }
   .demo { background:var(--amber); color:#fff; text-align:center; font-size:12px;
           font-weight:600; padding:5px; }
+  /* "also arriving on another order" -- information only (Matthew, 10/9/26) */
+  .alsobar { display:none; background:#fdf3e1; border:1px solid #f0d29a; border-radius:10px;
+             padding:10px 12px; font-size:13px; line-height:1.45; margin-bottom:10px; color:#5c3d06; }
+  .also-h { display:block; color:var(--amber); font-weight:600; margin-top:3px; }
+  .irow .l .also { font-size:11.5px; color:var(--amber); font-weight:600; margin-top:2px; }
 </style>
 </head>
 <body>
@@ -119,6 +124,7 @@
     ✓ Your saved progress was restored.
     <a href="#" id="freshlink" style="color:var(--accent); font-weight:600;">Start fresh instead</a>
   </div>
+  <div class="alsobar" id="alsobar"></div>
   <details class="itemsref">
     <summary>This week's items &amp; pricing</summary>
     <div id="itemlist"></div>
@@ -209,8 +215,12 @@ function pick(name, saved) {
   document.getElementById('review').style.display = 'none';
   var box = document.getElementById('stores');
   box.textContent = '';
+  var ALSO = (CFG.also && CFG.also.s) || {}, NOTES = (CFG.also && CFG.also.n) || [], alsoStores = 0;
   CFG.supervisors[name].forEach(function (st) {
     QTY[st.store] = {};
+    var also = ALSO[st.store] || null;
+    var alsoItems = also ? Object.keys(also).length : 0;
+    if (alsoItems) alsoStores++;
     var baked = (CFG.ordered && CFG.ordered[st.store]) || null;
     var local = (saved && saved.qty[st.store] && Object.keys(saved.qty[st.store]).length)
                 ? saved.qty[st.store] : null;
@@ -222,6 +232,8 @@ function pick(name, saved) {
     head.innerHTML = '<div><div class="nm">Store ' + st.store + '</div>' +
       '<div class="ct">' + esc(st.city) + ', ' + esc(st.state) + ' · ' + esc(st.banner) +
       (baked ? ' &nbsp;<b style="color:var(--accent)">✓ ordered ' + bakedTotal + ' cs</b>' : '') +
+      (alsoItems ? '<span class="also-h">⚑ ' + alsoItems + (alsoItems === 1 ? ' item' : ' items') +
+                   ' also coming on another order</span>' : '') +
       '</div></div>';
     var badge = document.createElement('div'); badge.className = 'badge zero'; badge.textContent = '0';
     head.appendChild(badge);
@@ -245,7 +257,12 @@ function pick(name, saved) {
       l.innerHTML = '<div class="n">' + esc(it.desc) + '</div><div class="d">' +
         it.pack + ' ' + esc(String(it.size)) + ' · $' + it.cost.toFixed(2) + '/cs</div>' +
         '<div class="d">$' + unit.toFixed(2) + ' unit cost · retail <b>' +
-        fmtRetail(retail) + '</b></div>';
+        fmtRetail(retail) + '</b></div>' +
+        ((also && also[idx]) ? also[idx].map(function (a) {
+          var nt = NOTES[a[0]] || {};
+          return '<div class="also">⚑ Also arriving ' + esc(nt.day || '') + ': ' + a[1] + ' ' +
+                 esc(nt.unit || 'cs') + ' on the ' + esc(nt.src || 'another order') + '</div>';
+        }).join('') : '');
       var stp = document.createElement('div'); stp.className = 'step';
       var minus = document.createElement('button'); minus.className = 'minus'; minus.textContent = '−';
       var inp = document.createElement('input'); inp.type = 'number'; inp.value = '';
@@ -290,6 +307,14 @@ function pick(name, saved) {
     card.appendChild(rows);
     box.appendChild(card);
   });
+  var bar = document.getElementById('alsobar');
+  if (alsoStores) {
+    bar.innerHTML = '<b>FYI:</b> ' + (alsoStores === 1 ? '1 of your stores already has'
+      : alsoStores + ' of your stores already have') + ' some of these ' +
+      'items coming on another order. Look for the <b style="color:var(--amber)">⚑</b> lines. ' +
+      'Order what each store needs.';
+    bar.style.display = 'block';
+  } else { bar.style.display = 'none'; }
   totals();
   saveProgress();
   document.getElementById('restored').style.display = saved ? 'block' : 'none';
