@@ -98,6 +98,12 @@ h2 { font-size:20px; margin:8px 0 14px; text-wrap:balance; }
   border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; }
 .addname { width:100%; height:40px; border:1.5px solid var(--line); border-radius:8px; background:var(--field);
   color:var(--ink); padding:0 10px; font-size:14px; font-weight:600; }
+.wihead { display:grid; grid-template-columns:7.5em minmax(0,1fr); gap:8px; }
+.wihead input { height:40px; border:1.5px solid var(--line); border-radius:8px; background:var(--field); color:var(--ink);
+  padding:0 10px; font-size:14px; font-weight:600; min-width:0; width:100%; }
+.wihead input.bad { border-color:var(--amber); background:var(--amber-soft); }
+.wilbl { font-size:11px; color:var(--sub); font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin-bottom:6px; }
+.wierr { font-size:12px; color:var(--amber); font-weight:700; margin-top:6px; }
 .rm { background:none; border:none; color:var(--sub); font-size:12px; cursor:pointer; padding:0; }
 footer { position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:1px solid var(--line); z-index:10;
   padding:10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
@@ -169,7 +175,7 @@ var $ = function (id) { return document.getElementById(id); };
 if (CFG.preview) $('demo').hidden = false;
 $('addr').textContent = CFG.email;
 
-// State: S.towns[town].items[plu] = {p:[v1,v2], ad:[b,b], nc:[b,b], tag:v, note:s}; S.towns[town].added = [{name, p, ad, nc, tag, note}]
+// State: S.towns[town].items[plu] = {p:[v1,v2], ad:[b,b], nc:[b,b], tag:v, note:s}; S.towns[town].added = [{plu, name, p, ad, nc, tag, note}] (write-ins; PLU required)
 var SUP = null, S = null;
 function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 // One saved draft per shop week (Wednesday to Tuesday)
@@ -183,6 +189,20 @@ function load() { try { var d = JSON.parse(localStorage.getItem(KEY)); if (d && 
 function clearSaved() { try { localStorage.removeItem(KEY); } catch (e) {} }
 function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
 function townCfg(name) { for (var i = 0; i < CFG.towns.length; i++) if (CFG.towns[i].town === name) return CFG.towns[i]; }
+var KNOWN = {};   // every PLU on any town's list -> description, so a write-in PLU fills its name
+CFG.towns.forEach(function (tc) { tc.items.forEach(function (it) { if (!KNOWN[it[0]]) KNOWN[it[0]] = it[1]; }); });
+function wiHasData(a) { return !!(num(a.p[0]) || num(a.p[1]) || a.nc[0] || a.nc[1] || num(a.tag)); }
+function writeInError(t, a) {
+  if (!wiHasData(a) && !a.plu && !a.name) return '';
+  if (!a.plu) return 'PLU is required for a write-in item.';
+  if (a.plu.length < 4) return 'PLU must be at least 4 digits.';
+  var tc = townCfg(t);
+  if (tc.items.some(function (it) { return String(it[0]) === a.plu; })) return 'PLU ' + a.plu + ' is already on your list. Enter it on that row instead.';
+  if (S.towns[t].added.some(function (b) { return b !== a && b.plu === a.plu; })) return 'PLU ' + a.plu + ' is written in twice.';
+  if (!a.name) return 'Add a short description so we know what this is.';
+  if (!wiHasData(a)) return 'Enter at least one price (or N/C).';
+  return '';
+}
 function num(v) { if (v === '' || v == null) return null; var n = parseFloat(String(v).replace(/[$,\s]/g, '')); return isFinite(n) && n > 0 ? n : null; }
 function money(n) { return n == null ? '' : n.toFixed(2); }
 
@@ -300,29 +320,50 @@ function buildTown(tc, open) {
     body.appendChild(row);
     chk();
   });
-  // Added items
+  // Write-in items: anything not on the list. PLU is required (Matthew, 10/14/26).
   var addWrap = document.createElement('div'); body.appendChild(addWrap);
   function drawAdded() {
     addWrap.textContent = '';
     S.towns[t].added.forEach(function (a, ai) {
+      if (a.plu == null) a.plu = '';
       var row = document.createElement('div'); row.className = 'item';
-      var top = document.createElement('div'); top.className = 'nm';
-      var nm = document.createElement('input'); nm.className = 'addname'; nm.placeholder = 'Item (e.g. Pomegranates each)'; nm.value = a.name;
-      nm.oninput = function () { a.name = nm.value; save(); };
-      top.appendChild(nm); row.appendChild(top);
+      var lbl = document.createElement('div'); lbl.className = 'wilbl'; lbl.textContent = 'Write-in item';
+      row.appendChild(lbl);
+      var top = document.createElement('div'); top.className = 'wihead';
+      var pl = document.createElement('input'); pl.inputMode = 'numeric'; pl.placeholder = 'PLU *'; pl.value = a.plu;
+      pl.setAttribute('aria-label', 'PLU (required)'); pl.autocomplete = 'off';
+      var nm = document.createElement('input'); nm.placeholder = 'Item (e.g. Pomegranates each)'; nm.value = a.name;
+      nm.setAttribute('aria-label', 'Item description');
+      top.appendChild(pl); top.appendChild(nm); row.appendChild(top);
+      var err = document.createElement('div'); err.className = 'wierr'; err.hidden = true;
+      function check() {
+        var e = writeInError(t, a);
+        err.hidden = !e; err.textContent = e || '';
+        pl.classList.toggle('bad', !!e && /PLU/.test(e));
+      }
+      pl.oninput = function () {
+        a.plu = pl.value.replace(/\D/g, ''); if (pl.value !== a.plu) pl.value = a.plu;
+        // fill the name from a known PLU; a name we filled follows the PLU, a typed name is never overwritten
+        var known = KNOWN[a.plu];
+        if (!a.name || a.name === a.auto) { a.name = known || ''; a.auto = known || ''; nm.value = a.name; }
+        check(); save(); totals();
+      };
+      nm.oninput = function () { a.name = nm.value; a.auto = ''; check(); save(); };
       var g = document.createElement('div'); g.className = 'grid'; g.style.gridTemplateColumns = cols;
-      tc.comps.forEach(function (cname, k) { g.appendChild(priceCell(cname, function () { return a.p[k]; }, function (v) { a.p[k] = v; }, null, a, k, refresh)); });
-      g.appendChild(priceCell('Our tag', function () { return a.tag; }, function (v) { a.tag = v; }, null, a, null, refresh));
-      row.appendChild(g);
+      function chg() { check(); refresh(); }
+      tc.comps.forEach(function (cname, k) { g.appendChild(priceCell(cname, function () { return a.p[k]; }, function (v) { a.p[k] = v; }, null, a, k, chg)); });
+      g.appendChild(priceCell('Our tag', function () { return a.tag; }, function (v) { a.tag = v; }, null, a, null, chg));
+      row.appendChild(g); row.appendChild(err);
       var rm = document.createElement('button'); rm.className = 'rm'; rm.type = 'button'; rm.textContent = 'Remove this item';
       rm.onclick = function () { S.towns[t].added.splice(ai, 1); drawAdded(); refresh(); };
       row.appendChild(rm); addWrap.appendChild(row);
+      a._check = check; check();
     });
   }
   drawAdded();
   var ar = document.createElement('div'); ar.className = 'addrow';
-  var ab = document.createElement('button'); ab.className = 'addbtn'; ab.type = 'button'; ab.textContent = '+ Add an item not on the list';
-  ab.onclick = function () { S.towns[t].added.push({ name: '', p: ['', ''], ad: [false, false], nc: [false, false], tag: '', note: '' }); drawAdded(); save(); };
+  var ab = document.createElement('button'); ab.className = 'addbtn'; ab.type = 'button'; ab.textContent = '+ Write in an item (PLU required)';
+  ab.onclick = function () { S.towns[t].added.push({ plu: '', name: '', p: ['', ''], ad: [false, false], nc: [false, false], tag: '', note: '' }); drawAdded(); save(); };
   ar.appendChild(ab); body.appendChild(ar);
   card.appendChild(body);
   paintBadge();
@@ -334,7 +375,7 @@ function totals() {
   CFG.supervisors[SUP].forEach(function (t) {
     var tc = townCfg(t), n = tc.comps.length;
     tc.items.forEach(function (it) { total++; var x = S.towns[t].items[it[0]]; if (x) { if (itemDone(x, n)) done++; if (itemTouched(x)) any = true; } });
-    if (S.towns[t].added.some(function (a) { return a.name && (num(a.p[0]) || num(a.p[1])); })) any = true;
+    if (S.towns[t].added.some(function (a) { return wiHasData(a); })) any = true;
   });
   $('done').textContent = done; $('total').textContent = total;
   $('sendbtn').disabled = !any;
@@ -357,10 +398,10 @@ function outText() {
       body.push(it[0] + ' ' + it[1] + ': ' + parts.join(' | ') + (x.note ? ' | Note: ' + x.note : ''));
     });
     S.towns[t].added.forEach(function (a) {
-      if (!a.name) return;
+      if (writeInError(t, a) || !wiHasData(a)) return;
       var parts = tc.comps.map(function (c, k) { return c + ' ' + fmtSlot(a, k); });
       if (num(a.tag) != null) parts.push('Tag ' + money(num(a.tag)));
-      body.push('NEW ' + a.name + ': ' + parts.join(' | '));
+      body.push('NEW ' + a.plu + ' ' + a.name + ': ' + parts.join(' | '));
     });
     if (body.length) { lines.push('[' + t + '] ' + tc.comps.join(' | ')); lines = lines.concat(body); lines.push(''); }
   });
@@ -370,6 +411,16 @@ function outText() {
 
 $('shopdate').onchange = function () { S.date = this.value; save(); };
 $('sendbtn').onclick = function () {
+  var bad = null;
+  CFG.supervisors[SUP].forEach(function (t) {
+    S.towns[t].added.forEach(function (a) { if (a._check) a._check(); if (!bad && writeInError(t, a)) bad = t; });
+  });
+  if (bad) {
+    var cards = document.querySelectorAll('.town'); var names = CFG.supervisors[SUP];
+    var card = cards[names.indexOf(bad)]; card.classList.add('open');
+    var e = card.querySelector('.wierr:not([hidden])'); (e || card).scrollIntoView({ block: 'center' });
+    return;
+  }
   $('outtext').textContent = outText();
   $('entry').hidden = true; $('foot').hidden = true; $('review').hidden = false; window.scrollTo(0, 0);
 };
