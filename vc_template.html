@@ -173,6 +173,9 @@ button.remember.on { background:var(--good-soft); color:var(--good); border-colo
 .chip.kept { background:var(--good-soft); color:var(--good); }
 .chip.week { background:var(--line-2); color:var(--muted); }
 h3.sec { margin-top:14px; }
+
+/* 10/20/26: On page / Emailed times -- never split a time across lines */
+.facts .when { white-space:nowrap; }
 </style>
 </head><body>
 <div id="root"></div>
@@ -381,15 +384,18 @@ function freshFacts(r){
   var read = [];
   if (r.sourceSheet)  read.push('tab <b>' + esc(r.sourceSheet) + '</b>');
   if (r.formDate)     read.push('form dated ' + esc(r.formDate));
-  // 10/20/26 (Matthew): when this section went onto the page, and when the vendor's email arrived -- Central
-  if (r.onPage) read.push('on this page since <b>' + esc(r.onPage) + '</b>');
-  if (r.emailed) read.push('emailed ' + esc(r.emailed));
   if (!r.onPage && r.fileModified) read.push('file saved ' + esc(r.fileModified));
   var dated = [];
   if (r.afiDate)        dated.push('AFI file dated <b>' + esc(r.afiDate) + '</b>');
   if (r.greenEffective) dated.push('green sheet <b>' + esc(r.greenEffective) + '</b>');
   if (r.greenItems != null) dated.push(r.greenItems + ' items on the green sheet');
+  // 10/20/26 (Matthew): when this vendor's section went onto the page, and when their email arrived --
+  // Central, each on its own line, the time first so it reads at a glance ("8:39 AM  Tue 10/20").
+  var when = function(v){ var m = /^(\S+ \S+) (.+)$/.exec(v || '');
+    return '<span class="when">' + (m ? '<b>' + esc(m[2]) + '</b> <span class="muted">' + esc(m[1]) + '</span>' : esc(v)) + '</span>'; };
   return (read.length  ? '<div><dt>Read from</dt><dd>' + read.join(' \u00b7 ') + '</dd></div>' : '') +
+         (r.onPage  ? '<div><dt>On page</dt><dd>' + when(r.onPage) + '</dd></div>' : '') +
+         (r.emailed ? '<div><dt>Emailed</dt><dd>' + when(r.emailed) + '</dd></div>' : '') +
          (dated.length ? '<div><dt>Dated</dt><dd>' + dated.join(' \u00b7 ') + '</dd></div>' : '');
 }
 
