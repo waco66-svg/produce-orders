@@ -71,6 +71,12 @@
          border:1.5px solid var(--line); border-radius:9px; background:#fff; }
   .qty.set { border-color:var(--accent); background:#f2f9f5; font-weight:700; }
   .qty.zero { color:#8b9a92; font-weight:600; background:#eef2f0; }
+  .qty.ly { color:#c62828; border-color:#e8a3a3; background:#fff6f6; font-weight:700; }
+  .lyrow { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 14px;
+    background:#fff6f6; border-top:1px solid #f1d0d0; font-size:13px; color:#8a2c2c; }
+  .lybtn { border:1px solid #c62828; color:#c62828; background:#fff; border-radius:9px; padding:8px 11px;
+    font:inherit; font-weight:700; font-size:13px; white-space:nowrap; }
+  .lynote { font-size:11px; color:#c62828; font-weight:700; margin-top:2px; }
   .foot { position:fixed; left:0; right:0; bottom:0; background:var(--card);
           border-top:1px solid var(--line); padding:11px 12px calc(11px + env(safe-area-inset-bottom));
           display:flex; gap:10px; align-items:center; justify-content:center; }
@@ -128,6 +134,23 @@ function load(){ try{ var d=JSON.parse(localStorage.getItem(KEY));
 function clearSaved(){ try{ localStorage.removeItem(KEY); }catch(e){} }
 
 function seenCount(store){ return Object.keys(QTY[store]||{}).length; }
+/* LAST YEAR'S ORDER (optional CFG.prior = {store:{"sec:i":qty}}). Shown in red as a
+   suggestion; it only becomes part of the order when the supervisor keeps it
+   (Keep last year) or types a number. Untouched red values are never sent. */
+function priorOf(store,key){ var p=(CFG.prior||{})[store]; return p? p[key] : undefined; }
+function hasPrior(store){ var p=(CFG.prior||{})[store]; return !!(p && Object.keys(p).length); }
+function keepLY(si){
+  var st=(CFG.supervisors[SUP]||[])[si], p=(CFG.prior||{})[st.store]||{};
+  QTY[st.store]=QTY[st.store]||{};
+  allItems().forEach(function(x){ if(QTY[st.store][x.k]===undefined && p[x.k]!==undefined) QTY[st.store][x.k]=Number(p[x.k])||0; });
+  var inputs=document.querySelectorAll('#b'+si+' input.qty');
+  Array.prototype.forEach.call(inputs,function(el){ var v=QTY[st.store][el.getAttribute('data-k')];
+    if(v!==undefined){ el.value=v; el.className='qty'+(Number(v)?' set':' zero'); } });
+  var N=totalItems(), seen=Object.keys(QTY[st.store]).length, pr=document.getElementById('p'+si);
+  if(pr){ pr.textContent=seen+' of '+N; pr.className='prog'+(seen>=N?' done':''); }
+  var r=document.getElementById('ly'+si); if(r) r.style.display='none';
+  save();
+}
 
 /* ---------- order text ----------
    An explicit 0 is DATA (reviewed and passing); an untouched item is a real gap
@@ -234,22 +257,24 @@ function render(){
        esc(st.banner==='Lowes'?'Lowes':'Food King')+'</span></div>'+
        '<div class="c">'+esc(st.city)+', '+esc(st.state)+'</div></div>'+
        '<div class="prog'+(done?' done':'')+'" id="p'+si+'">'+seen+' of '+N+'</div></div>'+
-       '<div id="b'+si+'" style="display:none">';
+       '<div id="b'+si+'" style="display:none">'+
+       (hasPrior(st.store)&&seen<N?'<div class="lyrow" id="ly'+si+'"><span>Red numbers are last year\'s order. Keep them or type over any of them.</span>'+
+        '<button class="lybtn" onclick="keepLY('+si+')">Keep last year</button></div>':'');
     (CFG.sections||[]).forEach(function(sec,xi){
       h+='<details class="sec"><summary><span>'+esc(sec.label)+'</span>'+
          '<span style="color:var(--sub);font-weight:600">'+sec.items.length+'</span></summary>'+
          '<div class="passrow"><span>Not ordering any of these?</span>'+
          '<button class="passbtn" onclick="passAll('+si+','+xi+')">Pass on all '+sec.items.length+'</button></div>';
       sec.items.forEach(function(it,i){
-        var key=sec.key+':'+i, v=(QTY[st.store]||{})[key];
+        var key=sec.key+':'+i, v=(QTY[st.store]||{})[key], lyv=priorOf(st.store,key), ly=(v===undefined)?lyv:undefined;
         h+='<div class="irow'+(it.ad?' ad':'')+'">'+
            '<img class="th" loading="lazy" alt="" src="'+imgSrc(it)+'" data-n="'+esc(it.desc)+'" data-d="'+esc(it.pack)+' '+esc(it.size)+' &middot; case '+money(it.cost)+'" onclick="showImg(this)" onerror="this.remove()">'+
            '<div class="info">'+
            '<div class="nm">'+(it.ad?'<span class="adtag">AD</span>':'')+esc(it.desc)+'</div>'+
            '<div class="dt">'+esc(it.pack)+' '+esc(it.size)+' &middot; case '+money(it.cost)+
-           ' &middot; retail '+money(retailFor(st,it))+'</div></div>'+
-           '<input class="qty'+(v===undefined?'':(Number(v)?' set':' zero'))+'" type="number" min="0" '+
-           'inputmode="numeric" pattern="[0-9]*" value="'+(v===undefined?'':v)+'" '+
+           ' &middot; retail '+money(retailFor(st,it))+'</div>'+(lyv!==undefined?'<div class="lynote">Last year: '+esc(lyv)+'</div>':'')+'</div>'+
+           '<input class="qty'+(v===undefined?(ly!==undefined?' ly':''):(Number(v)?' set':' zero'))+'" type="number" min="0" '+
+           'inputmode="numeric" pattern="[0-9]*" value="'+(v===undefined?(ly!==undefined?ly:''):v)+'" '+
            'data-st="'+st.store+'" data-k="'+key+'" data-si="'+si+'" onchange="setQ(this)" oninput="setQ(this)"></div>';
       });
       h+='</details>';
@@ -358,7 +383,8 @@ function review(){
   var h='<h3>Submit your order</h3>';
   if(untouched.length) h+='<div class="warn"><b>'+untouched.length+' store'+(untouched.length>1?'s':'')+
       ' not looked at yet:</b> '+untouched.map(function(s){return s.store;}).join(', ')+
-      '. Blank means nobody reviewed it. Use <b>Pass on all</b> if there is genuinely no order.</div>';
+      (CFG.prior? '. Stores you do not review stay at last year\'s order. Use <b>Keep last year</b> to confirm one, or <b>Pass on all</b> if there is genuinely no order.</div>'
+               : '. Blank means nobody reviewed it. Use <b>Pass on all</b> if there is genuinely no order.</div>');
   h+='<p>Check it over, then tap Submit. It goes straight to Matthew &mdash; you do not need to send an email.</p>'+
      '<textarea class="ta" id="ordertext" readonly>'+esc(body)+'</textarea>'+
      '<div class="row2"><button class="primary" id="submitbtn" onclick="submitOrder()">Submit order</button>'+
