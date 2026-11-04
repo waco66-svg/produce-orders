@@ -148,6 +148,8 @@ function stores() { return CFG.supervisors[SUP] || []; }
 function seen(st) { return Object.keys(QTY[st] || {}).length; }
 function cases(st) { var t = 0, q = QTY[st] || {}; Object.keys(q).forEach(function (k) { t += q[k]; }); return t; }
 function vendorLines(v) { return CFG.lines.filter(function (l) { return l.v === v; }); }
+function dow(s) { var p = s.split('/'); return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(2000 + (+p[2]), +p[0] - 1, +p[1]).getDay()]; }
+var SHIPNOTE = '<div class="banner"><b>All dates are AFI SHIP dates, not delivery dates.</b> Product leaves AFI on that date and arrives on your store\'s next regular AFI delivery after it.</div>';
 function shipLabel(s) { var p = s.split('/'); var m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[0]-1]; return m + ' ' + (+p[1]); }
 
 function header(btn, fn) {
@@ -160,7 +162,7 @@ function header(btn, fn) {
 function showWho() {
   SUP = null; CUR = null; header(null);
   document.getElementById('foot').style.display = 'none';
-  var h = (CFG.note ? '<div class="banner">' + CFG.note + '</div>' : '') + '<h2>Who\'s ordering?</h2><div class="namegrid">';
+  var h = (CFG.note ? '<div class="banner">' + CFG.note + '</div>' : '') + SHIPNOTE + '<h2>Who\'s ordering?</h2><div class="namegrid">';
   Object.keys(CFG.supervisors).forEach(function (n) { h += '<button class="namebtn" data-n="' + esc(n) + '">' + esc(n) + '</button>'; });
   h += '</div><div class="note">Pick your name, then a store. Go vendor by vendor - each item shows a row for every ship week. ' +
        'Blank means you have not looked at it; put 0 (or tap <b>Pass on all</b>) when you looked and are passing. ' +
@@ -214,6 +216,7 @@ function showStore(i, keepVendor) {
   });
   h += '</div>';
   var v = VENDORS[VEN];
+  h += SHIPNOTE;
   if (v.note) h += '<div class="banner">' + v.note + '</div>';
   h += '<div class="tools"><button class="tool" id="passv">Pass on all ' + esc(v.name) + '</button>' +
        '<button class="tool" id="clearv">Clear ' + esc(v.name) + '</button>';
@@ -231,7 +234,7 @@ function showStore(i, keepVendor) {
          (it.contents ? '<div class="ct2">Display contains: ' + esc(it.contents) + '</div>' : '') + '</div>';
     it.lines.forEach(function (ln) {
       var val = q[ln.id];
-      h += '<div class="srow"><div class="w">Ships week of ' + shipLabel(ln.ship) + '<small>' + ln.ship + '</small></div>' +
+      h += '<div class="srow"><div class="w">AFI ships ' + shipLabel(ln.ship) + '<small>' + dow(ln.ship) + ' ' + ln.ship + ' - ship date, not delivery</small></div>' +
            '<div class="step"><button class="minus" data-id="' + ln.id + '">&minus;</button>' +
            '<input type="number" inputmode="numeric" min="0" placeholder="–" data-id="' + ln.id + '" value="' + (val === undefined ? '' : val) + '" class="' +
            (val === undefined ? 'blank' : (val ? 'set' : 'zero')) + '">' +
@@ -296,7 +299,7 @@ function orderText() {
     var c = cases(st.store); total += c;
     var order = CFG.lines.filter(function (l) { return q[l.id] > 0; });
     out.push('Store ' + st.store + ' (' + st.city + ') - ' + c + ' cases, ' + ids.length + ' of ' + NLINES + ' lines reviewed' + (order.length ? ':' : ' - NO ORDER'));
-    order.forEach(function (l) { out.push('  ' + q[l.id] + ' x ' + l.desc + ' [' + VENDORS[l.v].name + ', ship ' + l.ship + '] {' + l.id + '}'); });
+    order.forEach(function (l) { out.push('  ' + q[l.id] + ' x ' + l.desc + ' [' + VENDORS[l.v].name + ', AFI ship ' + l.ship + '] {' + l.id + '}'); });
   });
   out.push('', 'TOTAL CASES: ' + total);
   return out.join('\n');
