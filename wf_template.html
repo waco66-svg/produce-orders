@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Food Show">
+<title>Food Show Orders</title>
+<style>
+  :root { --accent:#1f5f8b; --accent-dark:#174a6c; --bg:#f1f4f7; --card:#fff; --ink:#18232d;
+          --sub:#5d6b78; --line:#d9e1e8; --amber:#b45309; --ok:#1a6b3c; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--accent); color:#fff; padding:12px 14px; position:sticky; top:0; z-index:20;
+           display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  header .t { font-size:16.5px; font-weight:700; }
+  header .s { font-size:12px; opacity:.9; margin-top:2px; }
+  .chip { background:#fff; color:var(--accent); border:none; border-radius:8px; font-size:13px; font-weight:600;
+          padding:7px 10px; cursor:pointer; font-family:inherit; white-space:nowrap; }
+  .wrap { max-width:560px; margin:0 auto; padding:12px 12px 130px; }
+  h2 { font-size:19px; margin:8px 0 14px; }
+  .namegrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .namebtn { padding:17px 8px; font-size:17px; font-weight:600; background:var(--card); border:1.5px solid var(--line);
+             border-radius:12px; cursor:pointer; font-family:inherit; color:var(--ink); }
+  .note { font-size:12.5px; color:var(--sub); text-align:center; margin:14px 6px; line-height:1.5; }
+  .banner { background:#fff8e1; border-left:4px solid #e6b800; border-radius:8px; padding:10px 12px; margin-bottom:12px;
+            font-size:13px; line-height:1.45; }
+  .scard { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:13px 14px; margin-bottom:9px;
+           display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+  .scard .nm { font-size:16px; font-weight:700; }
+  .scard .ct { font-size:12px; color:var(--sub); margin-top:2px; }
+  .prog { font-size:12px; font-weight:700; border-radius:20px; padding:4px 10px; background:#d5dde4; color:#43515e; white-space:nowrap; }
+  .prog.part { background:#f3c77a; color:#5a3a00; }
+  .prog.done { background:var(--ok); color:#fff; }
+  .shead { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:4px 0 8px; }
+  .shead .nm { font-size:18px; font-weight:800; }
+  .shead .ct { font-size:12.5px; color:var(--sub); }
+  .navbtn { background:#fff; border:1.5px solid var(--line); border-radius:9px; padding:8px 11px; font-size:14px;
+            font-weight:700; color:var(--accent); font-family:inherit; }
+  .vtabs { position:sticky; top:56px; z-index:15; background:var(--bg); display:flex; gap:6px; overflow-x:auto;
+           padding:8px 0; margin-bottom:6px; scrollbar-width:none; }
+  .vtabs::-webkit-scrollbar { display:none; }
+  .vtab { flex:0 0 auto; border:1.5px solid var(--line); background:#fff; border-radius:20px; padding:7px 12px; font-size:13px;
+          font-weight:600; color:var(--ink); font-family:inherit; }
+  .vtab.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .vtab .c { font-weight:800; margin-left:4px; }
+  .vtab.done:not(.on) { border-color:var(--ok); color:var(--ok); }
+  .tools { display:flex; gap:8px; flex-wrap:wrap; margin:2px 0 10px; }
+  .tool { font-size:12.5px; font-weight:600; padding:8px 11px; border:1.5px solid var(--line); background:#fff;
+          border-radius:9px; color:#3d4b57; font-family:inherit; }
+  select.tool { padding:7px 8px; }
+  .item { background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:9px; overflow:hidden; }
+  .item .top { padding:11px 13px 6px; }
+  .item .n { font-size:14.5px; font-weight:700; line-height:1.25; }
+  .item .d { font-size:12px; color:var(--sub); margin-top:2px; }
+  .item .d b { color:var(--ink); }
+  .item .ct2 { font-size:11.5px; color:#6d5a2a; background:#fff8e1; border-radius:6px; padding:5px 7px; margin-top:5px; }
+  .srow { display:flex; align-items:center; justify-content:space-between; padding:7px 13px; border-top:1px solid #edf1f4; }
+  .srow .w { font-size:13px; font-weight:600; color:#3d4b57; }
+  .srow .w small { display:block; font-weight:400; color:var(--sub); font-size:11px; }
+  .step { display:flex; align-items:center; }
+  .step button { width:44px; height:42px; font-size:23px; font-weight:600; border:1.5px solid var(--line); background:#fff;
+                 font-family:inherit; color:var(--accent); }
+  .step .minus { border-radius:10px 0 0 10px; } .step .plus { border-radius:0 10px 10px 0; }
+  .step input { width:50px; height:42px; border:1.5px solid var(--line); border-left:none; border-right:none; text-align:center;
+                font-size:17px; font-weight:700; font-family:inherit; color:var(--ink); -moz-appearance:textfield; border-radius:0; }
+  .step input::-webkit-outer-spin-button, .step input::-webkit-inner-spin-button { -webkit-appearance:none; }
+  .step input.blank { color:#9aa6b0; } .step input.zero { background:#eef1f3; color:#8b98a3; }
+  .step input.set { background:#e5f1fa; color:var(--accent-dark); }
+  footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line);
+           padding:10px 14px calc(10px + env(safe-area-inset-bottom)); display:none; align-items:center;
+           justify-content:space-between; gap:10px; z-index:20; }
+  footer .tot { font-size:13.5px; } footer .tot b { font-size:17px; }
+  .primary { background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:15.5px; font-weight:700;
+             padding:13px 18px; font-family:inherit; }
+  .primary:disabled { background:#c3ccd4; }
+  .ghost { background:#fff; color:var(--accent); border:1.5px solid var(--accent); border-radius:12px; font-size:15px;
+           font-weight:700; padding:12px 16px; font-family:inherit; }
+  .modal { display:none; position:fixed; inset:0; background:rgba(10,20,30,.45); z-index:50; overflow:auto; }
+  .modal.on { display:block; }
+  .sheet { background:#fff; max-width:560px; margin:40px auto; border-radius:14px; padding:16px; }
+  .sheet h3 { margin:2px 0 10px; }
+  .ta { width:100%; height:260px; font-size:12px; font-family:ui-monospace,Menlo,monospace; border:1px solid var(--line);
+        border-radius:8px; padding:8px; }
+  .row2 { display:flex; gap:10px; margin-top:10px; } .row2 > * { flex:1; }
+  .warn { background:#fff3e0; border-left:4px solid #e08a00; border-radius:8px; padding:9px 11px; font-size:13px; margin-bottom:10px; }
+  .kv { font-size:12px; color:var(--sub); }
+  .sent { background:#e7f3ec; border:1px solid var(--ok); border-radius:10px; padding:9px 12px; font-size:13px; margin-bottom:10px; }
+  .demo { background:var(--amber); color:#fff; text-align:center; font-size:12px; font-weight:600; padding:5px; }
+</style>
+</head>
+<body>
+__DEMO__
+<header>
+  <div><div class="t" id="title">Food Show Orders</div><div class="s" id="hdrsub"></div></div>
+  <button class="chip" id="hdrbtn" style="display:none"></button>
+</header>
+<div class="wrap" id="app"></div>
+<footer id="foot">
+  <div class="tot"><b id="totcases">0</b> cases · <span id="totstores">0</span> stores</div>
+  <button class="primary" id="sendbtn">Review &amp; Submit</button>
+</footer>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script type="application/json" id="cfg">__CFG__</script>
+<script>
+var CFG = JSON.parse(document.getElementById('cfg').textContent);
+var SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwFt2hW6uRMtnIo3JDeoOkjscGIGNosE2g6i-TE1Tj2QyFZoNNtDXV3lc7r4aRRKNtT/exec';
+if (CFG.closed) {
+  document.body.innerHTML = '<div style="max-width:420px;margin:80px auto;background:#fff;border:1px solid #d9e1e8;border-radius:14px;padding:30px 22px;text-align:center"><div style="font-size:42px">&#9989;</div><h2 style="color:#1f5f8b">Ordering is closed</h2><p style="color:#5d6b78">' + (CFG.message || 'This food show window has closed.') + '</p></div>';
+  throw new Error('closed');
+}
+document.getElementById('title').textContent = CFG.show + ' · Produce';
+document.getElementById('hdrsub').textContent = 'Orders due ' + CFG.due + (CFG.orderedAsOf ? ' · synced ' + CFG.orderedAsOf : '');
+
+/* lines: [{id, v (vendor index), item, desc, pack, ship 'M/D/YY', net, each, contents}]
+   ITEMS groups lines by vendor + item so each item shows once with a row per ship date. */
+var VENDORS = CFG.vendors;                 // [{name, note}]
+var ITEMS = [];                            // [{v, item, desc, pack, net, each, contents, lines:[line]}]
+(function () {
+  var map = {};
+  CFG.lines.forEach(function (ln) {
+    var k = ln.v + '|' + ln.item;
+    if (!map[k]) { map[k] = {v: ln.v, item: ln.item, desc: ln.desc, pack: ln.pack, net: ln.net, each: ln.each,
+                             contents: ln.contents, lines: []}; ITEMS.push(map[k]); }
+    map[k].lines.push(ln);
+  });
+})();
+var NLINES = CFG.lines.length;
+var KEY = 'wf-' + CFG.week, SUP = null, QTY = {}, CUR = null, VEN = 0;
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify({sup: SUP, qty: QTY})); } catch (e) {} }
+function load() { try { var d = JSON.parse(localStorage.getItem(KEY)); if (d && d.sup && CFG.supervisors[d.sup]) return d; } catch (e) {} return null; }
+function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+function money(x) { return '$' + Number(x).toFixed(2); }
+function stores() { return CFG.supervisors[SUP] || []; }
+function seen(st) { return Object.keys(QTY[st] || {}).length; }
+function cases(st) { var t = 0, q = QTY[st] || {}; Object.keys(q).forEach(function (k) { t += q[k]; }); return t; }
+function vendorLines(v) { return CFG.lines.filter(function (l) { return l.v === v; }); }
+function shipLabel(s) { var p = s.split('/'); var m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[0]-1]; return m + ' ' + (+p[1]); }
+
+function header(btn, fn) {
+  var b = document.getElementById('hdrbtn');
+  if (!btn) { b.style.display = 'none'; return; }
+  b.style.display = 'inline-block'; b.textContent = btn; b.onclick = fn;
+}
+
+/* ---------- screen 1: who ---------- */
+function showWho() {
+  SUP = null; CUR = null; header(null);
+  document.getElementById('foot').style.display = 'none';
+  var h = (CFG.note ? '<div class="banner">' + CFG.note + '</div>' : '') + '<h2>Who\'s ordering?</h2><div class="namegrid">';
+  Object.keys(CFG.supervisors).forEach(function (n) { h += '<button class="namebtn" data-n="' + esc(n) + '">' + esc(n) + '</button>'; });
+  h += '</div><div class="note">Pick your name, then a store. Go vendor by vendor - each item shows a row for every ship week. ' +
+       'Blank means you have not looked at it; put 0 (or tap <b>Pass on all</b>) when you looked and are passing. ' +
+       'Your entries save on this phone as you go. Hit <b>Review &amp; Submit</b> when you are done - it goes straight to Matthew.</div>';
+  var app = document.getElementById('app'); app.innerHTML = h;
+  Array.prototype.forEach.call(app.querySelectorAll('.namebtn'), function (b) {
+    b.onclick = function () { SUP = b.getAttribute('data-n'); stores().forEach(function (s) { QTY[s.store] = QTY[s.store] || {}; }); save(); showStores(); };
+  });
+  window.scrollTo(0, 0);
+}
+
+/* ---------- screen 2: my stores ---------- */
+function showStores() {
+  CUR = null; header('Change name', showWho);
+  document.getElementById('foot').style.display = 'flex'; totals();
+  var h = '';
+  try { var sent = localStorage.getItem(KEY + '-sent-' + SUP); if (sent) h += '<div class="sent">&#10003; You submitted ' + esc(sent) + '. Change anything and submit again - the newest one counts.</div>'; } catch (e) {}
+  h += '<h2>' + esc(SUP) + ' - your stores</h2>';
+  stores().forEach(function (st, i) {
+    var n = seen(st.store), c = cases(st.store), baked = CFG.ordered && CFG.ordered[st.store];
+    var cls = n === 0 ? 'prog' : (n < NLINES ? 'prog part' : 'prog done');
+    var txt = n === 0 ? 'not started' : (n < NLINES ? n + ' of ' + NLINES + ' · ' + c + ' cs' : c + ' cs ✓');
+    h += '<div class="scard" data-i="' + i + '"><div><div class="nm">Store ' + st.store + '</div><div class="ct">' + esc(st.city) + ', ' + esc(st.state) +
+         (baked ? ' · <b style="color:#1a6b3c">on file: ' + baked.cases + ' cs</b>' : '') + '</div></div><span class="' + cls + '">' + txt + '</span></div>';
+  });
+  h += '<div class="note">Tap a store to enter its order.</div>';
+  var app = document.getElementById('app'); app.innerHTML = h;
+  Array.prototype.forEach.call(app.querySelectorAll('.scard'), function (el) {
+    el.onclick = function () { showStore(+el.getAttribute('data-i')); };
+  });
+  window.scrollTo(0, 0);
+}
+
+/* ---------- screen 3: one store, one vendor at a time ---------- */
+function showStore(i, keepVendor) {
+  CUR = i; if (!keepVendor) VEN = 0;
+  header('My stores', showStores);
+  var st = stores()[i], q = QTY[st.store] = QTY[st.store] || {};
+  // first time on a store that has an order on file: preload it
+  var baked = CFG.ordered && CFG.ordered[st.store];
+  if (baked && !Object.keys(q).length) { Object.keys(baked.q).forEach(function (k) { q[k] = baked.q[k]; }); save(); }
+  var h = '<div class="shead"><div><div class="nm">Store ' + st.store + '</div><div class="ct">' + esc(st.city) + ', ' + esc(st.state) + ' · AFI ' + st.afi + '</div></div>' +
+          '<div style="display:flex;gap:6px">' + (i > 0 ? '<button class="navbtn" id="prev">&#8249; ' + stores()[i-1].store + '</button>' : '') +
+          (i < stores().length - 1 ? '<button class="navbtn" id="next">' + stores()[i+1].store + ' &#8250;</button>' : '') + '</div></div>';
+  h += '<div class="vtabs" id="vtabs">';
+  VENDORS.forEach(function (v, vi) {
+    var vl = vendorLines(vi), s = 0, c = 0;
+    vl.forEach(function (l) { if (q[l.id] !== undefined) { s++; c += q[l.id]; } });
+    h += '<button class="vtab' + (vi === VEN ? ' on' : '') + (s === vl.length ? ' done' : '') + '" data-v="' + vi + '">' + esc(v.name) +
+         '<span class="c">' + (s === vl.length ? (c ? c + 'cs' : '✓') : s + '/' + vl.length) + '</span></button>';
+  });
+  h += '</div>';
+  var v = VENDORS[VEN];
+  if (v.note) h += '<div class="banner">' + v.note + '</div>';
+  h += '<div class="tools"><button class="tool" id="passv">Pass on all ' + esc(v.name) + '</button>' +
+       '<button class="tool" id="clearv">Clear ' + esc(v.name) + '</button>';
+  var others = stores().filter(function (s, j) { return j !== i && seen(s.store) > 0; });
+  if (others.length) {
+    h += '<select class="tool" id="copyfrom"><option value="">Copy ' + esc(v.name) + ' from…</option>';
+    others.forEach(function (s) { h += '<option value="' + s.store + '">Store ' + s.store + ' (' + esc(s.city) + ')</option>'; });
+    h += '</select>';
+  }
+  h += '</div>';
+  ITEMS.forEach(function (it, k) {
+    if (it.v !== VEN) return;
+    h += '<div class="item"><div class="top"><div class="n">' + esc(it.desc) + '</div><div class="d">' + esc(it.pack) +
+         ' · <b>' + money(it.net) + '</b>/case · ' + money(it.each) + ' each · item ' + it.item + '</div>' +
+         (it.contents ? '<div class="ct2">Display contains: ' + esc(it.contents) + '</div>' : '') + '</div>';
+    it.lines.forEach(function (ln) {
+      var val = q[ln.id];
+      h += '<div class="srow"><div class="w">Ships week of ' + shipLabel(ln.ship) + '<small>' + ln.ship + '</small></div>' +
+           '<div class="step"><button class="minus" data-id="' + ln.id + '">&minus;</button>' +
+           '<input type="number" inputmode="numeric" min="0" placeholder="–" data-id="' + ln.id + '" value="' + (val === undefined ? '' : val) + '" class="' +
+           (val === undefined ? 'blank' : (val ? 'set' : 'zero')) + '">' +
+           '<button class="plus" data-id="' + ln.id + '">+</button></div></div>';
+    });
+    h += '</div>';
+  });
+  h += '<div class="row2">' + (VEN > 0 ? '<button class="ghost" id="vprev">&#8249; ' + esc(VENDORS[VEN-1].name) + '</button>' : '') +
+       (VEN < VENDORS.length - 1 ? '<button class="primary" id="vnext">' + esc(VENDORS[VEN+1].name) + ' &#8250;</button>' :
+        (i < stores().length - 1 ? '<button class="primary" id="snext">Next store: ' + stores()[i+1].store + ' &#8250;</button>' : '<button class="primary" id="sdone">Done - my stores</button>')) + '</div>';
+  var app = document.getElementById('app'); app.innerHTML = h;
+  function set(id, v) {
+    var inp = app.querySelector('input[data-id="' + id + '"]');
+    if (v === undefined || v === '' || v === null || isNaN(v)) { delete q[id]; if (inp) { inp.value = ''; inp.className = 'blank'; } }
+    else { v = Math.max(0, Math.min(999, Math.round(v))); q[id] = v; if (inp) { inp.value = v; inp.className = v ? 'set' : 'zero'; } }
+  }
+  function changed() { save(); totals(); refreshTabs(); }
+  Array.prototype.forEach.call(app.querySelectorAll('.minus'), function (b) { b.onclick = function () { var id = b.getAttribute('data-id'); set(id, q[id] === undefined ? 0 : q[id] - 1); changed(); }; });
+  Array.prototype.forEach.call(app.querySelectorAll('.plus'), function (b) { b.onclick = function () { var id = b.getAttribute('data-id'); set(id, q[id] === undefined ? 1 : q[id] + 1); changed(); }; });
+  Array.prototype.forEach.call(app.querySelectorAll('input[data-id]'), function (inp) { inp.onchange = function () { set(inp.getAttribute('data-id'), inp.value === '' ? undefined : parseInt(inp.value, 10)); changed(); }; });
+  Array.prototype.forEach.call(app.querySelectorAll('.vtab'), function (b) { b.onclick = function () { VEN = +b.getAttribute('data-v'); showStore(i, true); window.scrollTo(0, 0); }; });
+  document.getElementById('passv').onclick = function () { vendorLines(VEN).forEach(function (l) { if (!q[l.id]) set(l.id, 0); }); changed(); };
+  document.getElementById('clearv').onclick = function () { vendorLines(VEN).forEach(function (l) { set(l.id); }); changed(); };
+  var cf = document.getElementById('copyfrom');
+  if (cf) cf.onchange = function () {
+    var src = QTY[cf.value] || {}; vendorLines(VEN).forEach(function (l) { set(l.id, src[l.id]); }); changed(); cf.value = '';
+  };
+  function go(fn) { var b = document.getElementById(fn[0]); if (b) b.onclick = fn[1]; }
+  go(['prev', function () { showStore(i - 1, true); window.scrollTo(0, 0); }]);
+  go(['next', function () { showStore(i + 1, true); window.scrollTo(0, 0); }]);
+  go(['vprev', function () { VEN--; showStore(i, true); window.scrollTo(0, 0); }]);
+  go(['vnext', function () { VEN++; showStore(i, true); window.scrollTo(0, 0); }]);
+  go(['snext', function () { VEN = 0; showStore(i + 1, true); window.scrollTo(0, 0); }]);
+  go(['sdone', showStores]);
+  document.getElementById('foot').style.display = 'flex'; totals();
+  function refreshTabs() {
+    Array.prototype.forEach.call(app.querySelectorAll('.vtab'), function (b) {
+      var vi = +b.getAttribute('data-v'), vl = vendorLines(vi), s = 0, c = 0;
+      vl.forEach(function (l) { if (q[l.id] !== undefined) { s++; c += q[l.id]; } });
+      b.className = 'vtab' + (vi === VEN ? ' on' : '') + (s === vl.length ? ' done' : '');
+      b.querySelector('.c').textContent = s === vl.length ? (c ? c + 'cs' : '✓') : s + '/' + vl.length;
+    });
+  }
+}
+
+function totals() {
+  var c = 0, s = 0, any = 0;
+  stores().forEach(function (st) { var t = cases(st.store); c += t; if (t) s++; if (seen(st.store)) any++; });
+  document.getElementById('totcases').textContent = c;
+  document.getElementById('totstores').textContent = s;
+  document.getElementById('sendbtn').disabled = any === 0;
+}
+
+/* ---------- order text + payload ---------- */
+var LINE = {}; CFG.lines.forEach(function (l) { LINE[l.id] = l; });
+function orderText() {
+  var out = ['FOOD SHOW ORDER - ' + CFG.show.toUpperCase() + ' - PRODUCE', 'Due: ' + CFG.due, 'Supervisor: ' + SUP, ''];
+  var total = 0;
+  stores().forEach(function (st) {
+    var q = QTY[st.store] || {}, ids = Object.keys(q);
+    if (!ids.length) return;
+    var c = cases(st.store); total += c;
+    var order = CFG.lines.filter(function (l) { return q[l.id] > 0; });
+    out.push('Store ' + st.store + ' (' + st.city + ') - ' + c + ' cases, ' + ids.length + ' of ' + NLINES + ' lines reviewed' + (order.length ? ':' : ' - NO ORDER'));
+    order.forEach(function (l) { out.push('  ' + q[l.id] + ' x ' + l.desc + ' [' + VENDORS[l.v].name + ', ship ' + l.ship + '] {' + l.id + '}'); });
+  });
+  out.push('', 'TOTAL CASES: ' + total);
+  return out.join('\n');
+}
+function payload() {
+  var st = [], cs = 0, n = 0;
+  stores().forEach(function (s) { var q = QTY[s.store] || {}; if (Object.keys(q).length) { n++; cs += cases(s.store); st.push({store: s.store, afi: s.afi, city: s.city, q: q}); } });
+  return {program: 'wf', holiday: CFG.show, week: CFG.week, due: CFG.due, supervisor: SUP, submittedAt: new Date().toISOString(),
+          totalCases: cs, storeCount: n, stores: st, text: orderText()};
+}
+function review() {
+  var un = stores().filter(function (s) { return seen(s.store) === 0; });
+  var part = stores().filter(function (s) { var n = seen(s.store); return n > 0 && n < NLINES; });
+  var h = '<h3>Submit your order</h3>';
+  if (un.length) h += '<div class="warn"><b>Not started:</b> ' + un.map(function (s) { return s.store; }).join(', ') + '. Blank means nobody looked - use <b>Pass on all</b> on each vendor if a store is ordering nothing.</div>';
+  if (part.length) h += '<div class="warn"><b>Partly done:</b> ' + part.map(function (s) { return s.store + ' (' + seen(s.store) + '/' + NLINES + ')'; }).join(', ') + '. You can submit now and finish later - the newest submission counts.</div>';
+  h += '<p style="font-size:14px">Check it over, then tap Submit. It goes straight to Matthew - no email needed.</p><textarea class="ta" readonly>' + esc(orderText()) + '</textarea>' +
+       '<div class="row2"><button class="primary" id="submitbtn">Submit order</button><button class="ghost" id="back">Back</button></div>';
+  document.getElementById('sheet').innerHTML = h;
+  document.getElementById('modal').className = 'modal on';
+  document.getElementById('back').onclick = closeModal;
+  document.getElementById('submitbtn').onclick = submitOrder;
+}
+function closeModal() { document.getElementById('modal').className = 'modal'; }
+function submitOrder() {
+  var b = document.getElementById('submitbtn'); b.disabled = true; b.textContent = 'Sending…';
+  var p = payload();
+  var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  var tm = ctl ? setTimeout(function () { ctl.abort(); }, 30000) : null;
+  fetch(SUBMIT_URL, {method: 'POST', mode: 'cors', redirect: 'follow', cache: 'no-store', headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                     body: JSON.stringify(p), signal: ctl ? ctl.signal : undefined})
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function (j) { if (tm) clearTimeout(tm); if (j && j.ok) receipt(j, p); else throw new Error((j && j.error) || 'server said no'); })
+    .catch(function (e) { if (tm) clearTimeout(tm); failed(e, p); });
+}
+function receipt(j, p) {
+  var when = new Date().toLocaleString();
+  try { localStorage.setItem(KEY + '-sent-' + SUP, when); } catch (e) {}
+  document.getElementById('sheet').innerHTML = '<h3>&#10003; Order received</h3><p><b>' + p.totalCases + ' cases</b> across <b>' + p.storeCount +
+    ' stores</b> went to Matthew at ' + esc(when) + '.</p><p>Come back any time before the deadline to change it and submit again - the newest one counts.</p>' +
+    (j.file ? '<p class="kv">Receipt: ' + esc(j.file) + '</p>' : '') + '<div class="row2"><button class="primary" id="ok">Done</button></div>';
+  document.getElementById('ok').onclick = function () { closeModal(); showStores(); };
+}
+function failed(err, p) {
+  document.getElementById('sheet').innerHTML = '<h3>Could not reach the order server</h3><div class="warn"><b>Your order is NOT sent yet</b> - but it is still saved on this phone. Try again in a minute. If it keeps failing, copy it and email it to ' + esc(CFG.email) + '.</div>' +
+    '<textarea class="ta" id="otext" readonly>' + esc(p.text) + '</textarea><div class="row2"><button class="primary" id="retry">Try again</button><button class="ghost" id="copy">Copy</button></div>' +
+    '<div class="row2"><button class="ghost" id="back2">Back</button></div><p class="kv">' + esc(String(err && err.message || err)) + '</p>';
+  document.getElementById('retry').onclick = function () { review(); submitOrder(); };
+  document.getElementById('back2').onclick = closeModal;
+  document.getElementById('copy').onclick = function () { var t = document.getElementById('otext'); t.select(); try { document.execCommand('copy'); this.textContent = 'Copied!'; } catch (e) {} };
+}
+document.getElementById('sendbtn').onclick = review;
+
+var SAVED = load();
+if (SAVED) { SUP = SAVED.sup; QTY = SAVED.qty || {}; stores().forEach(function (s) { QTY[s.store] = QTY[s.store] || {}; }); showStores(); }
+else showWho();
+</script>
+</body>
+</html>

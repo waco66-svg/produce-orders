@@ -3,7 +3,7 @@
 
 Runs on GitHub's servers (see .github/workflows/refresh.yml), triggered by
 Matthew's Apps Script when a new data file lands in "Order Page Data".
-For each program (dc, fpb, pom, vc, bep, ds, go, fl, ol, mum, fb, cf, pc, fa) it fetches the latest data JSON
+For each program (dc, fpb, pom, vc, bep, ds, go, fl, ol, mum, fb, cf, pc, fa, wf) it fetches the latest data JSON
 from the Apps Script endpoint and injects it into the matching template. If the
 fetch fails or there is no data yet, the existing page is left untouched.
 """
@@ -25,6 +25,7 @@ PAGES = [
     ("cf", "cf_template.html", "cf.html"),    # Cut Fruit & Mealtime weekly pricing approvals (added 10/6/26)
     ("pc", "pc_template.html", "pc.html"),    # Price Comp - supervisors submit competitor shelf prices (added 10/14/26)
     ("fa", "fa_template.html", "fa.html"),    # Free Avocado - special-cost coupon allocation for a few stores (added 11/2/26)
+    ("wf", "wf_template.html", "wf.html"),    # Food Show (Winterfest 2027) produce - vendor tabs, ship-week rows, POST submit (added 11/4/26)
 ]
 
 for param, tpl_name, out in PAGES:
