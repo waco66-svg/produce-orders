@@ -116,6 +116,16 @@ document.getElementById('hdrsub').textContent = 'Orders due ' + CFG.due + (CFG.o
 
 /* lines: [{id, v (vendor index), item, desc, pack, ship 'M/D/YY', net, each, contents}]
    ITEMS groups lines by vendor + item so each item shows once with a row per ship date. */
+/* Day of Show (Day Only, guide code ending S1) vendors lead the list - Matthew 11/4/26 */
+(function () {
+  function isDay(i) { return CFG.lines.some(function (l) { return l.v === i && /S1-/.test(l.id); }); }
+  var ord = CFG.vendors.map(function (v, i) { return i; })
+    .sort(function (a, b) { return ((isDay(a) ? 0 : 1) - (isDay(b) ? 0 : 1)) || (a - b); });
+  var nw = {}; ord.forEach(function (o, n) { nw[o] = n; });
+  CFG.vendors = ord.map(function (o) { return CFG.vendors[o]; });
+  CFG.lines.forEach(function (l, k) { l.v = nw[l.v]; l._k = k; });
+  CFG.lines.sort(function (a, b) { return (a.v - b.v) || (a._k - b._k); });
+})();
 var VENDORS = CFG.vendors;                 // [{name, note}]
 var ITEMS = [];                            // [{v, item, desc, pack, net, each, contents, lines:[line]}]
 (function () {
