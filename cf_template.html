@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="icons/cf-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/cf-180.png">
 <link rel="manifest" href="icons/cf.webmanifest">
@@ -100,6 +103,41 @@ table.ret tr.set td:first-child{box-shadow:inset 3px 0 0 var(--ok)}
 .sendbar input{font:500 14px var(--body);padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:10em}
 pre.out{white-space:pre-wrap;word-break:break-word;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;font:12.5px/1.5 var(--mono);margin:0}
 @media (prefers-reduced-motion:no-preference){.opt,.card{transition:border-color .15s,background .15s}}
+
+/* Phone layout (Matthew 11/25/26: the page was very hard to use on his phone). Desktop is unchanged. */
+@media (max-width:640px){
+  body{padding-inline:12px;padding-block:0 190px;font-size:16px}
+  .wrap{gap:18px}
+  input,select,textarea{font-size:16px !important}          /* stops iPhone zooming in on tap */
+  .opt{min-height:44px;justify-content:center}
+  .mini .opt{padding:10px 12px;font-size:15px}
+  .mini{gap:8px}
+  .mini input{width:6.5em;padding:10px 8px}
+  .write input,.sendbar input{padding:10px 10px}
+  .remember{font-size:15px}
+  .remember input{width:22px;height:22px}
+  .btn{padding:12px 16px;font-size:16px;min-height:44px}
+  .facts{grid-template-columns:1fr 1fr}
+  /* retail table -> one card per PLU */
+  .tw{overflow:visible;background:transparent;border:0}
+  table.ret,table.ret tbody,table.ret tr,table.ret td{display:block;width:100%}
+  table.ret thead{display:none}
+  table.ret tr.grp td{border-radius:6px;padding:8px 10px;margin-top:6px}
+  table.ret tr:not(.grp){display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;margin:8px 0}
+  table.ret td{border:0;padding:0}
+  table.ret td.c-plu{grid-column:1 / -1;font-size:13px;color:var(--muted)}
+  table.ret td.c-item{grid-column:1 / -1;font-weight:600;font-size:16px;margin-bottom:4px}
+  table.ret td.c-n{text-align:left}
+  table.ret td.c-n::before{content:attr(data-l);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  table.ret td.c-dec{grid-column:1 / -1;margin-top:8px}
+  table.ret tr.set{box-shadow:inset 4px 0 0 var(--ok)}
+  table.ret tr.set td:first-child{box-shadow:none}
+  .sendbar{padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+  .sendbar .in{gap:8px}
+  .sendbar .left{width:100%}
+  .sendbar input{flex:1;width:auto}
+  .sendbar .btn{flex:1}
+}
 </style>
 
 <div class="wrap">
@@ -253,9 +291,9 @@ function renderRetails(){
   RET.forEach(r => {
     const grp = (r.kind==='cutfruit'?'Cut fruit · band 45–60%':'Mealtime · band 40–50%') + ' · ' + (r.low?'below':'above');
     if (grp !== last){ html += `<tr class="grp"><td colspan="6">${grp}</td></tr>`; last = grp; }
-    html += `<tr class="${S.retails[r.plu]?'set':''}"><td class="num">${esc(r.plu)}</td><td>${esc(r.desc)}</td><td class="r num">${money(r.cost)}</td><td class="r num">${money(r.retail)}</td>
-      <td class="r"><span class="tag ${r.low?'bad':'warn'} num">${pct(r.margin)}</span></td>
-      <td id="rc-${esc(r.plu)}">${retailCell(r)}</td></tr>`;
+    html += `<tr class="${S.retails[r.plu]?'set':''}"><td class="num c-plu">${esc(r.plu)}</td><td class="c-item">${esc(r.desc)}</td><td class="r num c-n" data-l="Cost">${money(r.cost)}</td><td class="r num c-n" data-l="Retail">${money(r.retail)}</td>
+      <td class="r c-n" data-l="Margin"><span class="tag ${r.low?'bad':'warn'} num">${pct(r.margin)}</span></td>
+      <td class="c-dec" id="rc-${esc(r.plu)}">${retailCell(r)}</td></tr>`;
   });
   $('#retails').innerHTML = html;
 }
